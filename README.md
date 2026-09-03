@@ -13,7 +13,7 @@ Construcción incremental, módulo por módulo:
 
 - [x] Entidad `Celda` y su widget de visualización (`lib/modelo/celda.dart`,
       `lib/ui/widgets/celda_widget.dart`)
-- [ ] Reglas de color: [x] rojo, [x] amarillo, [ ] verde, [ ] azul, [ ] morado
+- [ ] Reglas de color: [x] rojo, [x] amarillo, [x] verde, [ ] azul, [ ] morado
 - [ ] Tablero completo (7×7, 9 zonas)
 - [ ] Motor de partida (dados, turnos, casillas iniciales)
 - [ ] Puntuación
@@ -71,3 +71,5 @@ de su zona, con borde grueso si es inicial y el valor centrado.
 - `regla_amarillo.dart`: `ReglaAmarillo` — sus 5 celdas están dispersas por el tablero
   pero se tratan como una única región lógica: no se puede repetir ningún valor entre
   ninguna de ellas (misma regla que rojo, reutilizando `puedeAgregarManteniendoDistintos`).
+- `regla_cualquiera.dart` / `regla_verde.dart`: `ReglaVerde` — sin restricción, cualquier
+  valor es válido en cualquier celda libre de la zona.
