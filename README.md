@@ -43,11 +43,17 @@ flutter run -d windows    # escritorio
 flutter test
 ```
 
+## Módulo: Posicion (`lib/modelo/posicion.dart`)
+
+Value object `{fila, columna}`: una posición fija en la grilla, reusable de forma
+independiente (por ejemplo para validar movimientos por posición sin necesitar la
+`Celda` completa).
+
 ## Módulo: Celda (`lib/modelo/celda.dart`)
 
 Entidad inmutable que representa una casilla del tablero:
 
-- `fila`, `columna`: posición fija en la grilla.
+- `posicion`: su `Posicion` fija en la grilla.
 - `color`: el `Color5` de su zona (determina qué regla aplica).
 - `valor`: el número 1-6 anotado, o `null` si sigue vacía.
 - `esInicial`: si es una de las 6 casillas fijas que se llenan en la preparación
