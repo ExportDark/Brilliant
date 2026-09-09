@@ -14,7 +14,8 @@ Construcción incremental, módulo por módulo:
 - [x] Entidad `Celda` y su widget de visualización (`lib/modelo/celda.dart`,
       `lib/ui/widgets/celda_widget.dart`)
 - [x] Reglas de color: rojo, amarillo, verde, azul, morado
-- [ ] Tablero completo (7×7, 9 zonas)
+- [x] `TipoRegion`, `Region`, `extraerValores`
+- [ ] `Tablero` completo (7×7, 9 regiones)
 - [ ] Motor de partida (dados, turnos, casillas iniciales)
 - [ ] Puntuación
 - [ ] UI jugable completa
@@ -83,3 +84,17 @@ de su zona, con borde grueso si es inicial y el valor centrado.
   deben terminar con el mismo valor.
 - `regla_maximo_valores_distintos.dart` / `regla_morado.dart`: `ReglaMorado` — como
   máximo 2 valores distintos en toda la zona (6 celdas).
+
+## Módulo: TipoRegion, Region, extraerValores (`lib/modelo/`)
+
+- `tipo_region.dart`: `TipoRegion{color, regla, cantidadCeldas}` — une cada color con
+  su regla ya instanciada. `cantidadCeldas` es propia de este mapa (amarillo 5, azul 4,
+  verde/morado/rojo 6), no una ley universal del color. 5 constantes ya armadas
+  (`tipoAmarillo`, `tipoVerde`, `tipoMorado`, `tipoAzul`, `tipoRojo`) que `Tablero`
+  reutilizará directo, sin ningún dispatcher/switch.
+- `region.dart`: `Region{identificador, tipo, casillas}` — una zona física concreta del
+  tablero. Valida al construirse que `casillas.length == tipo.cantidadCeldas` (falla
+  rápido si el layout se transcribe mal). `completada` es un getter calculado a partir
+  de `casillas`, nunca un campo guardado.
+- `extraer_valores.dart`: `extraerValores(Region) -> List<int>` — los valores ya
+  anotados en la región, para alimentar `region.tipo.regla.puedeAgregar(...)`.
