@@ -23,26 +23,20 @@ podrá recibir una posición sin más contexto.
 
 ---
 
-## Decisión 2: renglón/columna, no plano cartesiano
+## Decisión 2: coordenadas de renglón y columna
 
-**Por qué no era obvio:** ambas son "dos enteros"; la diferencia real es el nombre, el
-origen y la dirección de los ejes.
+`Posicion` guarda una **fila** y una **columna**, ambas base 0. Las razones:
 
-| Criterio | Renglón/columna (`fila`, `columna`) | Plano cartesiano (`x`, `y`) |
-|---|---|---|
-| Fuente de la verdad (el manual) | El tablero está documentado como tabla: fila 1..7 × columna A..G. Traducción directa | Habría que convertir en cada lectura |
-| Renderizado en Flutter | `GridView`/`Table`/`Column`+`Row` iteran filas arriba→abajo, columnas izq→der. Calza 1:1 | Hay que invertir el eje Y para dibujar |
-| Indexado de matriz | Convención universal `matriz[fila][columna]`; aplanar es `fila * 7 + columna` | Requiere recordar si es `[x][y]` o `[y][x]` |
-| Ambigüedad de ejes | Ninguna | El eje Y crece hacia arriba en matemáticas y hacia abajo en pantalla — fuente clásica de bugs |
-| Geometría (rotar, reflejar, vectores) | Se puede igual, con offsets `fila±1`, `columna±1` | Su única ventaja real |
+| Criterio | Por qué encaja |
+|---|---|
+| Fuente de la verdad (el manual) | El tablero está documentado como tabla: fila 1..7 × columna A..G. La traducción es directa, sin conversiones |
+| Renderizado en Flutter | `GridView`, `Table` y `Column`+`Row` iteran filas de arriba a abajo y columnas de izquierda a derecha. Calza 1:1 con cómo se dibuja |
+| Indexado de matriz | Sigue la convención universal `matriz[fila][columna]`; aplanar la grilla es `fila * 7 + columna` |
+| Claridad | "Fila" y "columna" nombran exactamente lo que son en un tablero, sin que haya que recordar cuál eje es cuál ni en qué dirección crece |
 
-**Decisión:** renglón/columna. La ventaja del cartesiano solo se paga con
-transformaciones geométricas (rotar mapas, generar variantes reflejadas, distancias
-vectoriales), y en Brilliant las regiones son fijas y transcritas del manual. Lo único
-"dinámico" es que otro mapa tendrá otro layout, no que el mismo layout se transforme. No
-había nada que ganar y sí un riesgo concreto que asumir.
-
-Tampoco encierra: cambiarlo después sería un rename, no una reescritura.
+Para las transformaciones geométricas que pudieran hacer falta más adelante (moverse a
+una casilla vecina, por ejemplo) basta con desplazamientos sobre esos mismos campos:
+`fila ± 1`, `columna ± 1`.
 
 ---
 

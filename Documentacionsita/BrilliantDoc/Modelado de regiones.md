@@ -88,10 +88,10 @@ derivada, que es idiomático en Dart.
 reglas de color (funciones puras independientes y testeables en aislado). Fue elección
 explícita del usuario sobre la alternativa del getter.
 
-**El problema que resuelve:** en `Brilliant Beta`, la extracción devolvía solo
-`List<int>` — la lista plana de valores, descartando de qué casilla venía cada uno. Eso
+**El problema que evita:** si la extracción fuera lo único que representa el contenido de
+una región, la lista plana de valores descartaría de qué casilla vino cada uno. Eso
 alcanza para las reglas, pero no para saber qué casilla concreta rompe una regla ni para
-distinguir entre las dos regiones físicas de un mismo color. Ahora la `Region` guarda sus
-`Celda` completas (cada una con su posición y valor) y tiene identificador propio, así
-que nada de eso se pierde: `extraerValores` es solo la vista aplanada que las reglas
-necesitan.
+distinguir entre las dos regiones físicas de un mismo color. Por eso la `Region` guarda
+sus `Celda` completas (cada una con su posición y valor) y tiene identificador propio:
+`extraerValores` es solo la vista aplanada que las reglas necesitan, no la fuente de la
+verdad.

@@ -59,9 +59,9 @@ region.tipo.regla.puedeAgregar(extraerValores(region), valor)
 
 El porqué de esto está en [[Modelado de regiones]].
 
-## Origen del diseño
+## Por qué este patrón
 
-Este patrón (función pura + wrapper por color) venía de un intento previo del proyecto,
-`Brilliant Beta`. Al comparar regla por regla contra el PDF del manual, coincidía
-exactamente, así que se reescribió igual en el proyecto nuevo en vez de inventar otra
-lógica. Ver [[Decisiones de extracción del manual]].
+Separar la función pura de la clase por color permite que dos colores con la misma
+restricción (rojo y amarillo, ambos "todos diferentes") compartan una única
+implementación probada, y que cada función se pueda testear sola, sin construir una
+región ni un tablero. Ver [[Decisiones de extracción del manual]].

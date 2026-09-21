@@ -64,25 +64,7 @@ Esto es lo que baja el conteo de **13 zonas a 9 regiones**.
 
 ---
 
-## 4. ¿Reusar el código de `Brilliant Beta` o escribir nuevo?
-
-**Por qué no era obvio:** ya existía un intento previo (`Brilliant Beta`) con las 5
-reglas de color implementadas y testeadas, pero se pidió explícitamente empezar de cero
-en la carpeta `Brilliant`, sin copiar ese código.
-
-| Alternativa | Ventaja | Desventaja |
-|---|---|---|
-| Copiar los archivos de Beta | Ahorra tiempo, ya estaba probado | Contradice la instrucción de "crear de 0" |
-| Reescribir el mismo diseño como código nuevo | Respeta la instrucción y aprovecha un patrón ya validado | Hay que reescribir en vez de copiar |
-| Diseñar una lógica completamente distinta | Máxima "limpieza" conceptual | Sin beneficio real: el diseño anterior ya coincidía con el PDF |
-
-**Decisión:** reescribir el mismo diseño (funciones puras + wrapper por color) como
-código nuevo. Antes de decidirlo se comparó regla por regla el comportamiento de Beta
-contra el PDF y coincidían exactamente, así que reinventar la lógica no aportaba nada.
-
----
-
-## 5. Cómo verificar que toda la extracción era correcta
+## 4. Cómo verificar que toda la extracción era correcta
 
 **Por qué no era obvio:** no había forma de leer la imagen del PDF con certeza
 pixel-perfecta; un error de transcripción (un color mal leído, una celda desplazada) se

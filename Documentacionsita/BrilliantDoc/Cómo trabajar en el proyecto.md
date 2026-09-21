@@ -9,7 +9,6 @@ Ver también: [[Estado del proyecto]] · [[Arquitectura general]]
 | Proyecto Flutter | `Escritorio/Algara The Final Chapter/Brilliant/` |
 | Este vault | `Brilliant/Documentacionsita/BrilliantDoc/` |
 | Repo remoto | https://github.com/ExportDark/Brilliant |
-| Intento previo (referencia) | `Escritorio/Algara The Final Chapter/Brilliant Beta/` |
 | Manual del juego | `Brilliant_Imitacion_Manual_y_Partidas.pdf` |
 
 ## El SDK de Flutter no está en el PATH
