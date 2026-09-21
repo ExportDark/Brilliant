@@ -15,7 +15,7 @@ Construcción incremental, módulo por módulo:
       `lib/ui/widgets/celda_widget.dart`)
 - [x] Reglas de color: rojo, amarillo, verde, azul, morado
 - [x] `TipoRegion`, `Region`, `extraerValores`
-- [ ] `Tablero` completo (7×7, 9 regiones)
+- [x] `Tablero` completo (7×7, 9 regiones)
 - [ ] Motor de partida (dados, turnos, casillas iniciales)
 - [ ] Puntuación
 - [ ] UI jugable completa
@@ -49,6 +49,11 @@ flutter test
 Value object `{fila, columna}`: una posición fija en la grilla, reusable de forma
 independiente (por ejemplo para validar movimientos por posición sin necesitar la
 `Celda` completa).
+
+Convierte con la notación del manual, donde la letra es la columna y el número es la
+fila: `Posicion.desdeNotacion("C1")` y `posicion.notacion` → `"C1"`. Así el layout del
+tablero se escribe igual que en el documento y los mensajes de error dicen `"C6"` en
+vez de `"fila 5, columna 2"`.
 
 ## Módulo: Celda (`lib/modelo/celda.dart`)
 
@@ -98,3 +103,20 @@ de su zona, con borde grueso si es inicial y el valor centrado.
   de `casillas`, nunca un campo guardado.
 - `extraer_valores.dart`: `extraerValores(Region) -> List<int>` — los valores ya
   anotados en la región, para alimentar `region.tipo.regla.puedeAgregar(...)`.
+
+## Módulo: Tablero (`lib/modelo/tablero.dart`)
+
+`Tablero.mapaOriginal()` arma el mapa 7×7 del manual: 9 regiones (1 amarilla de 5
+casillas dispersas + 2 de cada otro color) y las 6 casillas iniciales marcadas.
+
+Cada región se declara con la **lista de sus casillas en notación** (`['C1', 'C2',
+'D2', 'D3']`), no como una grilla de colores: así el layout se lee igual que el manual
+y no hay que deducir por adyacencia a cuál de las dos regiones de un color pertenece
+cada casilla.
+
+Como el layout se transcribe a mano, el tablero se valida solo al construirse: ninguna
+casilla declarada dos veces, ninguna casilla de la grilla sin cubrir, ninguna casilla
+fuera de la grilla, y (vía `Region`) cada región con la cantidad de casillas de su
+tipo. Cualquier error de transcripción revienta al instante diciendo qué casilla.
+
+Consultas: `regiones`, `celdas`, `celdaEn(posicion)` y `regionEn(posicion)`.
