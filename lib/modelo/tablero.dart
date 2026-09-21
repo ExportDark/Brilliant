@@ -48,6 +48,34 @@ class Tablero {
     return region.casillas.firstWhere((celda) => celda.posicion == posicion);
   }
 
+  /// Devuelve un tablero nuevo con [valor] anotado en [posicion].
+  /// Si la posición no existe en el tablero, devuelve el mismo tablero.
+  Tablero conValor(Posicion posicion, int valor) {
+    return _reemplazandoRegionEn(
+      posicion,
+      (region) => region.conCasilla(posicion, valor),
+    );
+  }
+
+  /// Devuelve un tablero nuevo con la casilla de [posicion] vaciada.
+  Tablero sinValor(Posicion posicion) {
+    return _reemplazandoRegionEn(
+      posicion,
+      (region) => region.sinCasilla(posicion),
+    );
+  }
+
+  Tablero _reemplazandoRegionEn(Posicion posicion, Region Function(Region) actualizar) {
+    final region = _regionPorPosicion[posicion];
+    if (region == null) return this;
+
+    final nuevasRegiones = [
+      for (final actual in regiones)
+        actual.identificador == region.identificador ? actualizar(actual) : actual,
+    ];
+    return Tablero._(nuevasRegiones, _indexarPorPosicion(nuevasRegiones));
+  }
+
   static Region _construirRegion(
     int identificador,
     TipoRegion tipo,

@@ -14,8 +14,13 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **`TipoRegion`, `Region`, `extraerValores`** ([[Modelado de regiones]])
 - [x] **`Tablero`** — las 9 regiones del mapa, con autovalidación del layout
       ([[Tablero y regiones]])
+- [x] **Actualización inmutable del modelo** — `Tablero.conValor` / `sinValor`,
+      `Region.conCasilla` / `sinCasilla`, `Celda.sinValor`
+- [x] **`PartidaBloc`** — la fase de preparación y su gate
+      ([[Fase de preparación y su bloc]])
 
-**El módulo `modelo/` está completo.** 69 tests, todos pasando.
+**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. 90 tests, todos
+pasando.
 
 ## Qué falta
 
@@ -23,8 +28,9 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
       con los ojos que la transcripción del layout coincide con la imagen del PDF: las
       validaciones confirman que la grilla está *completa*, pero no que cada color esté
       en la casilla correcta
-- [ ] **`juego/`** — dados (2d6), fases de partida, turnos, validación de movimientos
-- [ ] **Fase de preparación** — asignar la permutación 1-6 a las 6 casillas iniciales
+- [ ] **UI de la fase de preparación** — repartir los 1-6 en las 6 casillas iniciales
+- [ ] **Resto de `juego/`** — dados (2d6), turnos, validación de movimientos contra las
+      reglas de color, detección de fin de partida
 - [ ] **`puntuacion/`** — el cálculo de puntaje ([[Puntuación]])
 - [ ] **UI jugable completa** — poder jugar una partida de principio a fin
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual

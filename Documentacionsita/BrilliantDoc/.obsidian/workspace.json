@@ -11,10 +11,14 @@
             "id": "ba48859e5f800b2b",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "Decisiones de extracción del manual.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Decisiones de extracción del manual"
             }
           }
         ]
@@ -183,15 +187,21 @@
   },
   "active": "ba48859e5f800b2b",
   "lastOpenFiles": [
+    "Brilliant.md",
+    "Arquitectura general.md",
+    "Tablero y regiones.md",
+    "Fase de preparación y su bloc.md",
+    "Sistema de coordenadas.md",
+    "Reglas del juego.md",
+    "Reglas de color en código.md",
+    "Puntuación.md",
+    "Modelo de dominio.md",
+    "Modelado de regiones.md",
+    "Estado del proyecto.md",
+    "Decisiones de extracción del manual.md",
     "Cómo trabajar en el proyecto.md",
     "create a link.md",
-    "Estado del proyecto.md",
-    "Modelado de regiones.md",
-    "Sistema de coordenadas.md",
-    "Decisiones de extracción del manual.md",
-    "Reglas de color en código.md",
     "Reglas de color en código.md.tmp.27272.d154dce299d0",
-    "Modelo de dominio.md",
     "Modelo de dominio.md.tmp.27272.9cbbe5dcc38b",
     "Welcome.md"
   ]

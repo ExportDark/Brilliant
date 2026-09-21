@@ -36,9 +36,11 @@ nuevo?", sin importar si es rojo, verde o el color que sea.
 pieza que "sabe todo" al construirse, y por eso puede armar las 9 regiones sin que nadie
 tenga que buscar nada en tiempo de ejecución.
 
-`Partida` (todavía no construida) es la capa de más arriba: sabe en qué fase está el
-juego, qué salió en los dados, y decide si un movimiento del jugador es legal —
-delegando esa pregunta hacia abajo, a la región correspondiente.
+`PartidaBloc` es la capa de más arriba: sabe en qué fase está el juego, y decide si lo
+que intenta el jugador es legal — delegando esa pregunta hacia abajo, a la región
+correspondiente. Ya está construida su primera fase, la de preparación con su gate; ver
+[[Fase de preparación y su bloc]]. Falta lo demás: dados, turnos y validación de
+movimientos contra las reglas de color.
 
 ## El principio que atraviesa todo
 
@@ -65,7 +67,8 @@ se resuelva agregando código en su capa, sin tocar lo que ya funciona y ya est�
 lib/
   modelo/     Posicion, Celda, Color5, TipoRegion, Region, extraerValores, Tablero
   reglas/     ReglaColor + funciones puras + una clase por color
-  juego/      dado, fase de partida, turnos, validación de movimientos  (pendiente)
+  juego/      FasePartida, PartidaEvent, PartidaState, PartidaBloc
+              (faltan: dados, turnos, validación de movimientos)
   puntuacion/ cálculo de puntaje                                        (pendiente)
   ui/         widgets y pantallas
 test/         misma estructura que lib/, un test por archivo de lógica

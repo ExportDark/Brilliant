@@ -27,6 +27,10 @@ class Celda {
     );
   }
 
+  Celda sinValor() {
+    return Celda(posicion: posicion, color: color, esInicial: esInicial);
+  }
+
   @override
   bool operator ==(Object other) {
     return other is Celda &&

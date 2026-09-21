@@ -16,7 +16,8 @@ Construcción incremental, módulo por módulo:
 - [x] Reglas de color: rojo, amarillo, verde, azul, morado
 - [x] `TipoRegion`, `Region`, `extraerValores`
 - [x] `Tablero` completo (7×7, 9 regiones)
-- [ ] Motor de partida (dados, turnos, casillas iniciales)
+- [x] `PartidaBloc` — fase de preparación con su gate
+- [ ] Motor de partida (dados, turnos, validación de movimientos)
 - [ ] Puntuación
 - [ ] UI jugable completa
 
@@ -24,8 +25,9 @@ Construcción incremental, módulo por módulo:
 
 ```
 lib/
-  modelo/   entidades de dominio (Celda, Color5, ...)
+  modelo/   entidades de dominio (Posicion, Celda, Region, Tablero, ...)
   reglas/   reglas de colocación por color
+  juego/    estado de la partida: fases, eventos y BLoC
   ui/       widgets y pantallas
   main.dart
 test/       tests, misma estructura que lib/
@@ -120,3 +122,24 @@ fuera de la grilla, y (vía `Region`) cada región con la cantidad de casillas d
 tipo. Cualquier error de transcripción revienta al instante diciendo qué casilla.
 
 Consultas: `regiones`, `celdas`, `celdaEn(posicion)` y `regionEn(posicion)`.
+
+## Módulo: PartidaBloc (`lib/juego/`)
+
+Estado de la partida con el patrón BLoC (paquete `bloc`; `flutter_bloc` se agregará
+cuando llegue la UI).
+
+- `fase_partida.dart`: `FasePartida { preparando, jugando, terminada }`.
+- `partida_event.dart`: `sealed class PartidaEvent` — `PartidaIniciada`,
+  `ValorInicialAsignado`, `ValorInicialQuitado`, `PreparacionConfirmada`.
+- `partida_state.dart`: `PartidaState{tablero, fase}`. Todo lo demás se deriva del
+  tablero (`casillasIniciales`, `valoresDisponibles`, `preparacionCompleta`), sin estado
+  duplicado que pueda desincronizarse.
+- `partida_bloc.dart`: `PartidaBloc`.
+
+**El gate de la preparación:** la partida arranca en fase `preparando`, donde el jugador
+reparte los números 1-6 entre las 6 casillas iniciales (C1, F2, B4, E4, C6, E7) sin
+repetir. `PreparacionConfirmada` **no hace nada** mientras falte alguna casilla — solo
+con las 6 puestas la fase pasa a `jugando`.
+
+Los eventos inválidos (casilla que no es inicial, valor ya usado, valor fuera de 1-6) se
+ignoran sin emitir estado.
