@@ -18,7 +18,7 @@ Repositorio: https://github.com/ExportDark/Brilliant
 - [[Arquitectura general]] — las 4 capas y qué pregunta responde cada una
 - [[Modelo de dominio]] — `Posicion`, `Celda`, `TipoRegion`, `Region`, `Tablero`
 - [[Reglas de color en código]] — el contrato `ReglaColor` y las funciones puras
-- [[Fase de preparación y su bloc]] — `PartidaBloc` y el gate de los valores iniciales
+- [[Preparación de la partida]] — repartir los valores iniciales antes de jugar
 
 ## Decisiones de diseño
 

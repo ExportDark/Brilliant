@@ -14,12 +14,13 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **`TipoRegion`, `Region`, `extraerValores`** ([[Modelado de regiones]])
 - [x] **`Tablero`** — las 9 regiones del mapa, con autovalidación del layout
       ([[Tablero y regiones]])
-- [x] **Actualización inmutable del modelo** — `Tablero.conValor` / `sinValor`,
-      `Region.conCasilla` / `sinCasilla`, `Celda.sinValor`
-- [x] **`PartidaBloc`** — la fase de preparación y su gate
-      ([[Fase de preparación y su bloc]])
+- [x] **Anotar valores en el tablero** — `Tablero.conValor` / `sinValor`,
+      `Region.conCasilla` / `sinCasilla`, `Celda.sinValor`, todos devolviendo copias
+      nuevas sin mutar nada
+- [x] **`PreparacionBloc`** — el reparto de los valores iniciales, que no deja empezar
+      la partida hasta tener las 6 casillas llenas ([[Preparación de la partida]])
 
-**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. 90 tests, todos
+**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. 91 tests, todos
 pasando.
 
 ## Qué falta
@@ -35,22 +36,11 @@ pasando.
 - [ ] **UI jugable completa** — poder jugar una partida de principio a fin
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual
 
-## Historial de commits
-
-| Commit | Fecha | Qué agregó |
-|---|---|---|
-| `918664f` | 2026-09-21 | `Tablero` con las 9 regiones y notación en `Posicion` |
-| `9d2b697` | 2026-09-09 | `TipoRegion`, `Region` y `extraerValores` |
-| `befd8da` | 2026-09-09 | `Posicion` como value object; `Celda` la usa |
-| `c36f24c` | 2026-09-03 | Regla morado (máximo 2 valores distintos) |
-| `12b0b29` | 2026-09-03 | Regla azul (todos iguales) |
-| `55a14d3` | 2026-09-03 | Regla verde (cualquiera) |
-| `a97670e` | 2026-09-03 | Regla amarillo (región única dispersa) |
-| `e4cc27a` | 2026-09-03 | Regla rojo (todos diferentes) |
-| `0fe18ee` | 2026-09-03 | `Celda`, su widget y el scaffold del proyecto |
-
 ## Cómo se viene trabajando
 
 Construcción **incremental, módulo por módulo**: cada pieza se agrega con sus tests y su
 commit propio, con la documentación actualizada en el mismo commit. Nada de commits
 gigantes que mezclen varias cosas.
+
+Para ver qué se hizo y cuándo, el historial está en el repositorio: `git log --oneline`,
+o en https://github.com/ExportDark/Brilliant/commits.

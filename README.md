@@ -16,7 +16,7 @@ Construcción incremental, módulo por módulo:
 - [x] Reglas de color: rojo, amarillo, verde, azul, morado
 - [x] `TipoRegion`, `Region`, `extraerValores`
 - [x] `Tablero` completo (7×7, 9 regiones)
-- [x] `PartidaBloc` — fase de preparación con su gate
+- [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
 - [ ] Motor de partida (dados, turnos, validación de movimientos)
 - [ ] Puntuación
 - [ ] UI jugable completa
@@ -27,7 +27,7 @@ Construcción incremental, módulo por módulo:
 lib/
   modelo/   entidades de dominio (Posicion, Celda, Region, Tablero, ...)
   reglas/   reglas de colocación por color
-  juego/    estado de la partida: fases, eventos y BLoC
+  juego/    estado de la partida con BLoC (preparación, y más adelante los turnos)
   ui/       widgets y pantallas
   main.dart
 test/       tests, misma estructura que lib/
@@ -123,23 +123,33 @@ tipo. Cualquier error de transcripción revienta al instante diciendo qué casil
 
 Consultas: `regiones`, `celdas`, `celdaEn(posicion)` y `regionEn(posicion)`.
 
-## Módulo: PartidaBloc (`lib/juego/`)
+## Módulo: preparación de la partida (`lib/juego/`)
 
-Estado de la partida con el patrón BLoC (paquete `bloc`; `flutter_bloc` se agregará
-cuando llegue la UI).
+Antes de tirar el primer dado, el jugador reparte los números del **1 al 6** entre las
+**6 casillas iniciales** del tablero (C1, F2, B4, E4, C6, E7), sin repetir ninguno. Es
+una decisión estratégica: cuatro de esas casillas caen dentro de regiones con regla y
+condicionan lo que se podrá anotar ahí durante la partida.
 
-- `fase_partida.dart`: `FasePartida { preparando, jugando, terminada }`.
-- `partida_event.dart`: `sealed class PartidaEvent` — `PartidaIniciada`,
-  `ValorInicialAsignado`, `ValorInicialQuitado`, `PreparacionConfirmada`.
-- `partida_state.dart`: `PartidaState{tablero, fase}`. Todo lo demás se deriva del
-  tablero (`casillasIniciales`, `valoresDisponibles`, `preparacionCompleta`), sin estado
-  duplicado que pueda desincronizarse.
-- `partida_bloc.dart`: `PartidaBloc`.
+**La partida no puede empezar hasta que las 6 casillas tengan número.**
 
-**El gate de la preparación:** la partida arranca en fase `preparando`, donde el jugador
-reparte los números 1-6 entre las 6 casillas iniciales (C1, F2, B4, E4, C6, E7) sin
-repetir. `PreparacionConfirmada` **no hace nada** mientras falte alguna casilla — solo
-con las 6 puestas la fase pasa a `jugando`.
+Ese reparto lo administra `PreparacionBloc`, un bloc local: se crea en la pantalla de
+preparación, recibe en el constructor las casillas que hay que llenar y no conoce el
+tablero. Al terminar entrega las asignaciones en `PreparacionState.valores`.
 
-Los eventos inválidos (casilla que no es inicial, valor ya usado, valor fuera de 1-6) se
-ignoran sin emitir estado.
+- `preparacion_event.dart`: `ValorAsignado`, `ValorQuitado`, `PreparacionConfirmada`,
+  `PreparacionReiniciada`.
+- `preparacion_state.dart`: `PreparacionState{casillas, valores, confirmada}`, con
+  `disponibles`, `completa` y `valorDe(casilla)` derivados de lo repartido.
+- `preparacion_bloc.dart`: `PreparacionBloc`.
+
+Reglas que hace cumplir:
+
+1. Solo se aceptan las casillas que el bloc recibió, y solo números del 1 al 6.
+2. Un número ya usado en otra casilla se rechaza — así los 6 quedan distintos entre sí.
+   Cambiar el número de una casilla ya asignada sí se permite.
+3. `PreparacionConfirmada` no hace nada mientras falte alguna casilla. Solo con las 6
+   puestas marca `confirmada`.
+4. Una vez confirmada, el reparto queda fijo.
+
+Los eventos inválidos se ignoran sin emitir estado, de modo que en los tests el rechazo
+se observa como una ausencia de emisión.

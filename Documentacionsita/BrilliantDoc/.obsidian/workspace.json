@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Estado del proyecto.md",
+                "file": "Modelo de dominio.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Estado del proyecto"
+              "title": "Modelo de dominio"
             }
           }
         ]
@@ -187,19 +187,19 @@
   },
   "active": "ba48859e5f800b2b",
   "lastOpenFiles": [
-    "Cómo trabajar en el proyecto.md.tmp.27272.e5767aa98a7f",
     "Sistema de coordenadas.md",
+    "Tablero y regiones.md",
+    "Estado del proyecto.md",
+    "Cómo trabajar en el proyecto.md.tmp.27272.e5767aa98a7f",
     "Reglas del juego.md",
     "Reglas de color en código.md",
     "Puntuación.md",
     "Modelo de dominio.md",
     "Modelado de regiones.md",
     "Fase de preparación y su bloc.md",
-    "Estado del proyecto.md",
     "Decisiones de extracción del manual.md",
     "Brilliant.md",
     "Arquitectura general.md",
-    "Tablero y regiones.md",
     "Cómo trabajar en el proyecto.md",
     "create a link.md",
     "Reglas de color en código.md.tmp.27272.d154dce299d0",

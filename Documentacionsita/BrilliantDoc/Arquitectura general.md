@@ -30,17 +30,17 @@ región concreta sabe a cuál tipo pertenece. Así, validar un movimiento es sie
 misma pregunta hecha de la misma forma: "¿esta región, con su regla, acepta este valor
 nuevo?", sin importar si es rojo, verde o el color que sea.
 
-### 4. ¿Cómo se arma todo y quién manda? — `Tablero` / `Partida`
+### 4. ¿Cómo se arma todo y quién manda? — `Tablero` y los blocs
 
 `Tablero` es el que conoce el layout fijo (qué región cae en qué posición) — es la única
 pieza que "sabe todo" al construirse, y por eso puede armar las 9 regiones sin que nadie
 tenga que buscar nada en tiempo de ejecución.
 
-`PartidaBloc` es la capa de más arriba: sabe en qué fase está el juego, y decide si lo
-que intenta el jugador es legal — delegando esa pregunta hacia abajo, a la región
-correspondiente. Ya está construida su primera fase, la de preparación con su gate; ver
-[[Fase de preparación y su bloc]]. Falta lo demás: dados, turnos y validación de
-movimientos contra las reglas de color.
+Encima van los **blocs**, uno por cada momento del juego: reciben lo que el jugador
+intenta hacer, deciden si es válido y publican el estado resultante para que la pantalla
+lo dibuje. El primero es `PreparacionBloc`, que administra el reparto de los valores
+iniciales — ver [[Preparación de la partida]]. Faltan los dados, los turnos y la
+validación de las jugadas contra las reglas de color.
 
 ## El principio que atraviesa todo
 
@@ -67,7 +67,7 @@ se resuelva agregando código en su capa, sin tocar lo que ya funciona y ya est�
 lib/
   modelo/     Posicion, Celda, Color5, TipoRegion, Region, extraerValores, Tablero
   reglas/     ReglaColor + funciones puras + una clase por color
-  juego/      FasePartida, PartidaEvent, PartidaState, PartidaBloc
+  juego/      PreparacionBloc con su estado y sus eventos
               (faltan: dados, turnos, validación de movimientos)
   puntuacion/ cálculo de puntaje                                        (pendiente)
   ui/         widgets y pantallas
