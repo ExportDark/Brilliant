@@ -95,3 +95,8 @@ de dedo es plausible):
 Cualquiera de estos falla al instante diciendo **qué casilla** en notación del manual.
 
 Consultas: `regiones`, `celdas`, `celdaEn(posicion)`, `regionEn(posicion)`.
+
+Para anotar: `conValor(posicion, valor)`, `conValores({posicion: valor, ...})` y
+`sinValor(posicion)`. Devuelven un tablero **nuevo** sin mutar el original. `conValores`
+es el puente entre lo que el jugador reparte en la preparación y el tablero que se dibuja
+en pantalla.

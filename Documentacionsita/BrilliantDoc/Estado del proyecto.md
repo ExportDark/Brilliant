@@ -14,20 +14,21 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **`TipoRegion`, `Region`, `extraerValores`** ([[Modelado de regiones]])
 - [x] **`Tablero`** — las 9 regiones del mapa, con autovalidación del layout
       ([[Tablero y regiones]])
-- [x] **Anotar valores en el tablero** — `Tablero.conValor` / `sinValor`,
+- [x] **Anotar valores en el tablero** — `Tablero.conValor` / `conValores` / `sinValor`,
       `Region.conCasilla` / `sinCasilla`, `Celda.sinValor`, todos devolviendo copias
       nuevas sin mutar nada
+- [x] **`TableroWidget`** — la grilla 7×7 con el color de cada región, el número anotado
+      en cada casilla y la notación A–G / 1–7 en los bordes
 - [x] **`PreparacionBloc`** — el reparto de los valores iniciales, que no deja empezar
       la partida hasta tener las 6 casillas llenas ([[Preparación de la partida]])
 
-**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. 91 tests, todos
+**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. 98 tests, todos
 pasando.
 
 ## Qué falta
 
-- [ ] **`TableroWidget`** — dibujar la grilla 7×7 real. Es la única forma de verificar
-      con los ojos que la transcripción del layout coincide con la imagen del PDF: las
-      validaciones confirman que la grilla está *completa*, pero no que cada color esté
+- [ ] **Verificar a ojo el layout** — comparar el `TableroWidget` con la imagen del PDF:
+      las validaciones confirman que la grilla está *completa*, pero no que cada color esté
       en la casilla correcta
 - [ ] **UI de la fase de preparación** — repartir los 1-6 en las 6 casillas iniciales
 - [ ] **Resto de `juego/`** — dados (2d6), turnos, validación de movimientos contra las

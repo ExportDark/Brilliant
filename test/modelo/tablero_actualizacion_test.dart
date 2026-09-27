@@ -57,6 +57,30 @@ void main() {
     });
   });
 
+  group('Tablero.conValores', () {
+    test('anota cada valor en su casilla', () {
+      final valores = {
+        Posicion.desdeNotacion('C1'): 4,
+        Posicion.desdeNotacion('E7'): 2,
+      };
+
+      final actualizado = Tablero.mapaOriginal().conValores(valores);
+
+      expect(actualizado.celdaEn(Posicion.desdeNotacion('C1'))!.valor, 4);
+      expect(actualizado.celdaEn(Posicion.desdeNotacion('E7'))!.valor, 2);
+      expect(
+        actualizado.celdas.where((celda) => !celda.estaVacia),
+        hasLength(2),
+      );
+    });
+
+    test('sin valores devuelve el mismo tablero', () {
+      final tablero = Tablero.mapaOriginal();
+
+      expect(tablero.conValores({}), same(tablero));
+    });
+  });
+
   group('Tablero.sinValor', () {
     test('vacía la casilla indicada', () {
       final posicion = Posicion.desdeNotacion('F2');

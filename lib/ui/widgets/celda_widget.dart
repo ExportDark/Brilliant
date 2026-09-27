@@ -13,11 +13,20 @@ const _colorPorColor5 = {
 
 /// Representa visualmente una [Celda]: fondo del color de su zona, borde
 /// grueso si es una casilla inicial, y el valor anotado (si tiene).
+///
+/// Con [seleccionada], el borde se resalta en ámbar para marcar la casilla
+/// donde va a caer el próximo número.
 class CeldaWidget extends StatelessWidget {
   final Celda celda;
   final double tamano;
+  final bool seleccionada;
 
-  const CeldaWidget({super.key, required this.celda, this.tamano = 48});
+  const CeldaWidget({
+    super.key,
+    required this.celda,
+    this.tamano = 48,
+    this.seleccionada = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +37,8 @@ class CeldaWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: _colorPorColor5[celda.color],
         border: Border.all(
-          color: Colors.black,
-          width: celda.esInicial ? 3 : 1,
+          color: seleccionada ? Colors.amber : Colors.black,
+          width: seleccionada ? 4 : (celda.esInicial ? 3 : 1),
         ),
       ),
       child: Text(

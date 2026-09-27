@@ -57,6 +57,15 @@ class Tablero {
     );
   }
 
+  /// Devuelve un tablero nuevo con cada valor de [valores] anotado en su
+  /// posición. Las posiciones que no existen en el tablero se ignoran.
+  Tablero conValores(Map<Posicion, int> valores) {
+    return valores.entries.fold(
+      this,
+      (tablero, asignacion) => tablero.conValor(asignacion.key, asignacion.value),
+    );
+  }
+
   /// Devuelve un tablero nuevo con la casilla de [posicion] vaciada.
   Tablero sinValor(Posicion posicion) {
     return _reemplazandoRegionEn(

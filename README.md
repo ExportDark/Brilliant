@@ -16,6 +16,7 @@ Construcción incremental, módulo por módulo:
 - [x] Reglas de color: rojo, amarillo, verde, azul, morado
 - [x] `TipoRegion`, `Region`, `extraerValores`
 - [x] `Tablero` completo (7×7, 9 regiones)
+- [x] `TableroWidget`: la grilla 7×7 con los números anotados
 - [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
 - [ ] Motor de partida (dados, turnos, validación de movimientos)
 - [ ] Puntuación
@@ -70,7 +71,8 @@ Entidad inmutable que representa una casilla del tablero:
 `conValor(nuevoValor)` devuelve una copia con el valor anotado, sin mutar la original.
 
 `CeldaWidget` (`lib/ui/widgets/celda_widget.dart`) la renderiza como un cuadro del color
-de su zona, con borde grueso si es inicial y el valor centrado.
+de su zona, con borde grueso si es inicial y el valor centrado. Con `seleccionada`, el
+borde se resalta en ámbar.
 
 ## Módulo: regla de color rojo (`lib/reglas/`)
 
@@ -122,6 +124,21 @@ fuera de la grilla, y (vía `Region`) cada región con la cantidad de casillas d
 tipo. Cualquier error de transcripción revienta al instante diciendo qué casilla.
 
 Consultas: `regiones`, `celdas`, `celdaEn(posicion)` y `regionEn(posicion)`.
+
+Para anotar: `conValor(posicion, valor)`, `conValores({posicion: valor, ...})` y
+`sinValor(posicion)`, todos devolviendo un tablero nuevo sin mutar el original.
+
+## Módulo: TableroWidget (`lib/ui/widgets/tablero_widget.dart`)
+
+Dibuja la grilla completa de un `Tablero`: las 49 celdas con el color de su región y el
+número que tengan anotado, más las letras de columna (A–G) y los números de fila (1–7)
+para leer cada casilla con la notación del manual.
+
+Como se dibuja siempre a partir de un `Tablero`, para mostrar lo que el jugador va
+poniendo basta con pasarle `tablero.conValores(...)`: cada número aparece en su celda.
+
+Opcionalmente recibe `seleccionada` (la casilla resaltada), `alTocar` y `esTocable`
+(qué casillas responden al toque).
 
 ## Módulo: preparación de la partida (`lib/juego/`)
 
