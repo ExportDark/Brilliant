@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-09-21 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-09-27 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 
@@ -21,16 +21,18 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
       en cada casilla y la notación A–G / 1–7 en los bordes
 - [x] **`PreparacionBloc`** — el reparto de los valores iniciales, que no deja empezar
       la partida hasta tener las 6 casillas llenas ([[Preparación de la partida]])
+- [x] **Pantalla de preparación** — el jugador reparte los 1-6 tocando las casillas del
+      tablero y ve cada número en su posición. El botón **Inicio** solo se habilita con
+      las 6 llenas y lleva a una pantalla de partida provisional con los valores fijos
 
-**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. 98 tests, todos
-pasando.
+**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. La app ya arranca en la
+pantalla de preparación. 106 tests, todos pasando.
 
 ## Qué falta
 
 - [ ] **Verificar a ojo el layout** — comparar el `TableroWidget` con la imagen del PDF:
       las validaciones confirman que la grilla está *completa*, pero no que cada color esté
       en la casilla correcta
-- [ ] **UI de la fase de preparación** — repartir los 1-6 en las 6 casillas iniciales
 - [ ] **Resto de `juego/`** — dados (2d6), turnos, validación de movimientos contra las
       reglas de color, detección de fin de partida
 - [ ] **`puntuacion/`** — el cálculo de puntaje ([[Puntuación]])

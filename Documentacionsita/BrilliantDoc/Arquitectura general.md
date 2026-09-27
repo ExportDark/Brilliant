@@ -42,6 +42,11 @@ lo dibuje. El primero es `PreparacionBloc`, que administra el reparto de los val
 iniciales — ver [[Preparación de la partida]]. Faltan los dados, los turnos y la
 validación de las jugadas contra las reglas de color.
 
+Las pantallas (`ui/pantallas/`) se conectan a los blocs con `flutter_bloc`: cada una crea
+su bloc con `BlocProvider`, lo dibuja con `BlocBuilder`/`BlocConsumer` y solo le manda
+eventos. No decide nada por su cuenta. Para dibujar el tablero usan `TableroWidget`
+(`ui/widgets/`), que recibe un `Tablero` ya con sus valores.
+
 ## El principio que atraviesa todo
 
 Cada capa solo sabe resolver una pregunta (posición, valor, regla, layout, turno) y
@@ -70,6 +75,8 @@ lib/
   juego/      PreparacionBloc con su estado y sus eventos
               (faltan: dados, turnos, validación de movimientos)
   puntuacion/ cálculo de puntaje                                        (pendiente)
-  ui/         widgets y pantallas
+  ui/
+    widgets/    CeldaWidget, TableroWidget
+    pantallas/  PantallaPreparacion (con flutter_bloc), PantallaPartida (provisional)
 test/         misma estructura que lib/, un test por archivo de lógica
 ```

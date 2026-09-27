@@ -75,6 +75,34 @@ necesariamente que los valores son una permutación completa del 1 al 6 — la r
 "todos distintos" se cumple por construcción, sin necesidad de una comprobación aparte al
 final.
 
+## La pantalla
+
+`PantallaPreparacion` (`lib/ui/pantallas/pantalla_preparacion.dart`) es con la que arranca
+la app. Crea el bloc con `BlocProvider` (de `flutter_bloc`) y dibuja su estado:
+
+- **El tablero completo**, con lo repartido hasta ahora anotado en cada casilla
+  (`tablero.conValores(state.valores)`). Así el jugador ve en qué posición queda cada
+  número. Solo las 6 casillas iniciales responden al toque, y la seleccionada se resalta
+  en ámbar.
+- **Un resumen** con una chip por casilla: `C1 = 4`, `F2 = —`… Tocar una chip también
+  selecciona su casilla.
+- **Los números del 1 al 6.** Los ya usados en otra casilla salen deshabilitados, así que
+  el jugador nunca llega a intentar un repetido.
+- **Quitar**, que vacía la casilla seleccionada, y **Reiniciar**.
+- **Inicio**, habilitado solo cuando `state.completa`. Al oprimirlo manda
+  `PreparacionConfirmada`, y cuando el estado pasa a `confirmada` la app navega a
+  `PantallaPartida` con el tablero y los 6 valores ya fijos.
+
+Para asignar, se toca una casilla y luego un número. Después la selección salta sola a la
+siguiente casilla vacía, con lo que repartir los 6 son 6 toques de número si se sigue el
+orden.
+
+Qué casilla está seleccionada lo guarda la pantalla, no el bloc. Es estado de la interfaz:
+al reparto no le importa qué casilla se está mirando.
+
+`PantallaPartida` es provisional: solo muestra el tablero inicial hasta que existan los
+dados y los turnos.
+
 ## Decisión: el gate vive en el bloc, no en la pantalla
 
 La forma natural de mostrar esta regla en pantalla es un botón de "empezar" deshabilitado

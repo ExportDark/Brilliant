@@ -18,6 +18,7 @@ Construcción incremental, módulo por módulo:
 - [x] `Tablero` completo (7×7, 9 regiones)
 - [x] `TableroWidget`: la grilla 7×7 con los números anotados
 - [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
+- [x] Pantalla de preparación: repartir los 6 números en el tablero y botón **Inicio**
 - [ ] Motor de partida (dados, turnos, validación de movimientos)
 - [ ] Puntuación
 - [ ] UI jugable completa
@@ -29,7 +30,9 @@ lib/
   modelo/   entidades de dominio (Posicion, Celda, Region, Tablero, ...)
   reglas/   reglas de colocación por color
   juego/    estado de la partida con BLoC (preparación, y más adelante los turnos)
-  ui/       widgets y pantallas
+  ui/
+    widgets/    CeldaWidget, TableroWidget
+    pantallas/  PantallaPreparacion, PantallaPartida (provisional)
   main.dart
 test/       tests, misma estructura que lib/
 ```
@@ -170,3 +173,27 @@ Reglas que hace cumplir:
 
 Los eventos inválidos se ignoran sin emitir estado, de modo que en los tests el rechazo
 se observa como una ausencia de emisión.
+
+## Módulo: pantalla de preparación (`lib/ui/pantallas/`)
+
+Es la pantalla con la que arranca la app. El jugador reparte los números del 1 al 6 entre
+las 6 casillas iniciales, viendo en el tablero qué número va quedando en cada posición.
+
+- `pantalla_preparacion.dart`: `PantallaPreparacion` crea el `PreparacionBloc` (vía
+  `flutter_bloc`) con las casillas iniciales del mapa y dibuja su estado:
+  - el `TableroWidget` con lo repartido hasta ahora (`tablero.conValores(state.valores)`),
+    con la casilla seleccionada resaltada en ámbar;
+  - un resumen `C1 = 4 · F2 = — · ...` con una chip por casilla inicial;
+  - los botones del 1 al 6, donde los números ya usados salen deshabilitados;
+  - **Quitar** y **Reiniciar**;
+  - el botón **Inicio**, habilitado solo cuando `state.completa`.
+- `pantalla_partida.dart`: `PantallaPartida`, provisional. Al oprimir Inicio el bloc
+  confirma el reparto y la app pasa aquí con el tablero y los 6 valores ya fijos.
+
+Para asignar un número se toca una casilla inicial (en el tablero o en el resumen) y
+después el número. La selección salta sola a la siguiente casilla vacía. Qué casilla está
+seleccionada es estado de la pantalla, no del bloc: al reparto no le importa qué se está
+mirando.
+
+El botón Inicio deshabilitado es solo la cara visible de la regla. Aunque se oprimiera, el
+bloc no confirma un reparto incompleto.
