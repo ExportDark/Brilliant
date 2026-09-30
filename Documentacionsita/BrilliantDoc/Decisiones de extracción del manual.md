@@ -84,3 +84,11 @@ zona las rompía — esto último fue lo que confirmó que tratar el amarillo co
 > [!tip] Esa verificación ahora vive en el código
 > `Tablero` re-verifica el layout cada vez que se construye: sin casillas duplicadas,
 > sin huecos y sin nada fuera de la grilla. Ver [[Modelo de dominio]].
+
+> [!success] Verificado contra el PDF (2026-09-30)
+> Resultó que el PDF no es una imagen sino dibujo vectorial: cada casilla es un rectángulo
+> con su color de relleno exacto. Se leyeron esos colores de los 5 tableros del PDF
+> (páginas 1, 4, 5, 6 y 8) y se compararon con `Tablero.mapaOriginal()`. Coinciden las
+> 49 casillas en los 5 tableros, y el recuadro grueso cae justo en las 6 casillas
+> iniciales. También se revisaron los píxeles de la pantalla de preparación: el
+> `TableroWidget` dibuja el mismo mapa.
