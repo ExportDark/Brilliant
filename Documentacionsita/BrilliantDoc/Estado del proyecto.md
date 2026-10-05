@@ -31,9 +31,9 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **`PartidaBloc` y validación de jugadas** — dados (2d6), dado anclado, turnos,
       validación contra las reglas de color, pasar turno y fin de partida
       ([[Turnos y jugadas]])
-- [x] **Pantalla de partida** — tirar los dados, anclar uno, iluminar dónde cabe y
-      oscurecer dónde no, con la regla explicada al tocar una casilla oscurecida; pasar
-      turno y fin de partida
+- [x] **Pantalla de partida** — tirar los dados, anclar uno, iluminar dónde cabe (y
+      apenas dónde la regla lo impide, explicándola al tocar); pasar turno y fin de
+      partida. La cuadrícula siempre es negra: lo que se ilumina es la casilla
 
 **Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
 casilla acepta nada. Lo único que falta para cerrarla es el puntaje. 147 tests, todos

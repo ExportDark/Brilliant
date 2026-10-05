@@ -11,12 +11,17 @@ const _colorPorColor5 = {
   Color5.rojo: Colors.red,
 };
 
-/// Cómo se resalta una celda mientras se busca dónde anotar el dado anclado.
+/// Cuánto se acerca al blanco el color de la zona al iluminar una casilla:
+/// mucho para las que se pueden usar, poco para las que la regla bloquea.
+const _aclaradoFuerte = 0.55;
+const _aclaradoSuave = 0.25;
+
+/// Cómo se resalta una celda mientras se busca dónde anotar el dado.
 enum Iluminacion {
   /// Sin resaltar.
   normal,
 
-  /// El número anclado se puede anotar aquí.
+  /// El número se puede anotar aquí.
   posible,
 
   /// La casilla está libre, pero la regla de su zona no acepta el número.
@@ -26,9 +31,10 @@ enum Iluminacion {
 /// Representa visualmente una [Celda]: fondo del color de su zona, borde
 /// grueso si es una casilla inicial, y el valor anotado (si tiene).
 ///
-/// Con [seleccionada], el borde se resalta en ámbar para marcar la casilla
-/// donde va a caer el próximo número. Con [iluminacion], la celda se marca
-/// con borde blanco si el dado anclado cabe ahí, o se oscurece si no cabe.
+/// La cuadrícula siempre es negra: para resaltar una casilla se ilumina su
+/// relleno, que se aclara hacia el blanco. [seleccionada] (la casilla donde
+/// va a caer el próximo número) y [Iluminacion.posible] se aclaran mucho;
+/// [Iluminacion.bloqueada], solo un poco.
 class CeldaWidget extends StatelessWidget {
   final Celda celda;
   final double tamano;
@@ -43,32 +49,31 @@ class CeldaWidget extends StatelessWidget {
     this.iluminacion = Iluminacion.normal,
   });
 
+  double get _aclarado {
+    if (seleccionada || iluminacion == Iluminacion.posible) return _aclaradoFuerte;
+    if (iluminacion == Iluminacion.bloqueada) return _aclaradoSuave;
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final posible = iluminacion == Iluminacion.posible;
+    final aclarado = _aclarado;
 
     return Container(
       width: tamano,
       height: tamano,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: _colorPorColor5[celda.color],
-        border: Border.all(
-          color: seleccionada
-              ? Colors.amber
-              : (posible ? Colors.white : Colors.black),
-          width: seleccionada || posible ? 4 : (celda.esInicial ? 3 : 1),
-        ),
+        color: Color.lerp(_colorPorColor5[celda.color], Colors.white, aclarado),
+        border: Border.all(width: celda.esInicial ? 3 : 1),
       ),
-      foregroundDecoration: iluminacion == Iluminacion.bloqueada
-          ? const BoxDecoration(color: Colors.black54)
-          : null,
       child: Text(
         celda.valor?.toString() ?? '',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          // Sobre un fondo muy aclarado, el blanco ya no se lee.
+          color: aclarado >= _aclaradoFuerte ? Colors.black87 : Colors.white,
         ),
       ),
     );

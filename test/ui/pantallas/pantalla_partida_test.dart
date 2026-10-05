@@ -102,7 +102,7 @@ void main() {
       expect(celdas.map((celda) => celda.iluminacion).toSet(), {Iluminacion.normal});
     });
 
-    testWidgets('al anclar un dado se ilumina dónde cabe y se oscurece dónde no', (tester) async {
+    testWidgets('al anclar un dado se ilumina dónde cabe y se bloquea dónde no', (tester) async {
       await _abrir(tester);
 
       await _tirarYAnclar(tester, 0);
@@ -125,7 +125,7 @@ void main() {
       expect(_celdaEn(tester, 'C2').iluminacion, Iluminacion.bloqueada);
     });
 
-    testWidgets('tocar una casilla oscurecida explica la regla y no anota', (tester) async {
+    testWidgets('tocar una casilla bloqueada explica la regla y no anota', (tester) async {
       await _abrir(tester);
       await _tirarYAnclar(tester, 0);
 

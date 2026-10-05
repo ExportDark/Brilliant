@@ -14,9 +14,10 @@ import '../widgets/tablero_widget.dart';
 /// La pantalla donde se juega la partida, turno por turno.
 ///
 /// Se tiran los dos dados, se ancla uno tocándolo, y el tablero ilumina las
-/// casillas donde ese número cabe y oscurece las que su zona no lo acepta.
-/// Tocar una iluminada anota el número; tocar una oscurecida explica, debajo
-/// del tablero, qué regla lo impide. Si ningún dado cabe, se pasa el turno.
+/// casillas donde ese número cabe, y apenas las que su zona no lo acepta.
+/// Tocar una iluminada anota el número; tocar una apenas iluminada explica,
+/// debajo del tablero, qué regla lo impide. Si ningún dado cabe, se pasa el
+/// turno.
 class PantallaPartida extends StatelessWidget {
   final Tablero tablero;
 
@@ -42,7 +43,7 @@ class _VistaPartida extends StatefulWidget {
 }
 
 class _VistaPartidaState extends State<_VistaPartida> {
-  /// Por qué no se puede anotar en la última casilla oscurecida que se tocó.
+  /// Por qué no se puede anotar en la última casilla bloqueada que se tocó.
   /// Es estado de la pantalla: al bloc no le importa qué casilla se mira.
   String? _explicacion;
 

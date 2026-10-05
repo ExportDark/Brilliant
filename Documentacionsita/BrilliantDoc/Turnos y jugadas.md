@@ -75,11 +75,12 @@ Lo demás se calcula a partir de esos campos: `valorElegido`, `evaluar(posicion)
 
 - **El turno** y una indicación de qué hacer: tirar, elegir un dado, tocar una casilla
   iluminada, pasar el turno o, al final, cuántas casillas se llenaron.
-- **El tablero.** Con un dado anclado, cada casilla vacía se marca según
-  `state.evaluar(posicion)`: borde blanco (`Iluminacion.posible`) si el número cabe, u
-  oscurecida (`Iluminacion.bloqueada`) si la regla de su zona no lo permite. Las ocupadas
-  se quedan como están.
-- **La explicación.** Al tocar una casilla oscurecida aparece debajo del tablero qué regla
+- **El tablero.** Con un dado anclado, cada casilla vacía se ilumina según
+  `state.evaluar(posicion)`: mucho (`Iluminacion.posible`) si el número cabe, o apenas
+  (`Iluminacion.bloqueada`) si la regla de su zona no lo permite. Las ocupadas se quedan
+  como están. La cuadrícula siempre es negra: lo que cambia es el relleno de la casilla,
+  que se aclara hacia el blanco.
+- **La explicación.** Al tocar una casilla apenas iluminada aparece debajo del tablero qué regla
   lo impide y qué tiene ya la zona. Al tocar una iluminada se anota el número.
 - **Los dos dados.** Se tocan para anclarlos; el anclado lleva borde ámbar y un ancla
   debajo.

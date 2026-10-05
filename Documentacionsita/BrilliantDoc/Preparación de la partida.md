@@ -83,8 +83,8 @@ la app. Crea el bloc con `BlocProvider` (de `flutter_bloc`) y dibuja su estado:
 
 - **El tablero completo**, con lo repartido hasta ahora anotado en cada casilla
   (`tablero.conValores(state.valores)`). Así el jugador ve en qué posición queda cada
-  número. Solo las 6 casillas iniciales responden al toque, y la seleccionada se resalta
-  en ámbar.
+  número. Solo las 6 casillas iniciales responden al toque, y la seleccionada se ilumina
+  (su color se aclara; la cuadrícula sigue negra).
 - **Un resumen** con una chip por casilla: `C1 = 4`, `F2 = —`… Tocar una chip también
   selecciona su casilla.
 - **Los números del 1 al 6.** Los ya usados en otra casilla salen deshabilitados, así que

@@ -74,10 +74,10 @@ Entidad inmutable que representa una casilla del tablero:
 `conValor(nuevoValor)` devuelve una copia con el valor anotado, sin mutar la original.
 
 `CeldaWidget` (`lib/ui/widgets/celda_widget.dart`) la renderiza como un cuadro del color
-de su zona, con borde grueso si es inicial y el valor centrado. Con `seleccionada`, el
-borde se resalta en ámbar. Con `iluminacion` se marca con borde blanco
-(`Iluminacion.posible`) o se oscurece (`Iluminacion.bloqueada`), según si el dado
-anclado cabe ahí.
+de su zona, con borde grueso si es inicial y el valor centrado. La cuadrícula siempre es
+negra: para resaltar una casilla se **ilumina su relleno**, que se aclara hacia el
+blanco. Con `seleccionada` o `Iluminacion.posible` se aclara mucho; con
+`Iluminacion.bloqueada`, solo un poco.
 
 ## Módulo: regla de color rojo (`lib/reglas/`)
 
@@ -214,7 +214,7 @@ las 6 casillas iniciales, viendo en el tablero qué número va quedando en cada 
 - `pantalla_preparacion.dart`: `PantallaPreparacion` crea el `PreparacionBloc` (vía
   `flutter_bloc`) con las casillas iniciales del mapa y dibuja su estado:
   - el `TableroWidget` con lo repartido hasta ahora (`tablero.conValores(state.valores)`),
-    con la casilla seleccionada resaltada en ámbar;
+    con la casilla seleccionada iluminada;
   - un resumen `C1 = 4 · F2 = — · ...` con una chip por casilla inicial;
   - los botones del 1 al 6, donde los números ya usados salen deshabilitados;
   - **Quitar**, **Reiniciar** y **Aleatorio** (completa al azar lo que falta);
@@ -238,10 +238,10 @@ cada turno:
 1. **Tirar dados** saca los dos dados.
 2. Se toca un dado para **anclarlo** (borde ámbar y un ancla debajo). Mientras no se
    coloque, se puede anclar el otro.
-3. El tablero **ilumina** con borde blanco las casillas donde ese número cabe y
-   **oscurece** las casillas libres cuya zona no lo acepta.
-4. Tocar una casilla iluminada anota el número y pasa al siguiente turno. Tocar una
-   oscurecida muestra debajo del tablero qué regla lo impide, por ejemplo
+3. El tablero **ilumina** las casillas donde ese número cabe (mucho más claras) y apenas
+   aclara las casillas libres cuya zona no lo acepta. La cuadrícula sigue negra.
+4. Tocar una casilla iluminada anota el número y pasa al siguiente turno. Tocar una de
+   las apenas aclaradas muestra debajo del tablero qué regla lo impide, por ejemplo
    *"C2 · Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*.
 5. Si ningún dado cabe, aparece **Pasar turno**. Cuando ya ninguna casilla acepta nada, la
    pantalla anuncia el fin de la partida y cuántas casillas se llenaron.
