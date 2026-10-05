@@ -68,10 +68,35 @@ class PartidaState {
 Lo demás se calcula a partir de esos campos: `valorElegido`, `evaluar(posicion)`,
 `sinJugada` (se tiró y ningún dado cabe), `terminada` y `casillasLlenas`.
 
+## La pantalla
+
+`PantallaPartida` (`lib/ui/pantallas/pantalla_partida.dart`) crea el `PartidaBloc` con
+`BlocProvider` y dibuja su estado, de arriba abajo:
+
+- **El turno** y una indicación de qué hacer: tirar, elegir un dado, tocar una casilla
+  iluminada, pasar el turno o, al final, cuántas casillas se llenaron.
+- **El tablero.** Con un dado anclado, cada casilla vacía se marca según
+  `state.evaluar(posicion)`: borde blanco (`Iluminacion.posible`) si el número cabe, u
+  oscurecida (`Iluminacion.bloqueada`) si la regla de su zona no lo permite. Las ocupadas
+  se quedan como están.
+- **La explicación.** Al tocar una casilla oscurecida aparece debajo del tablero qué regla
+  lo impide y qué tiene ya la zona. Al tocar una iluminada se anota el número.
+- **Los dos dados.** Se tocan para anclarlos; el anclado lleva borde ámbar y un ancla
+  debajo.
+- **Tirar dados**, o **Pasar turno** cuando ningún dado cabe.
+
+La explicación que se está mostrando es estado de la pantalla, no del bloc, igual que la
+casilla seleccionada en la preparación. Se borra al tirar, al cambiar de dado y al
+colocar.
+
+`CeldaWidget` recibe la `Iluminacion` y `TableroWidget` la reparte con `iluminacionDe`, así
+que el tablero no sabe nada de dados ni de reglas: solo dibuja lo que le dicen.
+
 ## Decisión: los dados se inyectan
 
-El constructor recibe `tirarDado`, una función que devuelve una cara del 1 al 6. En la
-app es un `Random`; en los tests es una secuencia fija, para saber exactamente qué sale y
+El constructor recibe `tirarDado`, una función que devuelve una cara del 1 al 6.
+`PantallaPartida` también la recibe y se la pasa al bloc. En la app es un `Random`; en
+los tests es una secuencia fija, para saber exactamente qué sale y
 probar casos como "ningún dado cabe" sin depender de la suerte.
 
 ## Decisión: "pasar" es un evento explícito

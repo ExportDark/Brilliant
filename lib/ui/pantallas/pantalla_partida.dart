@@ -1,32 +1,267 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../juego/partida_bloc.dart';
+import '../../juego/partida_event.dart';
+import '../../juego/partida_state.dart';
+import '../../juego/validacion_jugada.dart';
+import '../../modelo/color5.dart';
+import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
+import '../widgets/celda_widget.dart';
 import '../widgets/tablero_widget.dart';
 
-/// Pantalla provisional de la partida: muestra el tablero con los valores
-/// iniciales ya fijos. Los dados y los turnos llegan en el siguiente módulo.
+/// La pantalla donde se juega la partida, turno por turno.
+///
+/// Se tiran los dos dados, se ancla uno tocándolo, y el tablero ilumina las
+/// casillas donde ese número cabe y oscurece las que su zona no lo acepta.
+/// Tocar una iluminada anota el número; tocar una oscurecida explica, debajo
+/// del tablero, qué regla lo impide. Si ningún dado cabe, se pasa el turno.
 class PantallaPartida extends StatelessWidget {
   final Tablero tablero;
 
-  const PantallaPartida({super.key, required this.tablero});
+  /// Decide qué sale en cada dado. Sin él salen al azar; los tests lo fijan.
+  final int Function()? tirarDado;
+
+  const PantallaPartida({super.key, required this.tablero, this.tirarDado});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Brilliant — partida')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TableroWidget(tablero: tablero),
-              const SizedBox(height: 16),
-              const Text(
-                'Partida lista. Los dados y los turnos vienen en el siguiente módulo.',
+    return BlocProvider(
+      create: (_) => PartidaBloc(tablero, tirarDado: tirarDado),
+      child: const _VistaPartida(),
+    );
+  }
+}
+
+class _VistaPartida extends StatefulWidget {
+  const _VistaPartida();
+
+  @override
+  State<_VistaPartida> createState() => _VistaPartidaState();
+}
+
+class _VistaPartidaState extends State<_VistaPartida> {
+  /// Por qué no se puede anotar en la última casilla oscurecida que se tocó.
+  /// Es estado de la pantalla: al bloc no le importa qué casilla se mira.
+  String? _explicacion;
+
+  PartidaBloc get _bloc => context.read<PartidaBloc>();
+
+  /// Manda [event] y borra la explicación, que ya no aplica a lo que sigue.
+  void _enviar(PartidaEvent event) {
+    setState(() => _explicacion = null);
+    _bloc.add(event);
+  }
+
+  void _tocarCasilla(PartidaState state, Posicion posicion) {
+    switch (state.evaluar(posicion)) {
+      case JugadaValida():
+        _enviar(ValorColocado(posicion));
+      case final ReglaRota rota:
+        setState(() => _explicacion = _explicar(posicion, rota));
+      case CasillaOcupada():
+      case null:
+        break;
+    }
+  }
+
+  String _explicar(Posicion posicion, ReglaRota rota) {
+    final tipo = rota.region.tipo;
+    return '${posicion.notacion} · Zona ${_nombreZona(tipo.color)} — '
+        '${tipo.regla.descripcion}. Ya tiene: ${rota.valoresEnZona.join(', ')}';
+  }
+
+  Iluminacion _iluminacion(PartidaState state, Posicion posicion) {
+    return switch (state.evaluar(posicion)) {
+      JugadaValida() => Iluminacion.posible,
+      ReglaRota() => Iluminacion.bloqueada,
+      CasillaOcupada() || null => Iluminacion.normal,
+    };
+  }
+
+  String _indicacion(PartidaState state) {
+    if (state.terminada) {
+      return 'Fin de la partida: llenaste ${state.casillasLlenas} de '
+          '${Tablero.filas * Tablero.columnas} casillas.';
+    }
+    if (state.dados == null) return 'Tira los dados.';
+    if (state.sinJugada) return 'Ningún dado tiene lugar en el tablero: pasa el turno.';
+
+    final valor = state.valorElegido;
+    if (valor == null) return 'Elige uno de los dos dados.';
+    return 'Toca una casilla iluminada para poner el $valor.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PartidaBloc, PartidaState>(
+      builder: (context, state) {
+        final dados = state.dados;
+        final explicacion = _explicacion;
+        final textos = Theme.of(context).textTheme;
+
+        return Scaffold(
+          appBar: AppBar(title: const Text('Brilliant — partida')),
+          body: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Turno ${state.turno}', style: textos.titleLarge),
+                  const SizedBox(height: 4),
+                  Text(_indicacion(state), style: textos.titleMedium),
+                  const SizedBox(height: 16),
+                  TableroWidget(
+                    tablero: state.tablero,
+                    iluminacionDe: (posicion) => _iluminacion(state, posicion),
+                    esTocable: (posicion) =>
+                        state.valorElegido != null &&
+                        state.tablero.celdaEn(posicion)!.estaVacia,
+                    alTocar: (posicion) => _tocarCasilla(state, posicion),
+                  ),
+                  if (explicacion != null) ...[
+                    const SizedBox(height: 16),
+                    _Explicacion(explicacion),
+                  ],
+                  if (dados != null) ...[
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 16,
+                      children: [
+                        for (final (indice, valor) in dados.indexed)
+                          _Dado(
+                            key: ValueKey('dado-$indice'),
+                            valor: valor,
+                            anclado: indice == state.dadoElegido,
+                            alTocar: () => _enviar(DadoElegido(indice)),
+                          ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  if (state.sinJugada)
+                    FilledButton.tonal(
+                      onPressed: () => _enviar(const TurnoPasado()),
+                      child: const Text('Pasar turno', style: TextStyle(fontSize: 18)),
+                    )
+                  else
+                    FilledButton(
+                      onPressed: dados == null && !state.terminada
+                          ? () => _enviar(const DadosTirados())
+                          : null,
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                      ),
+                      child: const Text('Tirar dados', style: TextStyle(fontSize: 18)),
+                    ),
+                ],
               ),
-            ],
+            ),
           ),
+        );
+      },
+    );
+  }
+}
+
+String _nombreZona(Color5 color) {
+  return switch (color) {
+    Color5.amarillo => 'amarilla',
+    Color5.verde => 'verde',
+    Color5.morado => 'morada',
+    Color5.azul => 'azul',
+    Color5.rojo => 'roja',
+  };
+}
+
+/// Un dado de la tirada. El anclado lleva borde ámbar y un ancla debajo.
+class _Dado extends StatelessWidget {
+  final int valor;
+  final bool anclado;
+  final VoidCallback alTocar;
+
+  const _Dado({
+    super.key,
+    required this.valor,
+    required this.anclado,
+    required this.alTocar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final forma = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+      side: BorderSide(
+        color: anclado ? Colors.amber.shade700 : Colors.black54,
+        width: anclado ? 4 : 2,
+      ),
+    );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          button: true,
+          selected: anclado,
+          child: Material(
+            color: anclado ? Colors.amber.shade100 : Colors.white,
+            shape: forma,
+            child: InkWell(
+              customBorder: forma,
+              onTap: alTocar,
+              child: SizedBox(
+                width: 64,
+                height: 64,
+                child: Center(
+                  child: Text(
+                    '$valor',
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Visibility.maintain(
+          visible: anclado,
+          child: Icon(Icons.anchor, size: 20, color: Colors.amber.shade800),
+        ),
+      ],
+    );
+  }
+}
+
+/// El recuadro que explica por qué la casilla tocada no acepta el número.
+class _Explicacion extends StatelessWidget {
+  final String texto;
+
+  const _Explicacion(this.texto);
+
+  @override
+  Widget build(BuildContext context) {
+    final colores = Theme.of(context).colorScheme;
+
+    return ConstrainedBox(
+      key: const ValueKey('explicacion'),
+      constraints: const BoxConstraints(maxWidth: 420),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colores.errorContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.block, color: colores.onErrorContainer),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(texto, style: TextStyle(color: colores.onErrorContainer)),
+            ),
+          ],
         ),
       ),
     );

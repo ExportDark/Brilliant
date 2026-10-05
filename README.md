@@ -20,9 +20,8 @@ Construcción incremental, módulo por módulo:
 - [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
 - [x] Pantalla de preparación: repartir los 6 números en el tablero y botón **Inicio**
 - [x] Motor de partida (`PartidaBloc`): dados, dado anclado, turnos, validación de jugadas
-- [ ] Pantalla de partida con los dados y las jugadas iluminadas
+- [x] Pantalla de partida: dados, dado anclado, jugadas iluminadas y la regla explicada
 - [ ] Puntuación
-- [ ] UI jugable completa
 
 ## Estructura
 
@@ -33,7 +32,7 @@ lib/
   juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
   ui/
     widgets/    CeldaWidget, TableroWidget
-    pantallas/  PantallaPreparacion, PantallaPartida (provisional)
+    pantallas/  PantallaPreparacion, PantallaPartida
   main.dart
 test/       tests, misma estructura que lib/
 ```
@@ -76,7 +75,9 @@ Entidad inmutable que representa una casilla del tablero:
 
 `CeldaWidget` (`lib/ui/widgets/celda_widget.dart`) la renderiza como un cuadro del color
 de su zona, con borde grueso si es inicial y el valor centrado. Con `seleccionada`, el
-borde se resalta en ámbar.
+borde se resalta en ámbar. Con `iluminacion` se marca con borde blanco
+(`Iluminacion.posible`) o se oscurece (`Iluminacion.bloqueada`), según si el dado
+anclado cabe ahí.
 
 ## Módulo: regla de color rojo (`lib/reglas/`)
 
@@ -143,7 +144,7 @@ Como se dibuja siempre a partir de un `Tablero`, para mostrar lo que el jugador 
 poniendo basta con pasarle `tablero.conValores(...)`: cada número aparece en su celda.
 
 Opcionalmente recibe `seleccionada` (la casilla resaltada), `alTocar` y `esTocable`
-(qué casillas responden al toque).
+(qué casillas responden al toque), e `iluminacionDe` (cómo se resalta cada casilla).
 
 ## Módulo: preparación de la partida (`lib/juego/`)
 
@@ -218,8 +219,8 @@ las 6 casillas iniciales, viendo en el tablero qué número va quedando en cada 
   - los botones del 1 al 6, donde los números ya usados salen deshabilitados;
   - **Quitar**, **Reiniciar** y **Aleatorio** (completa al azar lo que falta);
   - el botón **Inicio**, habilitado solo cuando `state.completa`.
-- `pantalla_partida.dart`: `PantallaPartida`, provisional. Al oprimir Inicio el bloc
-  confirma el reparto y la app pasa aquí con el tablero y los 6 valores ya fijos.
+- Al oprimir Inicio el bloc confirma el reparto y la app pasa a `PantallaPartida` con el
+  tablero y los 6 valores ya fijos.
 
 Para asignar un número se toca una casilla inicial (en el tablero o en el resumen) y
 después el número. La selección salta sola a la siguiente casilla vacía. Qué casilla está
@@ -228,3 +229,24 @@ mirando.
 
 El botón Inicio deshabilitado es solo la cara visible de la regla. Aunque se oprimiera, el
 bloc no confirma un reparto incompleto.
+
+## Módulo: pantalla de partida (`lib/ui/pantallas/pantalla_partida.dart`)
+
+`PantallaPartida` crea el `PartidaBloc` con el tablero que dejó la preparación y dibuja
+cada turno:
+
+1. **Tirar dados** saca los dos dados.
+2. Se toca un dado para **anclarlo** (borde ámbar y un ancla debajo). Mientras no se
+   coloque, se puede anclar el otro.
+3. El tablero **ilumina** con borde blanco las casillas donde ese número cabe y
+   **oscurece** las casillas libres cuya zona no lo acepta.
+4. Tocar una casilla iluminada anota el número y pasa al siguiente turno. Tocar una
+   oscurecida muestra debajo del tablero qué regla lo impide, por ejemplo
+   *"C2 · Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*.
+5. Si ningún dado cabe, aparece **Pasar turno**. Cuando ya ninguna casilla acepta nada, la
+   pantalla anuncia el fin de la partida y cuántas casillas se llenaron.
+
+Qué casillas se iluminan sale de `state.evaluar(posicion)`, es decir, de la misma
+validación que usa el bloc para aceptar o rechazar la jugada. La pantalla no decide nada
+por su cuenta. `PantallaPartida` recibe un `tirarDado` opcional, para que los tests fijen
+qué sale en los dados.

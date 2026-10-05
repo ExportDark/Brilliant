@@ -81,6 +81,6 @@ lib/
   puntuacion/ cálculo de puntaje                                        (pendiente)
   ui/
     widgets/    CeldaWidget, TableroWidget
-    pantallas/  PantallaPreparacion (con flutter_bloc), PantallaPartida (provisional)
+    pantallas/  PantallaPreparacion y PantallaPartida, cada una con su bloc
 test/         misma estructura que lib/, un test por archivo de lógica
 ```

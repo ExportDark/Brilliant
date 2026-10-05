@@ -102,8 +102,7 @@ orden.
 Qué casilla está seleccionada lo guarda la pantalla, no el bloc. Es estado de la interfaz:
 al reparto no le importa qué casilla se está mirando.
 
-`PantallaPartida` es provisional: solo muestra el tablero inicial hasta que existan los
-dados y los turnos.
+Lo que pasa en `PantallaPartida` está en [[Turnos y jugadas]].
 
 ## Decisión: el reparto aleatorio respeta lo ya puesto
 

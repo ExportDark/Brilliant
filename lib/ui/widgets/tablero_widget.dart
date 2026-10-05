@@ -9,12 +9,14 @@ import 'celda_widget.dart';
 /// los números de fila (1-7) de la notación del manual.
 ///
 /// Las celdas para las que [esTocable] devuelve verdadero responden al toque
-/// llamando a [alTocar] con su posición.
+/// llamando a [alTocar] con su posición. [iluminacionDe] decide cómo se
+/// resalta cada celda; sin él, ninguna se resalta.
 class TableroWidget extends StatelessWidget {
   final Tablero tablero;
   final Posicion? seleccionada;
   final void Function(Posicion)? alTocar;
   final bool Function(Posicion)? esTocable;
+  final Iluminacion Function(Posicion)? iluminacionDe;
   final double tamanoCelda;
 
   const TableroWidget({
@@ -23,6 +25,7 @@ class TableroWidget extends StatelessWidget {
     this.seleccionada,
     this.alTocar,
     this.esTocable,
+    this.iluminacionDe,
     this.tamanoCelda = 48,
   });
 
@@ -61,6 +64,7 @@ class TableroWidget extends StatelessWidget {
       celda: tablero.celdaEn(posicion)!,
       tamano: tamanoCelda,
       seleccionada: posicion == seleccionada,
+      iluminacion: iluminacionDe?.call(posicion) ?? Iluminacion.normal,
     );
 
     final tocable = alTocar != null && (esTocable?.call(posicion) ?? true);

@@ -23,7 +23,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
       la partida hasta tener las 6 casillas llenas ([[Preparación de la partida]])
 - [x] **Pantalla de preparación** — el jugador reparte los 1-6 tocando las casillas del
       tablero y ve cada número en su posición. El botón **Inicio** solo se habilita con
-      las 6 llenas y lleva a una pantalla de partida provisional con los valores fijos
+      las 6 llenas y lleva a la pantalla de partida
 - [x] **Botón Aleatorio** en la preparación — completa al azar las casillas que falten
 - [x] **Layout verificado contra el PDF** (2026-09-30) — se compararon los colores de las
       49 casillas de los 5 tableros del PDF con el modelo y con la pantalla, y coinciden
@@ -31,16 +31,18 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **`PartidaBloc` y validación de jugadas** — dados (2d6), dado anclado, turnos,
       validación contra las reglas de color, pasar turno y fin de partida
       ([[Turnos y jugadas]])
+- [x] **Pantalla de partida** — tirar los dados, anclar uno, iluminar dónde cabe y
+      oscurecer dónde no, con la regla explicada al tocar una casilla oscurecida; pasar
+      turno y fin de partida
 
-**Los módulos `modelo/` y `juego/` están completos.** La app ya arranca en la pantalla de
-preparación. 137 tests, todos pasando.
+**Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
+casilla acepta nada. Lo único que falta para cerrarla es el puntaje. 147 tests, todos
+pasando.
 
 ## Qué falta
 
-- [ ] **Pantalla de partida** — los dados, iluminar dónde cabe el dado anclado y explicar
-      la regla en las casillas donde no cabe
-- [ ] **`puntuacion/`** — el cálculo de puntaje ([[Puntuación]])
-- [ ] **UI jugable completa** — poder jugar una partida de principio a fin
+- [ ] **`puntuacion/`** — el cálculo de puntaje, y mostrarlo al terminar la partida
+      ([[Puntuación]])
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual
 
 ## Cómo se viene trabajando

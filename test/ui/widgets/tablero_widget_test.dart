@@ -50,6 +50,26 @@ void main() {
       expect(seleccionadas.map((celda) => celda.celda.posicion), [_pos('B4')]);
     });
 
+    testWidgets('cada celda recibe la iluminación que le toca', (tester) async {
+      await _mostrar(
+        tester,
+        TableroWidget(
+          tablero: Tablero.mapaOriginal(),
+          iluminacionDe: (posicion) => switch (posicion.notacion) {
+            'A2' => Iluminacion.posible,
+            'C2' => Iluminacion.bloqueada,
+            _ => Iluminacion.normal,
+          },
+        ),
+      );
+
+      final iluminadas = {
+        for (final celda in tester.widgetList<CeldaWidget>(find.byType(CeldaWidget)))
+          if (celda.iluminacion != Iluminacion.normal) celda.celda.posicion.notacion: celda.iluminacion,
+      };
+      expect(iluminadas, {'A2': Iluminacion.posible, 'C2': Iluminacion.bloqueada});
+    });
+
     testWidgets('tocar una casilla tocable avisa con su posición', (tester) async {
       final tocadas = <Posicion>[];
 
