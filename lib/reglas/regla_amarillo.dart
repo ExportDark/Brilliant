@@ -11,4 +11,8 @@ class ReglaAmarillo implements ReglaColor {
   bool puedeAgregar(List<int> numeros, int numero) {
     return puedeAgregarManteniendoDistintos(numeros, numero);
   }
+
+  @override
+  String get descripcion =>
+      'Todos diferentes: ningún número se repite entre las 5 casillas amarillas';
 }

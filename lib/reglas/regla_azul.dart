@@ -9,4 +9,7 @@ class ReglaAzul implements ReglaColor {
   bool puedeAgregar(List<int> numeros, int numero) {
     return puedeAgregarValorUnico(numeros, numero);
   }
+
+  @override
+  String get descripcion => 'Todos iguales: las 4 casillas llevan el mismo número';
 }

@@ -10,4 +10,7 @@ class ReglaRojo implements ReglaColor {
   bool puedeAgregar(List<int> numeros, int numero) {
     return puedeAgregarManteniendoDistintos(numeros, numero);
   }
+
+  @override
+  String get descripcion => 'Todos diferentes: las 6 casillas llevan números distintos';
 }

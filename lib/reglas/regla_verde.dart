@@ -9,4 +9,7 @@ class ReglaVerde implements ReglaColor {
   bool puedeAgregar(List<int> numeros, int numero) {
     return puedeAgregarCualquiera(numeros, numero);
   }
+
+  @override
+  String get descripcion => 'Cualquiera: sin restricción de valor';
 }

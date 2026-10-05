@@ -19,7 +19,8 @@ Construcción incremental, módulo por módulo:
 - [x] `TableroWidget`: la grilla 7×7 con los números anotados
 - [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
 - [x] Pantalla de preparación: repartir los 6 números en el tablero y botón **Inicio**
-- [ ] Motor de partida (dados, turnos, validación de movimientos)
+- [x] Motor de partida (`PartidaBloc`): dados, dado anclado, turnos, validación de jugadas
+- [ ] Pantalla de partida con los dados y las jugadas iluminadas
 - [ ] Puntuación
 - [ ] UI jugable completa
 
@@ -29,7 +30,7 @@ Construcción incremental, módulo por módulo:
 lib/
   modelo/   entidades de dominio (Posicion, Celda, Region, Tablero, ...)
   reglas/   reglas de colocación por color
-  juego/    estado de la partida con BLoC (preparación, y más adelante los turnos)
+  juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
   ui/
     widgets/    CeldaWidget, TableroWidget
     pantallas/  PantallaPreparacion, PantallaPartida (provisional)
@@ -81,7 +82,8 @@ borde se resalta en ámbar.
 
 - `regla_color.dart`: contrato `ReglaColor` — toda regla de color implementa
   `puedeAgregar(numeros, numero)`, decidiendo si el nuevo valor es válido dado lo que
-  ya hay en la zona.
+  ya hay en la zona, y `descripcion`, la regla dicha en una frase para mostrársela al
+  jugador.
 - `regla_numeros_distintos.dart`: función pura `puedeAgregarManteniendoDistintos` —
   el valor solo es válido si no se repite ningún número en la zona. La usan tanto el
   rojo como el amarillo (misma regla "todos diferentes", ver manual del juego).
@@ -177,6 +179,31 @@ bloc recibe un `Random` opcional en el constructor para que los tests usen una s
 
 Los eventos inválidos se ignoran sin emitir estado, de modo que en los tests el rechazo
 se observa como una ausencia de emisión.
+
+## Módulo: turnos y jugadas (`lib/juego/`)
+
+En cada turno se tiran **dos dados**, el jugador **ancla** uno (puede cambiarlo por el otro
+mientras no lo coloque) y lo anota en una casilla libre cuya zona lo acepte.
+
+- `validacion_jugada.dart`: `evaluarJugada(tablero, posicion, valor)` devuelve
+  `JugadaValida`, `CasillaOcupada` o `ReglaRota(region, valoresEnZona)`. Usa la regla de
+  la zona (`region.tipo.regla.puedeAgregar`). `hayLugarPara(tablero, valor)` dice si
+  alguna casilla libre acepta ese número.
+- `partida_event.dart`: `DadosTirados`, `DadoElegido(indice)`, `ValorColocado(posicion)`,
+  `TurnoPasado`.
+- `partida_state.dart`: `PartidaState{tablero, dados, dadoElegido, turno}`, con
+  `valorElegido`, `evaluar(posicion)`, `sinJugada`, `terminada` y `casillasLlenas`
+  derivados.
+- `partida_bloc.dart`: `PartidaBloc`. Recibe el tablero con los valores iniciales y una
+  función `tirarDado` opcional, para que los tests decidan qué sale.
+
+Reglas que hace cumplir:
+
+1. Una sola tirada por turno: hasta colocar o pasar no se vuelve a tirar.
+2. Solo se coloca con un dado anclado, en una casilla libre, y si la regla de su zona lo
+   acepta. Colocar cierra el turno.
+3. `TurnoPasado` solo procede si ninguno de los dos dados cabe en ningún lado.
+4. La partida termina cuando ya ninguna casilla acepta ningún número del 1 al 6.
 
 ## Módulo: pantalla de preparación (`lib/ui/pantallas/`)
 

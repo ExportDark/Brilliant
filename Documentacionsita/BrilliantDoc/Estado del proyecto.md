@@ -28,14 +28,17 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **Layout verificado contra el PDF** (2026-09-30) — se compararon los colores de las
       49 casillas de los 5 tableros del PDF con el modelo y con la pantalla, y coinciden
       todas, igual que las 6 casillas iniciales ([[Decisiones de extracción del manual]])
+- [x] **`PartidaBloc` y validación de jugadas** — dados (2d6), dado anclado, turnos,
+      validación contra las reglas de color, pasar turno y fin de partida
+      ([[Turnos y jugadas]])
 
-**El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. La app ya arranca en la
-pantalla de preparación. 111 tests, todos pasando.
+**Los módulos `modelo/` y `juego/` están completos.** La app ya arranca en la pantalla de
+preparación. 137 tests, todos pasando.
 
 ## Qué falta
 
-- [ ] **Resto de `juego/`** — dados (2d6), turnos, validación de movimientos contra las
-      reglas de color, detección de fin de partida
+- [ ] **Pantalla de partida** — los dados, iluminar dónde cabe el dado anclado y explicar
+      la regla en las casillas donde no cabe
 - [ ] **`puntuacion/`** — el cálculo de puntaje ([[Puntuación]])
 - [ ] **UI jugable completa** — poder jugar una partida de principio a fin
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual

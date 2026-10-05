@@ -16,4 +16,7 @@ class ReglaMorado implements ReglaColor {
       _maximoValoresDistintos,
     );
   }
+
+  @override
+  String get descripcion => 'Solo dos números diferentes en toda la zona';
 }

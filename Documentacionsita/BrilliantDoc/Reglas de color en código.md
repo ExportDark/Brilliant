@@ -24,10 +24,14 @@ e independiente.
 ```dart
 abstract class ReglaColor {
   bool puedeAgregar(List<int> numeros, int numero);
+  String get descripcion;
 }
 ```
 
-Dado lo que ya está anotado en la región, decide si un nuevo valor se puede agregar.
+Dado lo que ya está anotado en la región, `puedeAgregar` decide si un nuevo valor se puede
+agregar. `descripcion` es la regla dicha en una frase (por ejemplo, *"Todos iguales: las 4
+casillas llevan el mismo número"*), y es lo que la pantalla de partida le muestra al
+jugador cuando una casilla no acepta su número. Ver [[Turnos y jugadas]].
 
 ## Las funciones puras
 
