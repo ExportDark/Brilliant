@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 
 import '../modelo/posicion.dart';
@@ -16,11 +18,17 @@ import 'preparacion_state.dart';
 /// entrega las asignaciones en [PreparacionState.valores].
 ///
 /// Los eventos inválidos se ignoran sin emitir estado.
+///
+/// [azar] decide el [RepartoAleatorio]; los tests lo pasan con semilla fija.
 class PreparacionBloc extends Bloc<PreparacionEvent, PreparacionState> {
-  PreparacionBloc(List<Posicion> casillas)
-      : super(PreparacionState(casillas: List.unmodifiable(casillas))) {
+  final Random _azar;
+
+  PreparacionBloc(List<Posicion> casillas, {Random? azar})
+      : _azar = azar ?? Random(),
+        super(PreparacionState(casillas: List.unmodifiable(casillas))) {
     on<ValorAsignado>(_alAsignarValor);
     on<ValorQuitado>(_alQuitarValor);
+    on<RepartoAleatorio>(_alRepartirAlAzar);
     on<PreparacionConfirmada>(_alConfirmar);
     on<PreparacionReiniciada>(_alReiniciar);
   }
@@ -44,6 +52,22 @@ class PreparacionBloc extends Bloc<PreparacionEvent, PreparacionState> {
     if (!state.valores.containsKey(event.casilla)) return;
 
     emit(state.copiaCon(valores: {...state.valores}..remove(event.casilla)));
+  }
+
+  void _alRepartirAlAzar(RepartoAleatorio event, Emitter<PreparacionState> emit) {
+    if (state.confirmada) return;
+
+    // Con todas llenas no queda nada que completar: se revuelve desde cero.
+    final valores = state.completa ? <Posicion, int>{} : {...state.valores};
+    final vacias = state.casillas.where((casilla) => !valores.containsKey(casilla));
+    final numeros = valoresPosibles.difference(valores.values.toSet()).toList()
+      ..shuffle(_azar);
+
+    for (final (indice, casilla) in vacias.indexed) {
+      valores[casilla] = numeros[indice];
+    }
+
+    emit(state.copiaCon(valores: valores));
   }
 
   void _alConfirmar(PreparacionConfirmada event, Emitter<PreparacionState> emit) {

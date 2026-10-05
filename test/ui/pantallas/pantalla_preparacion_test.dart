@@ -120,6 +120,19 @@ void main() {
       }
     });
 
+    testWidgets('"Aleatorio" completa lo que falta y habilita "Inicio"', (tester) async {
+      await _abrir(tester);
+      await _asignar(tester, 'C1', 4);
+
+      await _tocar(tester, find.widgetWithText(OutlinedButton, 'Aleatorio'));
+
+      expect(_habilitado(tester, _inicio), isTrue);
+      expect(find.text('C1 = 4'), findsOneWidget);
+      expect(find.textContaining('= —'), findsNothing);
+      final numeros = {for (final casilla in casillasIniciales) _textoEnTablero(tester, casilla)};
+      expect(numeros, {'1', '2', '3', '4', '5', '6'});
+    });
+
     testWidgets('reiniciar borra el reparto y deshabilita "Inicio"', (tester) async {
       await _abrir(tester);
       await _repartir(tester);

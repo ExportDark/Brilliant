@@ -20,6 +20,12 @@ class ValorQuitado extends PreparacionEvent {
   const ValorQuitado(this.casilla);
 }
 
+/// Reparte al azar los números que faltan entre las casillas vacías,
+/// respetando lo que ya está puesto. Con todas llenas, revuelve todo.
+class RepartoAleatorio extends PreparacionEvent {
+  const RepartoAleatorio();
+}
+
 /// Cierra la preparación. Solo procede si las casillas ya están todas llenas.
 class PreparacionConfirmada extends PreparacionEvent {
   const PreparacionConfirmada();

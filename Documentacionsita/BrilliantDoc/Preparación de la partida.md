@@ -37,6 +37,7 @@ qué hacer con él.
 |---|---|
 | `ValorAsignado(casilla, valor)` | Anota un número en una casilla |
 | `ValorQuitado(casilla)` | Libera una casilla para volver a repartirla |
+| `RepartoAleatorio` | Reparte al azar los números que faltan entre las casillas vacías; con las 6 llenas, revuelve todo |
 | `PreparacionConfirmada` | Cierra el reparto y da luz verde para jugar |
 | `PreparacionReiniciada` | Borra todo y vuelve a empezar |
 
@@ -89,6 +90,7 @@ la app. Crea el bloc con `BlocProvider` (de `flutter_bloc`) y dibuja su estado:
 - **Los números del 1 al 6.** Los ya usados en otra casilla salen deshabilitados, así que
   el jugador nunca llega a intentar un repetido.
 - **Quitar**, que vacía la casilla seleccionada, y **Reiniciar**.
+- **Aleatorio**, que manda `RepartoAleatorio`: el azar completa lo que falta.
 - **Inicio**, habilitado solo cuando `state.completa`. Al oprimirlo manda
   `PreparacionConfirmada`, y cuando el estado pasa a `confirmada` la app navega a
   `PantallaPartida` con el tablero y los 6 valores ya fijos.
@@ -102,6 +104,18 @@ al reparto no le importa qué casilla se está mirando.
 
 `PantallaPartida` es provisional: solo muestra el tablero inicial hasta que existan los
 dados y los turnos.
+
+## Decisión: el reparto aleatorio respeta lo ya puesto
+
+`RepartoAleatorio` solo llena las casillas vacías, con los números que todavía no se
+usaron. Así el jugador puede fijar a mano las casillas que le importan (por ejemplo, el
+número de C1, que define toda la región azul) y dejar el resto al azar. Con las 6 ya
+llenas no queda nada que completar, así que revuelve todo de nuevo: oprimir el botón
+varias veces sigue dando repartos distintos.
+
+El bloc recibe un `Random` opcional en el constructor. En los tests se pasa con semilla
+fija, y lo que se comprueba es que el resultado sea una permutación completa del 1 al 6
+que conserve lo que ya estaba puesto.
 
 ## Decisión: el gate vive en el bloc, no en la pantalla
 

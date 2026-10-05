@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/juego/preparacion_bloc.dart';
@@ -177,6 +179,63 @@ void main() {
         expect(bloc.state.confirmada, isTrue);
         expect(bloc.state.valores, hasLength(6));
       },
+    );
+  });
+
+  group('PreparacionBloc — reparto aleatorio', () {
+    PreparacionBloc conSemilla() => PreparacionBloc(_casillas, azar: Random(7));
+
+    blocTest<PreparacionBloc, PreparacionState>(
+      'con todo vacío reparte los 6 números sin repetir',
+      build: conSemilla,
+      act: (bloc) => bloc.add(const RepartoAleatorio()),
+      verify: (bloc) {
+        expect(bloc.state.completa, isTrue);
+        expect(bloc.state.valores.values.toSet(), valoresPosibles);
+        expect(bloc.state.valores.keys.toSet(), _casillas.toSet());
+      },
+    );
+
+    blocTest<PreparacionBloc, PreparacionState>(
+      'respeta los números que ya estaban puestos',
+      build: conSemilla,
+      act: (bloc) => bloc
+        ..add(ValorAsignado(_pos('C1'), 4))
+        ..add(ValorAsignado(_pos('F2'), 1))
+        ..add(const RepartoAleatorio()),
+      verify: (bloc) {
+        expect(bloc.state.valorDe(_pos('C1')), 4);
+        expect(bloc.state.valorDe(_pos('F2')), 1);
+        expect(bloc.state.completa, isTrue);
+        expect(bloc.state.valores.values.toSet(), valoresPosibles);
+      },
+    );
+
+    blocTest<PreparacionBloc, PreparacionState>(
+      'con todo lleno vuelve a repartir desde cero',
+      build: conSemilla,
+      act: (bloc) {
+        _repartir(bloc);
+        bloc.add(const RepartoAleatorio());
+      },
+      skip: 6,
+      expect: () => [
+        isA<PreparacionState>()
+            .having((state) => state.completa, 'completa', isTrue)
+            .having((state) => state.valores.values.toSet(), 'valores', valoresPosibles),
+      ],
+    );
+
+    blocTest<PreparacionBloc, PreparacionState>(
+      'una vez confirmada, no reparte',
+      build: conSemilla,
+      act: (bloc) {
+        _repartir(bloc);
+        bloc.add(const PreparacionConfirmada());
+        bloc.add(const RepartoAleatorio());
+      },
+      skip: 7,
+      expect: () => <PreparacionState>[],
     );
   });
 

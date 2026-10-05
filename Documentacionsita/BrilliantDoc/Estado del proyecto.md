@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-09-30 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-04 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 
@@ -24,12 +24,13 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **Pantalla de preparación** — el jugador reparte los 1-6 tocando las casillas del
       tablero y ve cada número en su posición. El botón **Inicio** solo se habilita con
       las 6 llenas y lleva a una pantalla de partida provisional con los valores fijos
+- [x] **Botón Aleatorio** en la preparación — completa al azar las casillas que falten
 - [x] **Layout verificado contra el PDF** (2026-09-30) — se compararon los colores de las
       49 casillas de los 5 tableros del PDF con el modelo y con la pantalla, y coinciden
       todas, igual que las 6 casillas iniciales ([[Decisiones de extracción del manual]])
 
 **El módulo `modelo/` está completo** y la capa `juego/` ya arrancó. La app ya arranca en la
-pantalla de preparación. 106 tests, todos pasando.
+pantalla de preparación. 111 tests, todos pasando.
 
 ## Qué falta
 

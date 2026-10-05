@@ -156,8 +156,8 @@ Ese reparto lo administra `PreparacionBloc`, un bloc local: se crea en la pantal
 preparación, recibe en el constructor las casillas que hay que llenar y no conoce el
 tablero. Al terminar entrega las asignaciones en `PreparacionState.valores`.
 
-- `preparacion_event.dart`: `ValorAsignado`, `ValorQuitado`, `PreparacionConfirmada`,
-  `PreparacionReiniciada`.
+- `preparacion_event.dart`: `ValorAsignado`, `ValorQuitado`, `RepartoAleatorio`,
+  `PreparacionConfirmada`, `PreparacionReiniciada`.
 - `preparacion_state.dart`: `PreparacionState{casillas, valores, confirmada}`, con
   `disponibles`, `completa` y `valorDe(casilla)` derivados de lo repartido.
 - `preparacion_bloc.dart`: `PreparacionBloc`.
@@ -170,6 +170,10 @@ Reglas que hace cumplir:
 3. `PreparacionConfirmada` no hace nada mientras falte alguna casilla. Solo con las 6
    puestas marca `confirmada`.
 4. Una vez confirmada, el reparto queda fijo.
+
+`RepartoAleatorio` reparte al azar los números que faltan entre las casillas vacías,
+respetando lo que el jugador ya puso. Si las 6 ya están llenas, revuelve todo de nuevo. El
+bloc recibe un `Random` opcional en el constructor para que los tests usen una semilla fija.
 
 Los eventos inválidos se ignoran sin emitir estado, de modo que en los tests el rechazo
 se observa como una ausencia de emisión.
@@ -185,7 +189,7 @@ las 6 casillas iniciales, viendo en el tablero qué número va quedando en cada 
     con la casilla seleccionada resaltada en ámbar;
   - un resumen `C1 = 4 · F2 = — · ...` con una chip por casilla inicial;
   - los botones del 1 al 6, donde los números ya usados salen deshabilitados;
-  - **Quitar** y **Reiniciar**;
+  - **Quitar**, **Reiniciar** y **Aleatorio** (completa al azar lo que falta);
   - el botón **Inicio**, habilitado solo cuando `state.completa`.
 - `pantalla_partida.dart`: `PantallaPartida`, provisional. Al oprimir Inicio el bloc
   confirma el reparto y la app pasa aquí con el tablero y los 6 valores ya fijos.

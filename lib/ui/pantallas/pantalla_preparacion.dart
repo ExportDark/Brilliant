@@ -13,7 +13,8 @@ import 'pantalla_partida.dart';
 /// casillas iniciales, antes de tirar el primer dado.
 ///
 /// Se toca una casilla inicial (en el tablero o en el resumen) y después un
-/// número. El botón "Inicio" solo se habilita con todas las casillas llenas;
+/// número, o "Aleatorio" para que el azar complete lo que falta. El botón
+/// "Inicio" solo se habilita con todas las casillas llenas;
 /// al oprimirlo se pasa a la [PantallaPartida] con los valores ya fijos.
 class PantallaPreparacion extends StatelessWidget {
   const PantallaPreparacion({super.key});
@@ -176,6 +177,10 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
                       OutlinedButton(
                         onPressed: state.valores.isNotEmpty ? () => _reiniciar(state) : null,
                         child: const Text('Reiniciar'),
+                      ),
+                      OutlinedButton(
+                        onPressed: () => _bloc.add(const RepartoAleatorio()),
+                        child: const Text('Aleatorio'),
                       ),
                     ],
                   ),
