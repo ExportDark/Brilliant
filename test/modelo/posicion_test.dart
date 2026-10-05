@@ -39,6 +39,27 @@ void main() {
     });
   });
 
+  group('Posicion.vecinas', () {
+    test('son arriba, abajo, izquierda y derecha, sin diagonales', () {
+      expect(
+        Posicion.desdeNotacion('D4').vecinas,
+        unorderedEquals(['D3', 'D5', 'C4', 'E4'].map(Posicion.desdeNotacion)),
+      );
+    });
+
+    test('en el borde incluye posiciones fuera de la grilla', () {
+      expect(
+        Posicion.desdeNotacion('C1').vecinas,
+        unorderedEquals([
+          const Posicion(fila: -1, columna: 2),
+          Posicion.desdeNotacion('C2'),
+          Posicion.desdeNotacion('B1'),
+          Posicion.desdeNotacion('D1'),
+        ]),
+      );
+    });
+  });
+
   group('Posicion.notacion', () {
     test('devuelve la posición escrita como en el manual', () {
       expect(const Posicion(fila: 0, columna: 0).notacion, 'A1');

@@ -3,9 +3,9 @@
 Recreación digital (roll & write) del juego de mesa *Brilliant* (Ravensburger) — imitación
 casera con fines personales/educativos, sin afiliación oficial.
 
-Cada jugador tiene un tablero de 7×7 dividido en zonas de color; en cada turno se tiran
-2 dados y se anota uno de los dos valores en una celda libre, respetando la regla de la
-zona de color donde se coloque.
+Cada jugador tiene un tablero de 7×7 dividido en zonas de color. En cada turno se tiran
+2 dados: uno es el **ancla** y el otro se anota en una celda libre pegada (sin diagonales)
+a una casilla que tenga el número del ancla, respetando la regla de color de la zona.
 
 ## Estado del proyecto
 
@@ -19,8 +19,8 @@ Construcción incremental, módulo por módulo:
 - [x] `TableroWidget`: la grilla 7×7 con los números anotados
 - [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
 - [x] Pantalla de preparación: repartir los 6 números en el tablero y botón **Inicio**
-- [x] Motor de partida (`PartidaBloc`): dados, dado anclado, turnos, validación de jugadas
-- [x] Pantalla de partida: dados, dado anclado, jugadas iluminadas y la regla explicada
+- [x] Motor de partida (`PartidaBloc`): dados, regla del ancla, turnos, validación de jugadas
+- [x] Pantalla de partida: dados, anclas marcadas, jugadas iluminadas y la regla explicada
 - [ ] Puntuación
 
 ## Estructura
@@ -77,7 +77,7 @@ Entidad inmutable que representa una casilla del tablero:
 de su zona, con borde grueso si es inicial y el valor centrado. La cuadrícula siempre es
 negra: para resaltar una casilla se **ilumina su relleno**, que se aclara hacia el
 blanco. Con `seleccionada` o `Iluminacion.posible` se aclara mucho; con
-`Iluminacion.bloqueada`, solo un poco.
+`Iluminacion.bloqueada`, solo un poco. Con `esAncla` lleva un ⚓ chiquito en la esquina.
 
 ## Módulo: regla de color rojo (`lib/reglas/`)
 
@@ -144,7 +144,8 @@ Como se dibuja siempre a partir de un `Tablero`, para mostrar lo que el jugador 
 poniendo basta con pasarle `tablero.conValores(...)`: cada número aparece en su celda.
 
 Opcionalmente recibe `seleccionada` (la casilla resaltada), `alTocar` y `esTocable`
-(qué casillas responden al toque), e `iluminacionDe` (cómo se resalta cada casilla).
+(qué casillas responden al toque), `iluminacionDe` (cómo se resalta cada casilla) y
+`esAncla` (qué casillas llevan la marca de ancla).
 
 ## Módulo: preparación de la partida (`lib/juego/`)
 
@@ -183,28 +184,36 @@ se observa como una ausencia de emisión.
 
 ## Módulo: turnos y jugadas (`lib/juego/`)
 
-En cada turno se tiran **dos dados**, el jugador **ancla** uno (puede cambiarlo por el otro
-mientras no lo coloque) y lo anota en una casilla libre cuya zona lo acepte.
+En cada turno se tiran **dos dados** y el jugador elige uno como **ancla** (puede cambiarlo
+por el otro mientras no coloque). El **otro dado** se anota en una casilla libre pegada a
+una casilla que tenga el número del ancla, arriba, abajo, a la izquierda o a la derecha
+(sin diagonales), y solo si la regla de color de esa zona lo acepta. Por ejemplo: salen
+4 y 2, el ancla es el 4, y el 2 va junto a cualquier casilla con un 4.
 
-- `validacion_jugada.dart`: `evaluarJugada(tablero, posicion, valor)` devuelve
-  `JugadaValida`, `CasillaOcupada` o `ReglaRota(region, valoresEnZona)`. Usa la regla de
-  la zona (`region.tipo.regla.puedeAgregar`). `hayLugarPara(tablero, valor)` dice si
-  alguna casilla libre acepta ese número.
-- `partida_event.dart`: `DadosTirados`, `DadoElegido(indice)`, `ValorColocado(posicion)`,
-  `TurnoPasado`.
+Esta regla del ancla no viene del manual en PDF (que permitía cualquier casilla libre):
+es una decisión del proyecto.
+
+- `validacion_jugada.dart`: `evaluarJugada(tablero, posicion, ancla: a, valor: v)` devuelve
+  `CasillaOcupada`, `SinAncla(ancla)`, `ReglaRota(region, valoresEnZona)` o
+  `JugadaValida`. Las vecinas salen de `Posicion.vecinas` y la regla de color, de
+  `region.tipo.regla.puedeAgregar`. `hayJugada(tablero, ancla: a, valor: v)` dice si
+  alguna casilla acepta `v` con `a` de ancla.
+- `partida_event.dart`: `DadosTirados`, `DadoElegido(indice)` (el ancla),
+  `ValorColocado(posicion)` y `TurnoPasado`.
 - `partida_state.dart`: `PartidaState{tablero, dados, dadoElegido, turno}`, con
-  `valorElegido`, `evaluar(posicion)`, `sinJugada`, `terminada` y `casillasLlenas`
-  derivados.
+  `valorAncla`, `valorAColocar`, `evaluar(posicion)`, `esAncla(posicion)`, `sinJugada`,
+  `terminada` y `casillasLlenas` derivados.
 - `partida_bloc.dart`: `PartidaBloc`. Recibe el tablero con los valores iniciales y una
   función `tirarDado` opcional, para que los tests decidan qué sale.
 
 Reglas que hace cumplir:
 
 1. Una sola tirada por turno: hasta colocar o pasar no se vuelve a tirar.
-2. Solo se coloca con un dado anclado, en una casilla libre, y si la regla de su zona lo
-   acepta. Colocar cierra el turno.
-3. `TurnoPasado` solo procede si ninguno de los dos dados cabe en ningún lado.
-4. La partida termina cuando ya ninguna casilla acepta ningún número del 1 al 6.
+2. Solo se coloca con un ancla elegida, en una casilla libre pegada a un ancla, y si la
+   regla de su zona lo acepta. Colocar cierra el turno.
+3. `TurnoPasado` solo procede si no hay jugada con ninguno de los dos dados como ancla.
+4. La partida termina cuando ninguna combinación de ancla y número del 1 al 6 tiene
+   jugada.
 
 ## Módulo: pantalla de preparación (`lib/ui/pantallas/`)
 
@@ -236,15 +245,20 @@ bloc no confirma un reparto incompleto.
 cada turno:
 
 1. **Tirar dados** saca los dos dados.
-2. Se toca un dado para **anclarlo** (borde ámbar y un ancla debajo). Mientras no se
-   coloque, se puede anclar el otro.
-3. El tablero **ilumina** las casillas donde ese número cabe (mucho más claras) y apenas
-   aclara las casillas libres cuya zona no lo acepta. La cuadrícula sigue negra.
-4. Tocar una casilla iluminada anota el número y pasa al siguiente turno. Tocar una de
-   las apenas aclaradas muestra debajo del tablero qué regla lo impide, por ejemplo
-   *"C2 · Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*.
-5. Si ningún dado cabe, aparece **Pasar turno**. Cuando ya ninguna casilla acepta nada, la
-   pantalla anuncia el fin de la partida y cuántas casillas se llenaron.
+2. Se toca un dado para hacerlo **ancla** (borde ámbar y un ⚓ debajo). Mientras no se
+   coloque, se puede cambiar al otro.
+3. Las casillas del tablero que tienen el número ancla muestran un ⚓ chiquito. Sus
+   vecinas donde el otro dado cabe se **iluminan** (mucho más claras), y las vecinas
+   cuya zona no lo acepta se aclaran apenas. La cuadrícula sigue negra.
+4. Tocar una casilla iluminada anota el número y pasa al siguiente turno. Tocar cualquier
+   otra casilla vacía explica debajo del tablero por qué no se puede, por ejemplo:
+   - *"A2 no está junto a ningún 4: el 2 va arriba, abajo, a la izquierda o a la derecha
+     de un 4."*
+   - *"C2 · Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene:
+     4"*
+5. Si no hay jugada con ningún dado como ancla, aparece **Pasar turno**. Cuando ninguna
+   tirada posible tiene jugada, la pantalla anuncia el fin de la partida y cuántas
+   casillas se llenaron.
 
 Qué casillas se iluminan sale de `state.evaluar(posicion)`, es decir, de la misma
 validación que usa el bloc para aceptar o rechazar la jugada. La pantalla no decide nada

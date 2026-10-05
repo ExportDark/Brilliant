@@ -10,15 +10,17 @@ class DadosTirados extends PartidaEvent {
   const DadosTirados();
 }
 
-/// Ancla uno de los dos dados ([indice] 0 o 1) como el número a anotar.
-/// Mientras no se coloque, se puede anclar el otro.
+/// Elige uno de los dos dados ([indice] 0 o 1) como ancla: el otro se
+/// anotará junto a una casilla que tenga el número del ancla. Mientras no se
+/// coloque, se puede elegir el otro.
 class DadoElegido extends PartidaEvent {
   final int indice;
 
   const DadoElegido(this.indice);
 }
 
-/// Anota el dado anclado en [posicion], si la regla de su zona lo permite.
+/// Anota el dado que no es el ancla en [posicion], si está pegada a una
+/// casilla con el número ancla y la regla de su zona lo permite.
 class ValorColocado extends PartidaEvent {
   final Posicion posicion;
 

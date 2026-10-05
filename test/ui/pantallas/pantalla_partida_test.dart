@@ -36,7 +36,7 @@ int Function() _dado(List<int> caras) {
 Future<void> _abrir(
   WidgetTester tester, {
   Tablero? tablero,
-  List<int> caras = const [3, 5],
+  List<int> caras = const [4, 3],
 }) async {
   tester.view.physicalSize = const Size(1000, 1400);
   tester.view.devicePixelRatio = 1;
@@ -88,44 +88,62 @@ void main() {
 
       await _tocar(tester, _tirar);
 
-      expect(find.descendant(of: _dadoEn(0), matching: find.text('3')), findsOneWidget);
-      expect(find.descendant(of: _dadoEn(1), matching: find.text('5')), findsOneWidget);
+      expect(find.descendant(of: _dadoEn(0), matching: find.text('4')), findsOneWidget);
+      expect(find.descendant(of: _dadoEn(1), matching: find.text('3')), findsOneWidget);
       expect(_habilitado(tester, _tirar), isFalse);
     });
 
-    testWidgets('sin un dado anclado no se ilumina nada', (tester) async {
+    testWidgets('sin ancla elegida no se ilumina ni se marca nada', (tester) async {
       await _abrir(tester);
 
       await _tocar(tester, _tirar);
 
       final celdas = tester.widgetList<CeldaWidget>(find.byType(CeldaWidget));
       expect(celdas.map((celda) => celda.iluminacion).toSet(), {Iluminacion.normal});
+      expect(celdas.where((celda) => celda.esAncla), isEmpty);
     });
 
-    testWidgets('al anclar un dado se ilumina dónde cabe y se bloquea dónde no', (tester) async {
+    testWidgets('con el 4 de ancla se iluminan las vecinas de C1 donde cabe el 3', (
+      tester,
+    ) async {
       await _abrir(tester);
 
       await _tirarYAnclar(tester, 0);
 
-      // La zona azul ya tiene un 4 en C1: el 3 no entra en el resto de la zona.
+      expect(_celdaEn(tester, 'C1').esAncla, isTrue);
+      expect(_celdaEn(tester, 'B1').iluminacion, Iluminacion.posible);
+      expect(_celdaEn(tester, 'D1').iluminacion, Iluminacion.posible);
+      // C2 está junto al 4, pero la zona azul ya tiene un 4: el 3 no entra.
       expect(_celdaEn(tester, 'C2').iluminacion, Iluminacion.bloqueada);
-      expect(_celdaEn(tester, 'D2').iluminacion, Iluminacion.bloqueada);
-      expect(_celdaEn(tester, 'A2').iluminacion, Iluminacion.posible);
-      expect(_celdaEn(tester, 'C1').iluminacion, Iluminacion.normal);
-      expect(find.byIcon(Icons.anchor), findsNWidgets(2));
+      // Lejos del 4, o solo en diagonal, no se ilumina.
+      expect(_celdaEn(tester, 'A2').iluminacion, Iluminacion.normal);
+      expect(_celdaEn(tester, 'D2').iluminacion, Iluminacion.normal);
     });
 
-    testWidgets('cambiar de dado cambia lo que se ilumina', (tester) async {
-      await _abrir(tester, caras: [4, 5]);
-
+    testWidgets('cambiar de ancla mueve las anclas y lo que se ilumina', (tester) async {
+      await _abrir(tester);
       await _tirarYAnclar(tester, 0);
-      expect(_celdaEn(tester, 'C2').iluminacion, Iluminacion.posible);
 
       await _tocar(tester, _dadoEn(1));
-      expect(_celdaEn(tester, 'C2').iluminacion, Iluminacion.bloqueada);
+
+      // Ahora el ancla es el 3 (en C6) y se pone el 4.
+      expect(_celdaEn(tester, 'C1').esAncla, isFalse);
+      expect(_celdaEn(tester, 'C6').esAncla, isTrue);
+      expect(_celdaEn(tester, 'B6').iluminacion, Iluminacion.posible);
+      expect(_celdaEn(tester, 'C2').iluminacion, Iluminacion.normal);
     });
 
-    testWidgets('tocar una casilla bloqueada explica la regla y no anota', (tester) async {
+    testWidgets('tocar una casilla lejos del ancla explica dónde va', (tester) async {
+      await _abrir(tester);
+      await _tirarYAnclar(tester, 0);
+
+      await _tocar(tester, _casilla('A2'));
+
+      expect(find.textContaining('A2 no está junto a ningún 4'), findsOneWidget);
+      expect(_celdaEn(tester, 'A2').celda.valor, isNull);
+    });
+
+    testWidgets('tocar una casilla que rompe la regla la explica y no anota', (tester) async {
       await _abrir(tester);
       await _tirarYAnclar(tester, 0);
 
@@ -136,16 +154,16 @@ void main() {
       expect(_celdaEn(tester, 'C2').celda.valor, isNull);
     });
 
-    testWidgets('tocar una casilla iluminada anota el dado y pasa al siguiente turno', (
+    testWidgets('tocar una casilla iluminada anota el otro dado y pasa al siguiente turno', (
       tester,
     ) async {
       await _abrir(tester);
       await _tirarYAnclar(tester, 0);
       await _tocar(tester, _casilla('C2'));
 
-      await _tocar(tester, _casilla('A2'));
+      await _tocar(tester, _casilla('B1'));
 
-      expect(_celdaEn(tester, 'A2').celda.valor, 3);
+      expect(_celdaEn(tester, 'B1').celda.valor, 3);
       expect(find.text('Turno 2'), findsOneWidget);
       expect(_dadoEn(0), findsNothing);
       expect(find.byKey(const ValueKey('explicacion')), findsNothing);

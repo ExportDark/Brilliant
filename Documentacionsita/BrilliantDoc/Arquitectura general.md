@@ -42,8 +42,8 @@ lo dibuje. Son dos:
 
 - `PreparacionBloc` administra el reparto de los valores iniciales. Ver
   [[Preparación de la partida]].
-- `PartidaBloc` administra los turnos: tirar los dados, anclar uno y anotarlo donde la
-  regla lo permita. La validación de cada jugada es una función pura aparte,
+- `PartidaBloc` administra los turnos: tirar los dados, elegir uno como ancla y anotar el
+  otro junto a una casilla con ese número, donde la regla de color lo permita. La validación de cada jugada es una función pura aparte,
   `evaluarJugada`. Ver [[Turnos y jugadas]].
 
 Las pantallas (`ui/pantallas/`) se conectan a los blocs con `flutter_bloc`: cada una crea
@@ -77,7 +77,7 @@ lib/
   modelo/     Posicion, Celda, Color5, TipoRegion, Region, extraerValores, Tablero
   reglas/     ReglaColor + funciones puras + una clase por color
   juego/      PreparacionBloc y PartidaBloc, cada uno con su estado y sus eventos,
-              y evaluarJugada / hayLugarPara (validación de jugadas)
+              y evaluarJugada / hayJugada (validación de jugadas)
   puntuacion/ cálculo de puntaje                                        (pendiente)
   ui/
     widgets/    CeldaWidget, TableroWidget

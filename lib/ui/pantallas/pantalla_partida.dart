@@ -13,11 +13,13 @@ import '../widgets/tablero_widget.dart';
 
 /// La pantalla donde se juega la partida, turno por turno.
 ///
-/// Se tiran los dos dados, se ancla uno tocándolo, y el tablero ilumina las
-/// casillas donde ese número cabe, y apenas las que su zona no lo acepta.
-/// Tocar una iluminada anota el número; tocar una apenas iluminada explica,
-/// debajo del tablero, qué regla lo impide. Si ningún dado cabe, se pasa el
-/// turno.
+/// Se tiran los dos dados y se toca uno para hacerlo el ancla: el otro se
+/// anota pegado (arriba, abajo, izquierda o derecha) a una casilla que tenga
+/// el número del ancla. Esas casillas llevan la marca de ancla, y el tablero
+/// ilumina las vecinas donde el número cabe, y apenas las que su zona no lo
+/// acepta. Tocar una iluminada anota el número; tocar cualquier otra casilla
+/// vacía explica, debajo del tablero, por qué no se puede. Si no hay jugada
+/// con ningún dado como ancla, se pasa el turno.
 class PantallaPartida extends StatelessWidget {
   final Tablero tablero;
 
@@ -43,8 +45,8 @@ class _VistaPartida extends StatefulWidget {
 }
 
 class _VistaPartidaState extends State<_VistaPartida> {
-  /// Por qué no se puede anotar en la última casilla bloqueada que se tocó.
-  /// Es estado de la pantalla: al bloc no le importa qué casilla se mira.
+  /// Por qué no se puede anotar en la última casilla vacía que se tocó sin
+  /// jugada. Es estado de la pantalla: al bloc no le importa qué se mira.
   String? _explicacion;
 
   PartidaBloc get _bloc => context.read<PartidaBloc>();
@@ -60,24 +62,31 @@ class _VistaPartidaState extends State<_VistaPartida> {
       case JugadaValida():
         _enviar(ValorColocado(posicion));
       case final ReglaRota rota:
-        setState(() => _explicacion = _explicar(posicion, rota));
+        setState(() => _explicacion = _explicarRegla(posicion, rota));
+      case SinAncla(:final ancla):
+        setState(() => _explicacion = _explicarAncla(posicion, ancla, state.valorAColocar!));
       case CasillaOcupada():
       case null:
         break;
     }
   }
 
-  String _explicar(Posicion posicion, ReglaRota rota) {
+  String _explicarRegla(Posicion posicion, ReglaRota rota) {
     final tipo = rota.region.tipo;
     return '${posicion.notacion} · Zona ${_nombreZona(tipo.color)} — '
         '${tipo.regla.descripcion}. Ya tiene: ${rota.valoresEnZona.join(', ')}';
+  }
+
+  String _explicarAncla(Posicion posicion, int ancla, int valor) {
+    return '${posicion.notacion} no está junto a ningún $ancla: el $valor va arriba, '
+        'abajo, a la izquierda o a la derecha de un $ancla.';
   }
 
   Iluminacion _iluminacion(PartidaState state, Posicion posicion) {
     return switch (state.evaluar(posicion)) {
       JugadaValida() => Iluminacion.posible,
       ReglaRota() => Iluminacion.bloqueada,
-      CasillaOcupada() || null => Iluminacion.normal,
+      SinAncla() || CasillaOcupada() || null => Iluminacion.normal,
     };
   }
 
@@ -87,11 +96,14 @@ class _VistaPartidaState extends State<_VistaPartida> {
           '${Tablero.filas * Tablero.columnas} casillas.';
     }
     if (state.dados == null) return 'Tira los dados.';
-    if (state.sinJugada) return 'Ningún dado tiene lugar en el tablero: pasa el turno.';
+    if (state.sinJugada) return 'No hay jugada con ningún dado como ancla: pasa el turno.';
 
-    final valor = state.valorElegido;
-    if (valor == null) return 'Elige uno de los dos dados.';
-    return 'Toca una casilla iluminada para poner el $valor.';
+    final ancla = state.valorAncla;
+    final valor = state.valorAColocar;
+    if (ancla == null || valor == null) {
+      return 'Elige el dado ancla: el otro se pone junto a una casilla con ese número.';
+    }
+    return 'Pon el $valor junto a un $ancla (arriba, abajo, izquierda o derecha).';
   }
 
   @override
@@ -117,8 +129,9 @@ class _VistaPartidaState extends State<_VistaPartida> {
                   TableroWidget(
                     tablero: state.tablero,
                     iluminacionDe: (posicion) => _iluminacion(state, posicion),
+                    esAncla: state.esAncla,
                     esTocable: (posicion) =>
-                        state.valorElegido != null &&
+                        state.valorAncla != null &&
                         state.tablero.celdaEn(posicion)!.estaVacia,
                     alTocar: (posicion) => _tocarCasilla(state, posicion),
                   ),
@@ -178,7 +191,7 @@ String _nombreZona(Color5 color) {
   };
 }
 
-/// Un dado de la tirada. El anclado lleva borde ámbar y un ancla debajo.
+/// Un dado de la tirada. El que es ancla lleva borde ámbar y un ancla debajo.
 class _Dado extends StatelessWidget {
   final int valor;
   final bool anclado;

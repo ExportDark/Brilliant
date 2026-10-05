@@ -7,12 +7,15 @@ import 'partida_event.dart';
 import 'partida_state.dart';
 import 'validacion_jugada.dart';
 
-/// Administra los turnos de la partida: tirar los dos dados, anclar uno y
-/// anotarlo en una casilla donde la regla de su zona lo permita.
+/// Administra los turnos de la partida: tirar los dos dados, elegir uno como
+/// ancla y anotar el otro pegado (arriba, abajo, izquierda o derecha) a una
+/// casilla que tenga el número del ancla, donde la regla de su zona lo
+/// permita.
 ///
 /// Es un bloc local, acotado a la pantalla de partida: recibe el tablero con
 /// los valores iniciales ya puestos. Cada número anotado cierra el turno.
-/// Si ninguno de los dos dados cabe, el turno se puede pasar.
+/// Si no hay jugada con ninguno de los dos dados como ancla, el turno se
+/// puede pasar.
 ///
 /// Los eventos inválidos se ignoran sin emitir estado.
 ///
@@ -58,7 +61,7 @@ class PartidaBloc extends Bloc<PartidaEvent, PartidaState> {
   }
 
   void _alColocar(ValorColocado event, Emitter<PartidaState> emit) {
-    final valor = state.valorElegido;
+    final valor = state.valorAColocar;
     if (valor == null) return;
     if (state.tablero.celdaEn(event.posicion) == null) return;
     if (state.evaluar(event.posicion) is! JugadaValida) return;

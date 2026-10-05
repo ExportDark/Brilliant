@@ -23,6 +23,11 @@ posicion.notacion              // "C1"
 
 Ver [[Sistema de coordenadas]] para el porqué de esta elección.
 
+`posicion.vecinas` da las 4 posiciones pegadas: arriba, abajo, izquierda y derecha, sin
+diagonales. Es lo que usa la regla del ancla ([[Turnos y jugadas]]). `Posicion` no sabe
+el tamaño del tablero, así que en los bordes algunas vecinas caen fuera de la grilla:
+quien las use las descarta (`tablero.celdaEn` devuelve `null` para esas).
+
 ## `Celda` (`celda.dart`)
 
 Entidad **inmutable** que representa una casilla:

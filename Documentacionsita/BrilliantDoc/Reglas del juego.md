@@ -41,13 +41,22 @@ de esa zona específica:
    números del 1 al 6, sin repetir, uno en cada una de sus 6 casillas iniciales.
    Ver [[Tablero y regiones]].
 2. Se tiran los dos dados. El resultado se anuncia para todos por igual.
-3. Cada jugador elige, en privado y de forma simultánea, **UNO** de los dos números
-   mostrados (no la suma, el valor de un dado).
-4. Anota ese número en una casilla libre de su propio tablero (distinta de las 6
-   iniciales, que ya están ocupadas), dentro de la zona de color donde quiera jugarlo,
-   siempre que esa jugada no rompa la regla de esa zona.
+3. Cada jugador elige, en privado y de forma simultánea, **UNO** de los dos dados como
+   **ancla** (no la suma, el valor de un dado).
+4. Anota **el otro dado** en una casilla libre de su tablero **pegada a una casilla que
+   tenga el número del ancla**: arriba, abajo, a la izquierda o a la derecha, nunca en
+   diagonal. La jugada tampoco puede romper la regla de color de esa zona.
+   *Ejemplo:* salen 4 y 2. Si el ancla es el 4, el 2 va junto a cualquier casilla que
+   tenga un 4.
 5. El turno termina y se repite: se vuelven a tirar los dados hasta que los tableros se
-   llenen o ya no haya jugadas legales.
+   llenen o ya no haya jugadas legales. Si en una tirada no hay jugada con ninguno de los
+   dos dados como ancla, se pasa el turno.
+
+> [!warning] La regla del ancla no viene del manual
+> El PDF dice que el número se anota en *cualquier* casilla libre de la zona que se
+> quiera. La regla del ancla (pegado a una casilla con el número del otro dado) es una
+> decisión del proyecto del 2026-10-04, para que cada jugada dependa de cómo va el tablero.
+> Ver [[Turnos y jugadas]].
 
 ## Fuente
 

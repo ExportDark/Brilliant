@@ -24,6 +24,16 @@ class Posicion {
   /// La posición escrita como en el manual (ej. `"C1"`).
   String get notacion => '${String.fromCharCode(_codigoLetraA + columna)}${fila + 1}';
 
+  /// Las 4 posiciones pegadas a esta: arriba, abajo, izquierda y derecha. Las
+  /// diagonales no cuentan. En los bordes del tablero algunas caen fuera de
+  /// la grilla: quien las use tiene que descartarlas.
+  List<Posicion> get vecinas => [
+        Posicion(fila: fila - 1, columna: columna),
+        Posicion(fila: fila + 1, columna: columna),
+        Posicion(fila: fila, columna: columna - 1),
+        Posicion(fila: fila, columna: columna + 1),
+      ];
+
   @override
   bool operator ==(Object other) {
     return other is Posicion && other.fila == fila && other.columna == columna;

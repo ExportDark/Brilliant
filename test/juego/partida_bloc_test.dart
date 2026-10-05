@@ -34,7 +34,8 @@ int Function() _dado(List<int> caras) {
   return () => caras[siguiente++ % caras.length];
 }
 
-PartidaBloc _nuevoBloc({Tablero? tablero, List<int> caras = const [3, 5]}) =>
+/// Por defecto salen 4 y 3. Con el 4 de ancla, el 3 va junto a C1.
+PartidaBloc _nuevoBloc({Tablero? tablero, List<int> caras = const [4, 3]}) =>
     PartidaBloc(tablero ?? _inicial, tirarDado: _dado(caras));
 
 void main() {
@@ -44,19 +45,20 @@ void main() {
 
       expect(bloc.state.turno, 1);
       expect(bloc.state.dados, isNull);
-      expect(bloc.state.valorElegido, isNull);
+      expect(bloc.state.valorAncla, isNull);
+      expect(bloc.state.valorAColocar, isNull);
       expect(bloc.state.terminada, isFalse);
       expect(bloc.state.casillasLlenas, 6);
     });
   });
 
-  group('PartidaBloc — tirar y anclar un dado', () {
+  group('PartidaBloc — tirar y elegir el ancla', () {
     blocTest<PartidaBloc, PartidaState>(
-      'tirar saca los dos dados, sin ninguno anclado',
+      'tirar saca los dos dados, sin ancla elegida',
       build: _nuevoBloc,
       act: (bloc) => bloc.add(const DadosTirados()),
       verify: (bloc) {
-        expect(bloc.state.dados, [3, 5]);
+        expect(bloc.state.dados, [4, 3]);
         expect(bloc.state.dadoElegido, isNull);
       },
     );
@@ -72,22 +74,42 @@ void main() {
     );
 
     blocTest<PartidaBloc, PartidaState>(
-      'anclar un dado lo vuelve el número a anotar',
+      'el dado elegido es el ancla y el otro es el que se anota',
       build: _nuevoBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
-        ..add(const DadoElegido(1)),
-      verify: (bloc) => expect(bloc.state.valorElegido, 5),
+        ..add(const DadoElegido(0)),
+      verify: (bloc) {
+        expect(bloc.state.valorAncla, 4);
+        expect(bloc.state.valorAColocar, 3);
+      },
     );
 
     blocTest<PartidaBloc, PartidaState>(
-      'el dado anclado se puede cambiar por el otro',
+      'cambiar de ancla intercambia los dos números',
       build: _nuevoBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
-        ..add(const DadoElegido(1))
+        ..add(const DadoElegido(0))
+        ..add(const DadoElegido(1)),
+      verify: (bloc) {
+        expect(bloc.state.valorAncla, 3);
+        expect(bloc.state.valorAColocar, 4);
+      },
+    );
+
+    blocTest<PartidaBloc, PartidaState>(
+      'las casillas con el número ancla son anclas',
+      build: _nuevoBloc,
+      act: (bloc) => bloc
+        ..add(const DadosTirados())
         ..add(const DadoElegido(0)),
-      verify: (bloc) => expect(bloc.state.valorElegido, 3),
+      verify: (bloc) {
+        final anclas = bloc.state.tablero.celdas
+            .map((celda) => celda.posicion)
+            .where(bloc.state.esAncla);
+        expect(anclas, [_pos('C1')]);
+      },
     );
 
     blocTest<PartidaBloc, PartidaState>(
@@ -110,14 +132,14 @@ void main() {
 
   group('PartidaBloc — colocar', () {
     blocTest<PartidaBloc, PartidaState>(
-      'una jugada válida anota el número y cierra el turno',
+      'junto al ancla, anota el otro dado y cierra el turno',
       build: _nuevoBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0))
-        ..add(ValorColocado(_pos('A2'))),
+        ..add(ValorColocado(_pos('B1'))),
       verify: (bloc) {
-        expect(bloc.state.tablero.celdaEn(_pos('A2'))!.valor, 3);
+        expect(bloc.state.tablero.celdaEn(_pos('B1'))!.valor, 3);
         expect(bloc.state.dados, isNull);
         expect(bloc.state.dadoElegido, isNull);
         expect(bloc.state.turno, 2);
@@ -125,12 +147,23 @@ void main() {
     );
 
     blocTest<PartidaBloc, PartidaState>(
-      'sin un dado anclado no se coloca nada',
+      'sin ancla elegida no se coloca nada',
       build: _nuevoBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
-        ..add(ValorColocado(_pos('A2'))),
+        ..add(ValorColocado(_pos('B1'))),
       skip: 1,
+      expect: () => <PartidaState>[],
+    );
+
+    blocTest<PartidaBloc, PartidaState>(
+      'no se coloca lejos de las casillas con el número ancla',
+      build: _nuevoBloc,
+      act: (bloc) => bloc
+        ..add(const DadosTirados())
+        ..add(const DadoElegido(0))
+        ..add(ValorColocado(_pos('A2'))),
+      skip: 2,
       expect: () => <PartidaState>[],
     );
 

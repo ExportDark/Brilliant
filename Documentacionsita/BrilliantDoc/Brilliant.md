@@ -19,7 +19,7 @@ Repositorio: https://github.com/ExportDark/Brilliant
 - [[Modelo de dominio]] — `Posicion`, `Celda`, `TipoRegion`, `Region`, `Tablero`
 - [[Reglas de color en código]] — el contrato `ReglaColor` y las funciones puras
 - [[Preparación de la partida]] — repartir los valores iniciales antes de jugar
-- [[Turnos y jugadas]] — los dados, el dado anclado y la validación de cada jugada
+- [[Turnos y jugadas]] — los dados, la regla del ancla y la validación de cada jugada
 
 ## Decisiones de diseño
 

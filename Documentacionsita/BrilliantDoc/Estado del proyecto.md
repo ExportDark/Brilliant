@@ -28,22 +28,26 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 - [x] **Layout verificado contra el PDF** (2026-09-30) — se compararon los colores de las
       49 casillas de los 5 tableros del PDF con el modelo y con la pantalla, y coinciden
       todas, igual que las 6 casillas iniciales ([[Decisiones de extracción del manual]])
-- [x] **`PartidaBloc` y validación de jugadas** — dados (2d6), dado anclado, turnos,
-      validación contra las reglas de color, pasar turno y fin de partida
-      ([[Turnos y jugadas]])
-- [x] **Pantalla de partida** — tirar los dados, anclar uno, iluminar dónde cabe (y
-      apenas dónde la regla lo impide, explicándola al tocar); pasar turno y fin de
-      partida. La cuadrícula siempre es negra: lo que se ilumina es la casilla
+- [x] **`PartidaBloc` y validación de jugadas** — dados (2d6), turnos, la **regla del
+      ancla** (el otro dado va pegado, sin diagonales, a una casilla con el número del
+      ancla), las reglas de color, pasar turno y fin de partida ([[Turnos y jugadas]])
+- [x] **Pantalla de partida** — tirar los dados, elegir el ancla, ⚓ en las casillas con
+      ese número, iluminar dónde cabe el otro dado (y apenas dónde la regla de color lo
+      impide), explicar al tocar por qué no se puede; pasar turno y fin de partida. La
+      cuadrícula siempre es negra: lo que se ilumina es la casilla
 
 **Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
-casilla acepta nada. Lo único que falta para cerrarla es el puntaje. 147 tests, todos
+tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 160 tests, todos
 pasando.
 
 ## Qué falta
 
 - [ ] **`puntuacion/`** — el cálculo de puntaje, y mostrarlo al terminar la partida
       ([[Puntuación]])
-- [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual
+- [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual. Ojo: esas partidas
+      se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del ancla.
+      Sirven para validar las reglas de color, no el ancla
+- [ ] Afinar lo visual de la iluminación
 
 ## Cómo se viene trabajando
 

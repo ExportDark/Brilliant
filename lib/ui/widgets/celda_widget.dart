@@ -35,11 +35,15 @@ enum Iluminacion {
 /// relleno, que se aclara hacia el blanco. [seleccionada] (la casilla donde
 /// va a caer el próximo número) y [Iluminacion.posible] se aclaran mucho;
 /// [Iluminacion.bloqueada], solo un poco.
+///
+/// Con [esAncla], una marca de ancla en la esquina indica que la casilla
+/// tiene el número del dado ancla.
 class CeldaWidget extends StatelessWidget {
   final Celda celda;
   final double tamano;
   final bool seleccionada;
   final Iluminacion iluminacion;
+  final bool esAncla;
 
   const CeldaWidget({
     super.key,
@@ -47,6 +51,7 @@ class CeldaWidget extends StatelessWidget {
     this.tamano = 48,
     this.seleccionada = false,
     this.iluminacion = Iluminacion.normal,
+    this.esAncla = false,
   });
 
   double get _aclarado {
@@ -62,20 +67,42 @@ class CeldaWidget extends StatelessWidget {
     return Container(
       width: tamano,
       height: tamano,
-      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Color.lerp(_colorPorColor5[celda.color], Colors.white, aclarado),
         border: Border.all(width: celda.esInicial ? 3 : 1),
       ),
-      child: Text(
-        celda.valor?.toString() ?? '',
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          // Sobre un fondo muy aclarado, el blanco ya no se lee.
-          color: aclarado >= _aclaradoFuerte ? Colors.black87 : Colors.white,
-        ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Center(
+            child: Text(
+              celda.valor?.toString() ?? '',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                // Sobre un fondo muy aclarado, el blanco ya no se lee.
+                color: aclarado >= _aclaradoFuerte ? Colors.black87 : Colors.white,
+              ),
+            ),
+          ),
+          if (esAncla) const Positioned(top: 1, right: 1, child: _MarcaAncla()),
+        ],
       ),
+    );
+  }
+}
+
+/// El ancla chiquita de la esquina, sobre un círculo claro para que se vea
+/// en cualquier color de zona.
+class _MarcaAncla extends StatelessWidget {
+  const _MarcaAncla();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(1),
+      decoration: const BoxDecoration(color: Colors.white70, shape: BoxShape.circle),
+      child: const Icon(Icons.anchor, size: 12, color: Colors.black87),
     );
   }
 }
