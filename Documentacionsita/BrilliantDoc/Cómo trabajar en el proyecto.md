@@ -1,6 +1,6 @@
 # Cómo trabajar en el proyecto
 
-Ver también: [[Estado del proyecto]] · [[Arquitectura general]]
+Ver también: [[Estado del proyecto]] · [[Arquitectura general]] · [[Pruebas]]
 
 ## Dónde está todo
 
@@ -9,7 +9,7 @@ Ver también: [[Estado del proyecto]] · [[Arquitectura general]]
 | Proyecto Flutter | `Escritorio/Algara The Final Chapter/Brilliant/` |
 | Este vault | `Brilliant/Documentacionsita/BrilliantDoc/` |
 | Repo remoto | https://github.com/ExportDark/Brilliant |
-| Manual del juego | `Brilliant_Imitacion_Manual_y_Partidas.pdf` |
+| Manual del juego | `Brilliant_Imitacion_Manual_y_Partidas.pdf`, en `C:\Users\expor\Downloads\` (fuera del repo) |
 
 ## El SDK de Flutter no está en el PATH
 
@@ -35,6 +35,43 @@ flutter build web         # compilar para web
 
 VS Code tiene instaladas las extensiones `dart-code.dart-code` y `dart-code.flutter`, así
 que los archivos `.dart` se reconocen solos (resaltado, análisis, botón Run/Debug).
+
+## Probar la app en el navegador (sin Chrome)
+
+En esta máquina no hay Chrome, pero sí Edge y Node. Así se revisa la app de verdad y se
+le sacan capturas, que es como se verificó cada cambio visual:
+
+1. Compilar: `C:\src\flutter\bin\flutter.bat build web` (tarda alrededor de un minuto).
+2. Servir `build/web`: `python -m http.server 8765 --bind 127.0.0.1`.
+3. En una carpeta temporal (no en el repo), instalar `playwright-core` y abrir Edge sin
+   ventana: `chromium.launch({ channel: 'msedge', headless: true })`.
+4. Flutter web dibuja todo en un canvas. Para poder encontrar botones hay que activar la
+   semántica haciendo clic en `flt-semantics-placeholder` desde JavaScript.
+   - Los botones son `flt-semantics[role="button"]` con su texto adentro.
+   - Las chips del resumen (`C1 = 4`) tienen el texto en `aria-label`.
+   - Las casillas del tablero no tienen etiqueta: se tocan por coordenadas, a partir de
+     la etiqueta de columna "A". Son 48 px por casilla.
+5. Revisar las capturas y cerrar el servidor del puerto 8765.
+
+## Leer el PDF del manual
+
+El PDF no es una imagen: es dibujo vectorial (salió de Excel). Cada casilla del tablero
+es un rectángulo con su color exacto, así que se puede leer con precisión en vez de a ojo:
+
+- Con PyMuPDF (`pip install --target <carpeta temporal> pymupdf`),
+  `page.get_drawings()` da cada rectángulo con su color de relleno, y
+  `page.get_text()` da los números de las partidas.
+- Los tableros están en las páginas 1, 4, 5, 6 y 8. Las casillas iniciales son las que
+  tienen el recuadro grueso.
+
+Así se verificó el layout el 2026-09-30. Ver [[Decisiones de extracción del manual]].
+
+## Archivos que no se suben al repo
+
+- `NOTITAS.txt`: notas personales de pendientes.
+- `devtools_options.yaml`: lo crea Flutter DevTools al correr la app desde VS Code.
+- `.obsidian/workspace.json` y `.obsidian/graph.json`: Obsidian los reescribe solo al
+  abrir o cerrar paneles.
 
 ## Problema conocido: Application Control de Windows
 
@@ -71,3 +108,6 @@ Windows → Control de aplicaciones y del explorador.
 - **Entidades inmutables** (`Celda.conValor()` devuelve una copia, no muta)
 - **Commits incrementales**: una pieza por commit, con sus tests y el README
   actualizado en el mismo commit; mensajes breves
+- **Todo cambio queda en el vault**: se actualiza la nota del tema y se agrega una entrada
+  en [[Historial de cambios]], con la fecha, el porqué y el commit. Ver también
+  [[Pruebas]] para cómo están organizados los tests

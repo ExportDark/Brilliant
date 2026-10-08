@@ -2,7 +2,7 @@
 
 Última actualización: 2026-10-08 · Repo: https://github.com/ExportDark/Brilliant
 
-Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
+Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
 ## Qué está construido
 
@@ -37,7 +37,9 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
       cuadrícula siempre es negra: lo que se ilumina es la casilla
 - [x] **Partidas completas simuladas** — 10 partidas con dados al azar (semillas fijas)
       jugadas hasta el final por el `PartidaBloc`: todas terminan y ninguna zona rompe su
-      regla de color (`test/juego/partida_completa_test.dart`)
+      regla de color (`test/juego/partida_completa_test.dart`). Ver [[Pruebas]]
+- [x] **Un archivo por prueba** para los casos sueltos de la regla del ancla, con
+      ayudantes compartidos en `test/juego/ayudantes.dart`
 
 **Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
 tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 177 tests, todos
@@ -45,8 +47,10 @@ pasando.
 
 ## Qué falta
 
+- [ ] **Decidir cómo se puntúa.** Con las reglas actuales el tablero **siempre** termina
+      lleno, así que contar casillas no distingue a nadie. Hay que elegir entre contar
+      turnos o fijar un número de rondas ([[Puntuación]])
 - [ ] **`puntuacion/`** — el cálculo de puntaje, y mostrarlo al terminar la partida
-      ([[Puntuación]])
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual. Ojo: esas partidas
       se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del ancla.
       Sirven para validar las reglas de color, no el ancla
@@ -58,5 +62,6 @@ Construcción **incremental, módulo por módulo**: cada pieza se agrega con sus
 commit propio, con la documentación actualizada en el mismo commit. Nada de commits
 gigantes que mezclen varias cosas.
 
-Para ver qué se hizo y cuándo, el historial está en el repositorio: `git log --oneline`,
-o en https://github.com/ExportDark/Brilliant/commits.
+Qué se hizo y cuándo, con su porqué, está en [[Historial de cambios]]. El detalle exacto
+de cada commit está en el repositorio: `git log --oneline`, o en
+https://github.com/ExportDark/Brilliant/commits.

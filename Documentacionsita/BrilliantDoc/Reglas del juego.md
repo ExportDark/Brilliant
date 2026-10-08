@@ -11,6 +11,11 @@ Ver también: [[Tablero y regiones]] · [[Puntuación]]
 Llenar la mayor cantidad de casillas posible respetando la regla de cada zona de color.
 Entre más zonas completes cumpliendo su regla, mejor tablero terminas.
 
+> [!important] Con las reglas de este proyecto, el tablero siempre se llena
+> Jugando sin límite de turnos, toda partida termina con las 49 casillas llenas: lo que
+> cambia es cuántos turnos tarda. Este objetivo, tal como lo plantea el manual, supone un
+> número fijo de rondas. Ver [[Puntuación]].
+
 ## Materiales
 
 - Una hoja/tablero de 7×7 por jugador

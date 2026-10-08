@@ -16,9 +16,14 @@ Ver también: [[Reglas del juego]] · [[Preparación de la partida]] · [[Reglas
 4. Si **no hay jugada con ninguno de los dos dados como ancla**, el turno se pasa sin anotar.
 
 La partida **termina** cuando ninguna tirada posible tiene jugada: ninguna combinación de
-ancla y número del 1 al 6 cabe en ningún lado. Eso incluye el tablero lleno, pero también
-un tablero con casillas libres que ninguna tirada puede llenar, por ejemplo una zona roja
-que ya repitió un número.
+ancla y número del 1 al 6 cabe en ningún lado.
+
+En la práctica eso es **el tablero lleno**. Jugando, ninguna zona se queda sin salida, y
+toda casilla vacía tarde o temprano queda junto a una llena, así que la partida siempre
+acaba con las 49 casillas (lo confirmaron las partidas simuladas de [[Pruebas]]). Un
+tablero con casillas libres que nadie puede llenar, como una zona roja con un número
+repetido, solo se puede armar a mano en los tests, saltándose las reglas. Ver
+[[Puntuación]] para lo que esto significa al contar puntos.
 
 Al empezar siempre hay jugada: la preparación pone los 6 números, uno en cada casilla
 inicial, así que cualquier dado tiene al menos una casilla ancla.
