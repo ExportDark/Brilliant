@@ -190,6 +190,77 @@ void main() {
       expect: () => <PartidaState>[],
       verify: (bloc) => expect(bloc.state.tablero.celdaEn(_pos('C2'))!.valor, isNull),
     );
+
+    blocTest<PartidaBloc, PartidaState>(
+      'una posición fuera del tablero se ignora sin errores',
+      build: _nuevoBloc,
+      act: (bloc) => bloc
+        ..add(const DadosTirados())
+        ..add(const DadoElegido(0))
+        ..add(const ValorColocado(Posicion(fila: 9, columna: 9))),
+      skip: 2,
+      expect: () => <PartidaState>[],
+      errors: () => <Object>[],
+    );
+
+    blocTest<PartidaBloc, PartidaState>(
+      'con los dos dados iguales, el ancla y el número a anotar son el mismo',
+      build: () => _nuevoBloc(caras: [4, 4]),
+      // C2 está junto al 4 de C1, y la zona azul acepta otro 4.
+      act: (bloc) => bloc
+        ..add(const DadosTirados())
+        ..add(const DadoElegido(0))
+        ..add(ValorColocado(_pos('C2'))),
+      skip: 1,
+      expect: () => [
+        isA<PartidaState>()
+            .having((state) => state.valorAncla, 'valorAncla', 4)
+            .having((state) => state.valorAColocar, 'valorAColocar', 4),
+        isA<PartidaState>().having(
+          (state) => state.tablero.celdaEn(_pos('C2'))!.valor,
+          'valor en C2',
+          4,
+        ),
+      ],
+    );
+  });
+
+  group('PartidaBloc — la cadena de anclas', () {
+    // Turno 1: sale 4 y 3, ancla 4, el 3 va a B1 (junto al 4 de C1).
+    // Turno 2: sale 3 y 5, ancla 3: el 3 recién puesto en B1 ya sirve de ancla.
+    PartidaBloc enCadena() => _nuevoBloc(caras: [4, 3, 3, 5]);
+
+    void primerTurnoYAnclaDelSegundo(PartidaBloc bloc) => bloc
+      ..add(const DadosTirados())
+      ..add(const DadoElegido(0))
+      ..add(ValorColocado(_pos('B1')))
+      ..add(const DadosTirados())
+      ..add(const DadoElegido(0));
+
+    blocTest<PartidaBloc, PartidaState>(
+      'un número recién anotado es ancla en el turno siguiente',
+      build: enCadena,
+      act: primerTurnoYAnclaDelSegundo,
+      verify: (bloc) {
+        expect(bloc.state.valorAncla, 3);
+        expect(bloc.state.esAncla(_pos('B1')), isTrue);
+        expect(bloc.state.esAncla(_pos('C6')), isTrue);
+      },
+    );
+
+    blocTest<PartidaBloc, PartidaState>(
+      'se puede jugar junto al ancla nueva, aunque quede lejos de las iniciales',
+      build: enCadena,
+      // A1 solo toca a B1: ninguna casilla inicial tiene un 3 a su lado.
+      act: (bloc) {
+        primerTurnoYAnclaDelSegundo(bloc);
+        bloc.add(ValorColocado(_pos('A1')));
+      },
+      verify: (bloc) {
+        expect(bloc.state.tablero.celdaEn(_pos('A1'))!.valor, 5);
+        expect(bloc.state.turno, 3);
+      },
+    );
   });
 
   group('PartidaBloc — sin jugada y fin de partida', () {
@@ -228,6 +299,25 @@ void main() {
       skip: 1,
       expect: () => <PartidaState>[],
       verify: (bloc) => expect(bloc.state.sinJugada, isFalse),
+    );
+
+    blocTest<PartidaBloc, PartidaState>(
+      'al anotar la última jugada posible, la partida termina y ya no se tira',
+      build: () => _nuevoBloc(tablero: soloCabeElSeis, caras: [2, 6]),
+      // El 2 de E6 es el ancla y el 6 completa la corrida roja en E5.
+      act: (bloc) => bloc
+        ..add(const DadosTirados())
+        ..add(const DadoElegido(0))
+        ..add(ValorColocado(_pos('E5')))
+        ..add(const DadosTirados()),
+      skip: 3,
+      expect: () => <PartidaState>[],
+      verify: (bloc) {
+        expect(bloc.state.tablero.celdaEn(_pos('E5'))!.valor, 6);
+        expect(bloc.state.terminada, isTrue);
+        expect(bloc.state.casillasLlenas, 49);
+        expect(bloc.state.dados, isNull);
+      },
     );
 
     blocTest<PartidaBloc, PartidaState>(

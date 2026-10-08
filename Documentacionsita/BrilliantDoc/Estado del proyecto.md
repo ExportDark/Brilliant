@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-04 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-08 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
 
@@ -35,9 +35,12 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]]
       ese número, iluminar dónde cabe el otro dado (y apenas dónde la regla de color lo
       impide), explicar al tocar por qué no se puede; pasar turno y fin de partida. La
       cuadrícula siempre es negra: lo que se ilumina es la casilla
+- [x] **Partidas completas simuladas** — 10 partidas con dados al azar (semillas fijas)
+      jugadas hasta el final por el `PartidaBloc`: todas terminan y ninguna zona rompe su
+      regla de color (`test/juego/partida_completa_test.dart`)
 
 **Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
-tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 160 tests, todos
+tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 177 tests, todos
 pasando.
 
 ## Qué falta

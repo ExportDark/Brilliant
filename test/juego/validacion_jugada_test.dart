@@ -106,6 +106,21 @@ void main() {
     });
   });
 
+  group('evaluarJugada — el orden de los chequeos', () {
+    test('lejos del ancla gana, aunque la regla de la zona también lo rechace', () {
+      // D3 es azul y la zona ya tiene un 4, así que el 3 no entraría; pero
+      // además no hay ningún 5 a su lado, y eso es lo que se le dice al jugador.
+      final resultado = _evaluar(_inicial(), 'D3', ancla: 5, valor: 3);
+
+      expect(resultado, isA<SinAncla>());
+      expect((resultado as SinAncla).ancla, 5);
+    });
+
+    test('ocupada gana, aunque tampoco haya un ancla al lado', () {
+      expect(_evaluar(_inicial(), 'C1', ancla: 6, valor: 3), isA<CasillaOcupada>());
+    });
+  });
+
   group('hayJugada', () {
     test('sin ninguna casilla con el número ancla no hay jugada', () {
       expect(hayJugada(Tablero.mapaOriginal(), ancla: 1, valor: 1), isFalse);
