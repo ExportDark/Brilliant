@@ -61,6 +61,12 @@ Windows → Control de aplicaciones y del explorador.
 - **Nombres en español**, consistentes con el dominio del juego (`Celda`, `Region`,
   `Tablero`, `puedeAgregar`, `casillas`)
 - **Un test por archivo de lógica**, en `test/` con la misma estructura que `lib/`
+- **Pruebas sueltas, una por archivo**: los casos puntuales de la regla del ancla viven
+  cada uno en su propio archivo, en `test/juego/partida/` (los de `PartidaBloc`) y
+  `test/juego/validacion/` (los de `evaluarJugada`). El nombre del archivo dice qué
+  prueba, por ejemplo `dados_iguales_test.dart`. Los ayudantes que comparten (el tablero
+  de la Partida 1, los dados con caras fijas…) están en `test/juego/ayudantes.dart`, que
+  no termina en `_test.dart`, así que `flutter test` no lo corre solo
 - **Funciones puras** para la lógica de reglas, testeables en aislado
 - **Entidades inmutables** (`Celda.conValor()` devuelve una copia, no muta)
 - **Commits incrementales**: una pieza por commit, con sus tests y el README

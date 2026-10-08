@@ -3,45 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/juego/partida_bloc.dart';
 import 'package:brilliant/juego/partida_event.dart';
 import 'package:brilliant/juego/partida_state.dart';
-import 'package:brilliant/modelo/posicion.dart';
-import 'package:brilliant/modelo/tablero.dart';
 
-Posicion _pos(String notacion) => Posicion.desdeNotacion(notacion);
+import 'ayudantes.dart';
 
-/// El tablero con los valores iniciales de la Partida 1 del manual.
-final _inicial = Tablero.mapaOriginal().conValores({
-  _pos('C1'): 4,
-  _pos('F2'): 1,
-  _pos('B4'): 2,
-  _pos('E4'): 5,
-  _pos('C6'): 3,
-  _pos('E7'): 6,
-});
-
-/// Todo el tablero lleno menos [libre]. Las casillas sin valor en [valores]
-/// llevan un 1; no se revisan las reglas al llenarlo.
-Tablero _llenoMenos(String libre, {Map<String, int> valores = const {}}) {
-  final base = Tablero.mapaOriginal();
-  return base.conValores({
-    for (final celda in base.celdas)
-      if (celda.posicion != _pos(libre)) celda.posicion: valores[celda.posicion.notacion] ?? 1,
-  });
-}
-
-/// Un dado que va sacando [caras] en orden, para que los tests sepan qué sale.
-int Function() _dado(List<int> caras) {
-  var siguiente = 0;
-  return () => caras[siguiente++ % caras.length];
-}
-
-/// Por defecto salen 4 y 3. Con el 4 de ancla, el 3 va junto a C1.
-PartidaBloc _nuevoBloc({Tablero? tablero, List<int> caras = const [4, 3]}) =>
-    PartidaBloc(tablero ?? _inicial, tirarDado: _dado(caras));
+// Los casos de la regla del ancla viven uno por archivo en `partida/`.
 
 void main() {
   group('PartidaBloc — estado inicial', () {
     test('arranca en el turno 1, sin dados', () {
-      final bloc = _nuevoBloc();
+      final bloc = partidaBloc();
 
       expect(bloc.state.turno, 1);
       expect(bloc.state.dados, isNull);
@@ -55,7 +25,7 @@ void main() {
   group('PartidaBloc — tirar y elegir el ancla', () {
     blocTest<PartidaBloc, PartidaState>(
       'tirar saca los dos dados, sin ancla elegida',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc.add(const DadosTirados()),
       verify: (bloc) {
         expect(bloc.state.dados, [4, 3]);
@@ -65,7 +35,7 @@ void main() {
 
     blocTest<PartidaBloc, PartidaState>(
       'no se puede volver a tirar sin colocar o pasar',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadosTirados()),
@@ -75,7 +45,7 @@ void main() {
 
     blocTest<PartidaBloc, PartidaState>(
       'el dado elegido es el ancla y el otro es el que se anota',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0)),
@@ -87,7 +57,7 @@ void main() {
 
     blocTest<PartidaBloc, PartidaState>(
       'cambiar de ancla intercambia los dos números',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0))
@@ -100,7 +70,7 @@ void main() {
 
     blocTest<PartidaBloc, PartidaState>(
       'las casillas con el número ancla son anclas',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0)),
@@ -108,20 +78,20 @@ void main() {
         final anclas = bloc.state.tablero.celdas
             .map((celda) => celda.posicion)
             .where(bloc.state.esAncla);
-        expect(anclas, [_pos('C1')]);
+        expect(anclas, [pos('C1')]);
       },
     );
 
     blocTest<PartidaBloc, PartidaState>(
       'no se puede anclar un dado antes de tirar',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc.add(const DadoElegido(0)),
       expect: () => <PartidaState>[],
     );
 
     blocTest<PartidaBloc, PartidaState>(
       'solo hay dos dados para anclar',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(2)),
@@ -133,13 +103,13 @@ void main() {
   group('PartidaBloc — colocar', () {
     blocTest<PartidaBloc, PartidaState>(
       'junto al ancla, anota el otro dado y cierra el turno',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0))
-        ..add(ValorColocado(_pos('B1'))),
+        ..add(ValorColocado(pos('B1'))),
       verify: (bloc) {
-        expect(bloc.state.tablero.celdaEn(_pos('B1'))!.valor, 3);
+        expect(bloc.state.tablero.celdaEn(pos('B1'))!.valor, 3);
         expect(bloc.state.dados, isNull);
         expect(bloc.state.dadoElegido, isNull);
         expect(bloc.state.turno, 2);
@@ -148,131 +118,56 @@ void main() {
 
     blocTest<PartidaBloc, PartidaState>(
       'sin ancla elegida no se coloca nada',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
-        ..add(ValorColocado(_pos('B1'))),
+        ..add(ValorColocado(pos('B1'))),
       skip: 1,
       expect: () => <PartidaState>[],
     );
 
     blocTest<PartidaBloc, PartidaState>(
       'no se coloca lejos de las casillas con el número ancla',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0))
-        ..add(ValorColocado(_pos('A2'))),
+        ..add(ValorColocado(pos('A2'))),
       skip: 2,
       expect: () => <PartidaState>[],
     );
 
     blocTest<PartidaBloc, PartidaState>(
       'no se coloca en una casilla ocupada',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0))
-        ..add(ValorColocado(_pos('C1'))),
+        ..add(ValorColocado(pos('C1'))),
       skip: 2,
       expect: () => <PartidaState>[],
     );
 
     blocTest<PartidaBloc, PartidaState>(
       'no se coloca donde la regla de la zona no lo permite',
-      build: _nuevoBloc,
+      build: partidaBloc,
       // La zona azul ya tiene un 4 en C1: el 3 no entra en C2.
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0))
-        ..add(ValorColocado(_pos('C2'))),
+        ..add(ValorColocado(pos('C2'))),
       skip: 2,
       expect: () => <PartidaState>[],
-      verify: (bloc) => expect(bloc.state.tablero.celdaEn(_pos('C2'))!.valor, isNull),
-    );
-
-    blocTest<PartidaBloc, PartidaState>(
-      'una posición fuera del tablero se ignora sin errores',
-      build: _nuevoBloc,
-      act: (bloc) => bloc
-        ..add(const DadosTirados())
-        ..add(const DadoElegido(0))
-        ..add(const ValorColocado(Posicion(fila: 9, columna: 9))),
-      skip: 2,
-      expect: () => <PartidaState>[],
-      errors: () => <Object>[],
-    );
-
-    blocTest<PartidaBloc, PartidaState>(
-      'con los dos dados iguales, el ancla y el número a anotar son el mismo',
-      build: () => _nuevoBloc(caras: [4, 4]),
-      // C2 está junto al 4 de C1, y la zona azul acepta otro 4.
-      act: (bloc) => bloc
-        ..add(const DadosTirados())
-        ..add(const DadoElegido(0))
-        ..add(ValorColocado(_pos('C2'))),
-      skip: 1,
-      expect: () => [
-        isA<PartidaState>()
-            .having((state) => state.valorAncla, 'valorAncla', 4)
-            .having((state) => state.valorAColocar, 'valorAColocar', 4),
-        isA<PartidaState>().having(
-          (state) => state.tablero.celdaEn(_pos('C2'))!.valor,
-          'valor en C2',
-          4,
-        ),
-      ],
-    );
-  });
-
-  group('PartidaBloc — la cadena de anclas', () {
-    // Turno 1: sale 4 y 3, ancla 4, el 3 va a B1 (junto al 4 de C1).
-    // Turno 2: sale 3 y 5, ancla 3: el 3 recién puesto en B1 ya sirve de ancla.
-    PartidaBloc enCadena() => _nuevoBloc(caras: [4, 3, 3, 5]);
-
-    void primerTurnoYAnclaDelSegundo(PartidaBloc bloc) => bloc
-      ..add(const DadosTirados())
-      ..add(const DadoElegido(0))
-      ..add(ValorColocado(_pos('B1')))
-      ..add(const DadosTirados())
-      ..add(const DadoElegido(0));
-
-    blocTest<PartidaBloc, PartidaState>(
-      'un número recién anotado es ancla en el turno siguiente',
-      build: enCadena,
-      act: primerTurnoYAnclaDelSegundo,
-      verify: (bloc) {
-        expect(bloc.state.valorAncla, 3);
-        expect(bloc.state.esAncla(_pos('B1')), isTrue);
-        expect(bloc.state.esAncla(_pos('C6')), isTrue);
-      },
-    );
-
-    blocTest<PartidaBloc, PartidaState>(
-      'se puede jugar junto al ancla nueva, aunque quede lejos de las iniciales',
-      build: enCadena,
-      // A1 solo toca a B1: ninguna casilla inicial tiene un 3 a su lado.
-      act: (bloc) {
-        primerTurnoYAnclaDelSegundo(bloc);
-        bloc.add(ValorColocado(_pos('A1')));
-      },
-      verify: (bloc) {
-        expect(bloc.state.tablero.celdaEn(_pos('A1'))!.valor, 5);
-        expect(bloc.state.turno, 3);
-      },
+      verify: (bloc) => expect(bloc.state.tablero.celdaEn(pos('C2'))!.valor, isNull),
     );
   });
 
   group('PartidaBloc — sin jugada y fin de partida', () {
-    // E5 es la última casilla libre y su zona roja ya tiene del 1 al 5: solo el 6 cabe.
-    final soloCabeElSeis = _llenoMenos(
-      'E5',
-      valores: {'F5': 1, 'E6': 2, 'D6': 3, 'D7': 4, 'E7': 5},
-    );
+    final soloCabeElSeis = soloCabeElSeisEnE5();
 
     blocTest<PartidaBloc, PartidaState>(
       'si ningún dado cabe, se puede pasar el turno',
-      build: () => _nuevoBloc(tablero: soloCabeElSeis, caras: [2, 3]),
+      build: () => partidaBloc(tablero: soloCabeElSeis, caras: [2, 3]),
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const TurnoPasado()),
@@ -285,14 +180,14 @@ void main() {
 
     blocTest<PartidaBloc, PartidaState>(
       'con la tirada sin jugada, el estado lo avisa',
-      build: () => _nuevoBloc(tablero: soloCabeElSeis, caras: [2, 3]),
+      build: () => partidaBloc(tablero: soloCabeElSeis, caras: [2, 3]),
       act: (bloc) => bloc.add(const DadosTirados()),
       verify: (bloc) => expect(bloc.state.sinJugada, isTrue),
     );
 
     blocTest<PartidaBloc, PartidaState>(
       'si algún dado cabe, no se puede pasar',
-      build: () => _nuevoBloc(tablero: soloCabeElSeis, caras: [2, 6]),
+      build: () => partidaBloc(tablero: soloCabeElSeis, caras: [2, 6]),
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const TurnoPasado()),
@@ -302,27 +197,8 @@ void main() {
     );
 
     blocTest<PartidaBloc, PartidaState>(
-      'al anotar la última jugada posible, la partida termina y ya no se tira',
-      build: () => _nuevoBloc(tablero: soloCabeElSeis, caras: [2, 6]),
-      // El 2 de E6 es el ancla y el 6 completa la corrida roja en E5.
-      act: (bloc) => bloc
-        ..add(const DadosTirados())
-        ..add(const DadoElegido(0))
-        ..add(ValorColocado(_pos('E5')))
-        ..add(const DadosTirados()),
-      skip: 3,
-      expect: () => <PartidaState>[],
-      verify: (bloc) {
-        expect(bloc.state.tablero.celdaEn(_pos('E5'))!.valor, 6);
-        expect(bloc.state.terminada, isTrue);
-        expect(bloc.state.casillasLlenas, 49);
-        expect(bloc.state.dados, isNull);
-      },
-    );
-
-    blocTest<PartidaBloc, PartidaState>(
       'sin tirar no se puede pasar',
-      build: _nuevoBloc,
+      build: partidaBloc,
       act: (bloc) => bloc.add(const TurnoPasado()),
       expect: () => <PartidaState>[],
     );
@@ -330,7 +206,7 @@ void main() {
     blocTest<PartidaBloc, PartidaState>(
       'cuando ninguna casilla acepta nada, la partida termina y ya no se tira',
       // La zona roja #9 ya tiene 1 repetido: E5 no acepta ningún número.
-      build: () => _nuevoBloc(tablero: _llenoMenos('E5')),
+      build: () => partidaBloc(tablero: llenoMenos('E5')),
       act: (bloc) => bloc.add(const DadosTirados()),
       expect: () => <PartidaState>[],
       verify: (bloc) {
