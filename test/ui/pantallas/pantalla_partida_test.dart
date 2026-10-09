@@ -4,6 +4,7 @@ import 'package:brilliant/modelo/posicion.dart';
 import 'package:brilliant/modelo/tablero.dart';
 import 'package:brilliant/ui/pantallas/pantalla_partida.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
+import 'package:brilliant/ui/widgets/tablero_widget.dart';
 
 Posicion _pos(String notacion) => Posicion.desdeNotacion(notacion);
 
@@ -93,24 +94,24 @@ void main() {
       expect(_habilitado(tester, _tirar), isFalse);
     });
 
-    testWidgets('sin ancla elegida no se ilumina ni se marca nada', (tester) async {
+    testWidgets('sin dado ancla elegido no se ilumina ni se resalta nada', (tester) async {
       await _abrir(tester);
 
       await _tocar(tester, _tirar);
 
       final celdas = tester.widgetList<CeldaWidget>(find.byType(CeldaWidget));
       expect(celdas.map((celda) => celda.iluminacion).toSet(), {Iluminacion.normal});
-      expect(celdas.where((celda) => celda.esAncla), isEmpty);
+      expect(celdas.where((celda) => celda.numeroResaltado), isEmpty);
     });
 
-    testWidgets('con el 4 de ancla se iluminan las vecinas de C1 donde cabe el 3', (
+    testWidgets('con el 4 como dado ancla se resalta el 4 de C1 y se iluminan sus vecinas', (
       tester,
     ) async {
       await _abrir(tester);
 
       await _tirarYAnclar(tester, 0);
 
-      expect(_celdaEn(tester, 'C1').esAncla, isTrue);
+      expect(_celdaEn(tester, 'C1').numeroResaltado, isTrue);
       expect(_celdaEn(tester, 'B1').iluminacion, Iluminacion.posible);
       expect(_celdaEn(tester, 'D1').iluminacion, Iluminacion.posible);
       // C2 está junto al 4, pero la zona azul ya tiene un 4: el 3 no entra.
@@ -120,20 +121,35 @@ void main() {
       expect(_celdaEn(tester, 'D2').iluminacion, Iluminacion.normal);
     });
 
-    testWidgets('cambiar de ancla mueve las anclas y lo que se ilumina', (tester) async {
+    testWidgets('el ancla se ve solo en los dados, nunca en el tablero', (tester) async {
+      await _abrir(tester);
+
+      await _tirarYAnclar(tester, 0);
+
+      final enElTablero = find.descendant(
+        of: find.byType(TableroWidget),
+        matching: find.byIcon(Icons.anchor),
+      );
+      expect(enElTablero, findsNothing);
+      expect(find.descendant(of: _dadoEn(0), matching: find.byIcon(Icons.anchor)), findsOneWidget);
+    });
+
+    testWidgets('cambiar de dado ancla cambia el número resaltado y lo que se ilumina', (
+      tester,
+    ) async {
       await _abrir(tester);
       await _tirarYAnclar(tester, 0);
 
       await _tocar(tester, _dadoEn(1));
 
-      // Ahora el ancla es el 3 (en C6) y se pone el 4.
-      expect(_celdaEn(tester, 'C1').esAncla, isFalse);
-      expect(_celdaEn(tester, 'C6').esAncla, isTrue);
+      // Ahora el dado ancla es el 3: se resalta el 3 de C6 y se pone el 4.
+      expect(_celdaEn(tester, 'C1').numeroResaltado, isFalse);
+      expect(_celdaEn(tester, 'C6').numeroResaltado, isTrue);
       expect(_celdaEn(tester, 'B6').iluminacion, Iluminacion.posible);
       expect(_celdaEn(tester, 'C2').iluminacion, Iluminacion.normal);
     });
 
-    testWidgets('tocar una casilla lejos del ancla explica dónde va', (tester) async {
+    testWidgets('tocar una casilla lejos del número buscado explica dónde va', (tester) async {
       await _abrir(tester);
       await _tirarYAnclar(tester, 0);
 

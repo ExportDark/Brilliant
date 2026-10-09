@@ -64,5 +64,36 @@ void main() {
 
       expect(seleccionada, posible);
     });
+
+    testWidgets('el número resaltado va en negro sobre un círculo claro', (tester) async {
+      await _mostrarConNumero(tester, numeroResaltado: true);
+
+      expect(_circulos(tester), hasLength(1));
+      expect(tester.widget<Text>(find.text('4')).style!.color, Colors.black87);
+    });
+
+    testWidgets('sin resaltar, el número va en blanco y sin círculo', (tester) async {
+      await _mostrarConNumero(tester, numeroResaltado: false);
+
+      expect(_circulos(tester), isEmpty);
+      expect(tester.widget<Text>(find.text('4')).style!.color, Colors.white);
+    });
   });
 }
+
+/// Una casilla azul con un 4 anotado, con o sin el número resaltado.
+Future<void> _mostrarConNumero(WidgetTester tester, {required bool numeroResaltado}) {
+  const conCuatro = Celda(posicion: Posicion(fila: 0, columna: 2), color: Color5.azul, valor: 4);
+  return tester.pumpWidget(
+    MaterialApp(
+      home: Center(child: CeldaWidget(celda: conCuatro, numeroResaltado: numeroResaltado)),
+    ),
+  );
+}
+
+/// Los contenedores circulares dentro de la celda.
+Iterable<Container> _circulos(WidgetTester tester) => tester
+    .widgetList<Container>(
+      find.descendant(of: find.byType(CeldaWidget), matching: find.byType(Container)),
+    )
+    .where((contenedor) => (contenedor.decoration as BoxDecoration?)?.shape == BoxShape.circle);

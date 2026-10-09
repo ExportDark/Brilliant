@@ -9,7 +9,7 @@ import 'validacion_jugada.dart';
 
 /// Administra los turnos de la partida: tirar los dos dados, elegir uno como
 /// ancla y anotar el otro pegado (arriba, abajo, izquierda o derecha) a una
-/// casilla que tenga el número del ancla, donde la regla de su zona lo
+/// casilla que tenga el número del dado ancla, donde la regla de su zona lo
 /// permita.
 ///
 /// Es un bloc local, acotado a la pantalla de partida: recibe el tablero con

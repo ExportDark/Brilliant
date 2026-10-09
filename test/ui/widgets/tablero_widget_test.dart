@@ -70,20 +70,20 @@ void main() {
       expect(iluminadas, {'A2': Iluminacion.posible, 'C2': Iluminacion.bloqueada});
     });
 
-    testWidgets('solo las casillas indicadas llevan la marca de ancla', (tester) async {
+    testWidgets('solo las casillas indicadas resaltan su número', (tester) async {
       await _mostrar(
         tester,
         TableroWidget(
-          tablero: Tablero.mapaOriginal(),
-          esAncla: (posicion) => posicion == _pos('C1'),
+          tablero: Tablero.mapaOriginal().conValor(_pos('C1'), 4),
+          numeroResaltadoEn: (posicion) => posicion == _pos('C1'),
         ),
       );
 
-      final anclas = tester
+      final resaltadas = tester
           .widgetList<CeldaWidget>(find.byType(CeldaWidget))
-          .where((celda) => celda.esAncla);
-      expect(anclas.map((celda) => celda.celda.posicion), [_pos('C1')]);
-      expect(find.byIcon(Icons.anchor), findsOneWidget);
+          .where((celda) => celda.numeroResaltado);
+      expect(resaltadas.map((celda) => celda.celda.posicion), [_pos('C1')]);
+      expect(find.byIcon(Icons.anchor), findsNothing);
     });
 
     testWidgets('tocar una casilla tocable avisa con su posición', (tester) async {

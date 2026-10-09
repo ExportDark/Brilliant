@@ -8,20 +8,21 @@ import '../ayudantes.dart';
 
 void main() {
   blocTest<PartidaBloc, PartidaState>(
-    'PartidaBloc: un número recién anotado es ancla en el turno siguiente',
-    // Turno 1: sale 4 y 3, ancla 4, el 3 va a B1 (junto al 4 de C1).
-    // Turno 2: sale 3 y 5, ancla 3.
+    'PartidaBloc: se puede jugar junto a un número recién anotado, aunque quede lejos de las iniciales',
+    // Turno 1: sale 4 y 3, dado ancla 4, el 3 va a B1 (junto al 4 de C1).
+    // Turno 2: sale 3 y 5, dado ancla 3, el 5 va a A1. A1 solo toca el 3 de
+    // B1: ninguna casilla inicial tiene un 3 a su lado.
     build: () => partidaBloc(caras: [4, 3, 3, 5]),
     act: (bloc) => bloc
       ..add(const DadosTirados())
       ..add(const DadoElegido(0))
       ..add(ValorColocado(pos('B1')))
       ..add(const DadosTirados())
-      ..add(const DadoElegido(0)),
+      ..add(const DadoElegido(0))
+      ..add(ValorColocado(pos('A1'))),
     verify: (bloc) {
-      expect(bloc.state.valorAncla, 3);
-      expect(bloc.state.esAncla(pos('B1')), isTrue);
-      expect(bloc.state.esAncla(pos('C6')), isTrue);
+      expect(bloc.state.tablero.celdaEn(pos('A1'))!.valor, 5);
+      expect(bloc.state.turno, 3);
     },
   );
 }

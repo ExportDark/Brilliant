@@ -13,10 +13,11 @@ import '../widgets/tablero_widget.dart';
 
 /// La pantalla donde se juega la partida, turno por turno.
 ///
-/// Se tiran los dos dados y se toca uno para hacerlo el ancla: el otro se
-/// anota pegado (arriba, abajo, izquierda o derecha) a una casilla que tenga
-/// el número del ancla. Esas casillas llevan la marca de ancla, y el tablero
-/// ilumina las vecinas donde el número cabe, y apenas las que su zona no lo
+/// Se tiran los dos dados y se toca uno para hacerlo el ancla. El ancla es
+/// solo un dado: su número es el que se busca en el tablero, y el otro dado
+/// se anota pegado (arriba, abajo, izquierda o derecha) a una casilla que
+/// tenga ese número. Esas casillas iluminan su número, y el tablero ilumina
+/// las vecinas donde el otro dado cabe, y apenas las que su zona no lo
 /// acepta. Tocar una iluminada anota el número; tocar cualquier otra casilla
 /// vacía explica, debajo del tablero, por qué no se puede. Si no hay jugada
 /// con ningún dado como ancla, se pasa el turno.
@@ -63,8 +64,8 @@ class _VistaPartidaState extends State<_VistaPartida> {
         _enviar(ValorColocado(posicion));
       case final ReglaRota rota:
         setState(() => _explicacion = _explicarRegla(posicion, rota));
-      case SinAncla(:final ancla):
-        setState(() => _explicacion = _explicarAncla(posicion, ancla, state.valorAColocar!));
+      case SinVecinoConNumero(:final numero):
+        setState(() => _explicacion = _explicarVecino(posicion, numero, state.valorAColocar!));
       case CasillaOcupada():
       case null:
         break;
@@ -77,16 +78,16 @@ class _VistaPartidaState extends State<_VistaPartida> {
         '${tipo.regla.descripcion}. Ya tiene: ${rota.valoresEnZona.join(', ')}';
   }
 
-  String _explicarAncla(Posicion posicion, int ancla, int valor) {
-    return '${posicion.notacion} no está junto a ningún $ancla: el $valor va arriba, '
-        'abajo, a la izquierda o a la derecha de un $ancla.';
+  String _explicarVecino(Posicion posicion, int numero, int valor) {
+    return '${posicion.notacion} no está junto a ningún $numero: el $valor va arriba, '
+        'abajo, a la izquierda o a la derecha de una casilla con $numero.';
   }
 
   Iluminacion _iluminacion(PartidaState state, Posicion posicion) {
     return switch (state.evaluar(posicion)) {
       JugadaValida() => Iluminacion.posible,
       ReglaRota() => Iluminacion.bloqueada,
-      SinAncla() || CasillaOcupada() || null => Iluminacion.normal,
+      SinVecinoConNumero() || CasillaOcupada() || null => Iluminacion.normal,
     };
   }
 
@@ -98,12 +99,12 @@ class _VistaPartidaState extends State<_VistaPartida> {
     if (state.dados == null) return 'Tira los dados.';
     if (state.sinJugada) return 'No hay jugada con ningún dado como ancla: pasa el turno.';
 
-    final ancla = state.valorAncla;
+    final buscado = state.valorAncla;
     final valor = state.valorAColocar;
-    if (ancla == null || valor == null) {
+    if (buscado == null || valor == null) {
       return 'Elige el dado ancla: el otro se pone junto a una casilla con ese número.';
     }
-    return 'Pon el $valor junto a un $ancla (arriba, abajo, izquierda o derecha).';
+    return 'Pon el $valor junto a un $buscado (arriba, abajo, izquierda o derecha).';
   }
 
   @override
@@ -129,7 +130,7 @@ class _VistaPartidaState extends State<_VistaPartida> {
                   TableroWidget(
                     tablero: state.tablero,
                     iluminacionDe: (posicion) => _iluminacion(state, posicion),
-                    esAncla: state.esAncla,
+                    numeroResaltadoEn: state.tieneNumeroBuscado,
                     esTocable: (posicion) =>
                         state.valorAncla != null &&
                         state.tablero.celdaEn(posicion)!.estaVacia,

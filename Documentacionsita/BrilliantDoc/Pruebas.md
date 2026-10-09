@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 177 tests, todos pasando (2026-10-08).
+las pruebas y qué se aprendió de ellas. 180 tests, todos pasando (2026-10-09).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -22,26 +22,30 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 |---|---|---|
 | `test/modelo/` | 47 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion` y `Tablero` (layout del manual, anotar y vaciar casillas) |
 | `test/reglas/` | 33 | Las funciones puras de cada restricción y las 5 clases de color. Algunos casos usan datos reales de la Partida 1 del manual |
-| `test/juego/` | 68 | `PreparacionBloc`, `PartidaBloc`, `evaluarJugada` / `hayJugada`, los casos sueltos de la regla del ancla y las partidas completas simuladas |
-| `test/ui/` | 29 | `CeldaWidget`, `TableroWidget`, la pantalla de preparación y la de partida |
+| `test/juego/` | 68 | `PreparacionBloc`, `PartidaBloc`, `evaluarJugada` / `hayJugada`, los casos sueltos de la regla del dado ancla y las partidas completas simuladas |
+| `test/ui/` | 32 | `CeldaWidget` (iluminación y número resaltado), `TableroWidget`, la pantalla de preparación y la de partida (incluido que el ancla se vea solo en los dados) |
 
 ## Cómo están organizadas
 
 - **Un archivo de test por archivo de lógica**, con la misma estructura de carpetas que
   `lib/`. Por ejemplo, `lib/juego/partida_bloc.dart` se prueba en
   `test/juego/partida_bloc_test.dart`.
-- **Los casos sueltos de la regla del ancla, uno por archivo**, con un nombre que dice qué
-  prueban:
+- **Los casos sueltos de la regla del dado ancla, uno por archivo**, con un nombre que dice
+  qué prueban:
 
   | Archivo | Qué prueba |
   |---|---|
-  | `test/juego/partida/ancla_recien_anotada_test.dart` | Un número recién anotado es ancla en el turno siguiente |
-  | `test/juego/partida/jugar_junto_al_ancla_nueva_test.dart` | Se puede jugar junto a esa ancla nueva, aunque quede lejos de las iniciales |
-  | `test/juego/partida/dados_iguales_test.dart` | Con 4 y 4, el ancla y el número a anotar son el mismo |
+  | `test/juego/partida/numero_recien_anotado_test.dart` | Un número recién anotado ya cuenta al buscar en el turno siguiente |
+  | `test/juego/partida/jugar_junto_al_numero_nuevo_test.dart` | Se puede jugar junto a ese número nuevo, aunque quede lejos de las iniciales |
+  | `test/juego/partida/dados_iguales_test.dart` | Con 4 y 4, el dado ancla y el número a anotar son el mismo |
   | `test/juego/partida/fin_tras_la_ultima_jugada_test.dart` | Al anotar la última jugada posible la partida termina y ya no deja tirar |
   | `test/juego/partida/posicion_fuera_del_tablero_test.dart` | Una posición fuera del tablero se ignora sin errores |
-  | `test/juego/validacion/lejos_del_ancla_gana_test.dart` | Si una casilla está lejos del ancla y además rompe la regla, se explica lo del ancla |
+  | `test/juego/validacion/lejos_del_numero_gana_test.dart` | Si una casilla está lejos del número buscado y además rompe la regla, se explica lo del número |
   | `test/juego/validacion/ocupada_gana_test.dart` | Una casilla ocupada gana sobre todo lo demás |
+
+  Los tres primeros archivos se llamaban `ancla_recien_anotada_test.dart`,
+  `jugar_junto_al_ancla_nueva_test.dart` y `lejos_del_ancla_gana_test.dart`. Se renombraron
+  el 2026-10-09, cuando el ancla pasó a ser solo un dado.
 
 - **Ayudantes compartidos** en `test/juego/ayudantes.dart`: `pos('C1')`,
   `tableroPartida1()` (los valores iniciales de la Partida 1: C1=4, F2=1, B4=2, E4=5,

@@ -36,14 +36,15 @@ enum Iluminacion {
 /// va a caer el próximo número) y [Iluminacion.posible] se aclaran mucho;
 /// [Iluminacion.bloqueada], solo un poco.
 ///
-/// Con [esAncla], una marca de ancla en la esquina indica que la casilla
-/// tiene el número del dado ancla.
+/// Con [numeroResaltado], el número de la casilla se ilumina: va sobre un
+/// círculo claro. Se usa para las casillas que tienen el número que sacó el
+/// dado ancla.
 class CeldaWidget extends StatelessWidget {
   final Celda celda;
   final double tamano;
   final bool seleccionada;
   final Iluminacion iluminacion;
-  final bool esAncla;
+  final bool numeroResaltado;
 
   const CeldaWidget({
     super.key,
@@ -51,7 +52,7 @@ class CeldaWidget extends StatelessWidget {
     this.tamano = 48,
     this.seleccionada = false,
     this.iluminacion = Iluminacion.normal,
-    this.esAncla = false,
+    this.numeroResaltado = false,
   });
 
   double get _aclarado {
@@ -63,46 +64,48 @@ class CeldaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final aclarado = _aclarado;
+    final numero = Text(
+      celda.valor?.toString() ?? '',
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        // Sobre un fondo muy aclarado, o sobre el círculo del número
+        // resaltado, el blanco ya no se lee.
+        color: aclarado >= _aclaradoFuerte || numeroResaltado
+            ? Colors.black87
+            : Colors.white,
+      ),
+    );
 
     return Container(
       width: tamano,
       height: tamano,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Color.lerp(_colorPorColor5[celda.color], Colors.white, aclarado),
         border: Border.all(width: celda.esInicial ? 3 : 1),
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Center(
-            child: Text(
-              celda.valor?.toString() ?? '',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                // Sobre un fondo muy aclarado, el blanco ya no se lee.
-                color: aclarado >= _aclaradoFuerte ? Colors.black87 : Colors.white,
-              ),
-            ),
-          ),
-          if (esAncla) const Positioned(top: 1, right: 1, child: _MarcaAncla()),
-        ],
-      ),
+      child: numeroResaltado ? _NumeroResaltado(tamano: tamano * 0.68, child: numero) : numero,
     );
   }
 }
 
-/// El ancla chiquita de la esquina, sobre un círculo claro para que se vea
-/// en cualquier color de zona.
-class _MarcaAncla extends StatelessWidget {
-  const _MarcaAncla();
+/// El círculo claro detrás del número resaltado, para que se vea iluminado en
+/// cualquier color de zona.
+class _NumeroResaltado extends StatelessWidget {
+  final double tamano;
+  final Widget child;
+
+  const _NumeroResaltado({required this.tamano, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(1),
-      decoration: const BoxDecoration(color: Colors.white70, shape: BoxShape.circle),
-      child: const Icon(Icons.anchor, size: 12, color: Colors.black87),
+      width: tamano,
+      height: tamano,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      child: child,
     );
   }
 }

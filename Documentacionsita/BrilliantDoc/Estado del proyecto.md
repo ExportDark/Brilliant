@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-08 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-09 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
@@ -29,12 +29,15 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       49 casillas de los 5 tableros del PDF con el modelo y con la pantalla, y coinciden
       todas, igual que las 6 casillas iniciales ([[Decisiones de extracción del manual]])
 - [x] **`PartidaBloc` y validación de jugadas** — dados (2d6), turnos, la **regla del
-      ancla** (el otro dado va pegado, sin diagonales, a una casilla con el número del
-      ancla), las reglas de color, pasar turno y fin de partida ([[Turnos y jugadas]])
-- [x] **Pantalla de partida** — tirar los dados, elegir el ancla, ⚓ en las casillas con
-      ese número, iluminar dónde cabe el otro dado (y apenas dónde la regla de color lo
-      impide), explicar al tocar por qué no se puede; pasar turno y fin de partida. La
-      cuadrícula siempre es negra: lo que se ilumina es la casilla
+      dado ancla** (el otro dado va pegado, sin diagonales, a una casilla con el número
+      del dado ancla), las reglas de color, pasar turno y fin de partida
+      ([[Turnos y jugadas]])
+- [x] **Pantalla de partida** — tirar los dados, elegir el dado ancla, iluminar el número
+      de las casillas que lo tienen, iluminar dónde cabe el otro dado (y apenas dónde la
+      regla de color lo impide), explicar al tocar por qué no se puede; pasar turno y fin
+      de partida. La cuadrícula siempre es negra, y la ⚓ solo aparece en los dados
+- [x] **El ancla es solo un dado** (2026-10-09) — en el tablero no hay anclas, solo
+      casillas con números; el código, los tests y la pantalla ya hablan así
 - [x] **Partidas completas simuladas** — 10 partidas con dados al azar (semillas fijas)
       jugadas hasta el final por el `PartidaBloc`: todas terminan y ninguna zona rompe su
       regla de color (`test/juego/partida_completa_test.dart`). Ver [[Pruebas]]
@@ -42,7 +45,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       ayudantes compartidos en `test/juego/ayudantes.dart`
 
 **Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
-tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 177 tests, todos
+tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 180 tests, todos
 pasando.
 
 ## Qué falta
@@ -52,8 +55,8 @@ pasando.
       turnos o fijar un número de rondas ([[Puntuación]])
 - [ ] **`puntuacion/`** — el cálculo de puntaje, y mostrarlo al terminar la partida
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual. Ojo: esas partidas
-      se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del ancla.
-      Sirven para validar las reglas de color, no el ancla
+      se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del dado
+      ancla. Sirven para validar las reglas de color, no la del dado ancla
 - [ ] Afinar lo visual de la iluminación
 
 ## Cómo se viene trabajando

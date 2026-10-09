@@ -4,8 +4,8 @@ import 'package:brilliant/juego/validacion_jugada.dart';
 import '../ayudantes.dart';
 
 void main() {
-  test('evaluarJugada: ocupada gana, aunque tampoco haya un ancla al lado', () {
-    // C1 ya tiene el 4, y además no hay ningún 6 a su lado.
+  test('evaluarJugada: ocupada gana, aunque tampoco tenga al lado el número buscado', () {
+    // Dado ancla 6. C1 ya tiene el 4, y además no hay ningún 6 a su lado.
     expect(evaluarEn(tableroPartida1(), 'C1', ancla: 6, valor: 3), isA<CasillaOcupada>());
   });
 }

@@ -5,8 +5,9 @@ import 'validacion_jugada.dart';
 
 /// Cómo va la partida: el tablero, la tirada del turno y el dado ancla.
 ///
-/// De los dos dados, el ancla dice junto a qué casillas se puede jugar (las
-/// que tienen ese número) y el otro es el número que se anota.
+/// El ancla es solo un dado: dice qué número buscar en el tablero. El otro
+/// dado es el que se anota, pegado a alguna casilla que tenga ese número. En
+/// el tablero no hay anclas, solo casillas con números.
 class PartidaState {
   final Tablero tablero;
 
@@ -51,8 +52,9 @@ class PartidaState {
     return evaluarJugada(tablero, posicion, ancla: ancla, valor: valor);
   }
 
-  /// Verdadero si la casilla de [posicion] tiene el número ancla.
-  bool esAncla(Posicion posicion) {
+  /// Verdadero si la casilla de [posicion] tiene el número que se busca: el
+  /// que sacó el dado ancla.
+  bool tieneNumeroBuscado(Posicion posicion) {
     final ancla = valorAncla;
     return ancla != null && tablero.celdaEn(posicion)?.valor == ancla;
   }

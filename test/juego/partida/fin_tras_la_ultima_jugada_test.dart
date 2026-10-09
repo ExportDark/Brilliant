@@ -10,7 +10,7 @@ void main() {
   blocTest<PartidaBloc, PartidaState>(
     'PartidaBloc: al anotar la última jugada posible, la partida termina y ya no se tira',
     build: () => partidaBloc(tablero: soloCabeElSeisEnE5(), caras: [2, 6]),
-    // El 2 de E6 es el ancla y el 6 completa la corrida roja en E5.
+    // Dado ancla 2: E5 está junto al 2 de E6, y el 6 completa ahí la corrida roja.
     act: (bloc) => bloc
       ..add(const DadosTirados())
       ..add(const DadoElegido(0))

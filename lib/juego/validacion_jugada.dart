@@ -8,8 +8,8 @@ sealed class ResultadoJugada {
   const ResultadoJugada();
 }
 
-/// La casilla está libre, pegada a un ancla, y la regla de su zona acepta el
-/// número.
+/// La casilla está libre, pegada a una casilla con el número del dado ancla,
+/// y la regla de su zona acepta el número.
 class JugadaValida extends ResultadoJugada {
   const JugadaValida();
 }
@@ -20,15 +20,15 @@ class CasillaOcupada extends ResultadoJugada {
 }
 
 /// La casilla está libre, pero ninguna de sus vecinas (arriba, abajo,
-/// izquierda o derecha) tiene el número [ancla].
-class SinAncla extends ResultadoJugada {
-  final int ancla;
+/// izquierda o derecha) tiene el [numero] que se busca, el del dado ancla.
+class SinVecinoConNumero extends ResultadoJugada {
+  final int numero;
 
-  const SinAncla(this.ancla);
+  const SinVecinoConNumero(this.numero);
 }
 
-/// La casilla está libre y pegada a un ancla, pero el número rompería la
-/// regla de su zona.
+/// La casilla está libre y pegada a una casilla con el número del dado ancla,
+/// pero el número rompería la regla de su zona.
 class ReglaRota extends ResultadoJugada {
   /// La zona cuya regla no lo permite.
   final Region region;
@@ -39,10 +39,13 @@ class ReglaRota extends ResultadoJugada {
   const ReglaRota(this.region, this.valoresEnZona);
 }
 
-/// Decide si [valor] se puede anotar en [posicion] usando [ancla] como
-/// referencia: la casilla tiene que estar libre, pegada (sin diagonales) a
-/// una casilla que tenga el número [ancla], y la regla de su zona tiene que
+/// Decide si [valor] se puede anotar en [posicion] cuando el dado ancla sacó
+/// [ancla]: la casilla tiene que estar libre, pegada (sin diagonales) a una
+/// casilla del tablero que tenga ese número, y la regla de su zona tiene que
 /// aceptar [valor].
+///
+/// El ancla es solo uno de los dos dados: en el tablero no hay anclas, solo
+/// casillas que tienen el número que salió en ese dado.
 ///
 /// Lanza [ArgumentError] si [posicion] no es una casilla del tablero.
 ResultadoJugada evaluarJugada(
@@ -59,17 +62,18 @@ ResultadoJugada evaluarJugada(
 
   if (!celda.estaVacia) return const CasillaOcupada();
 
-  final pegadaAlAncla = posicion.vecinas.any(
+  final pegadaAlNumero = posicion.vecinas.any(
     (vecina) => tablero.celdaEn(vecina)?.valor == ancla,
   );
-  if (!pegadaAlAncla) return SinAncla(ancla);
+  if (!pegadaAlNumero) return SinVecinoConNumero(ancla);
 
   final valores = extraerValores(region);
   if (region.tipo.regla.puedeAgregar(valores, valor)) return const JugadaValida();
   return ReglaRota(region, valores);
 }
 
-/// Verdadero si alguna casilla del tablero acepta [valor] pegada a un [ancla].
+/// Verdadero si alguna casilla del tablero acepta [valor] pegada a una
+/// casilla con el número [ancla] que sacó el dado ancla.
 bool hayJugada(Tablero tablero, {required int ancla, required int valor}) {
   return tablero.celdas.any(
     (celda) =>

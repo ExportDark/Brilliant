@@ -6,7 +6,8 @@ import 'package:brilliant/juego/partida_state.dart';
 
 import 'ayudantes.dart';
 
-// Los casos de la regla del ancla viven uno por archivo en `partida/`.
+// Los casos sueltos de la regla del dado ancla viven uno por archivo en
+// `partida/`.
 
 void main() {
   group('PartidaBloc — estado inicial', () {
@@ -69,16 +70,16 @@ void main() {
     );
 
     blocTest<PartidaBloc, PartidaState>(
-      'las casillas con el número ancla son anclas',
+      'con el 4 como dado ancla, se buscan las casillas que tienen un 4',
       build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
         ..add(const DadoElegido(0)),
       verify: (bloc) {
-        final anclas = bloc.state.tablero.celdas
+        final conElNumero = bloc.state.tablero.celdas
             .map((celda) => celda.posicion)
-            .where(bloc.state.esAncla);
-        expect(anclas, [pos('C1')]);
+            .where(bloc.state.tieneNumeroBuscado);
+        expect(conElNumero, [pos('C1')]);
       },
     );
 
@@ -102,7 +103,7 @@ void main() {
 
   group('PartidaBloc — colocar', () {
     blocTest<PartidaBloc, PartidaState>(
-      'junto al ancla, anota el otro dado y cierra el turno',
+      'junto a una casilla con el número del dado ancla, anota el otro dado y cierra el turno',
       build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())
@@ -127,7 +128,7 @@ void main() {
     );
 
     blocTest<PartidaBloc, PartidaState>(
-      'no se coloca lejos de las casillas con el número ancla',
+      'no se coloca lejos de las casillas con el número del dado ancla',
       build: partidaBloc,
       act: (bloc) => bloc
         ..add(const DadosTirados())

@@ -9,30 +9,32 @@ import 'ayudantes.dart';
 // uno por archivo en `validacion/`.
 
 void main() {
-  group('evaluarJugada — el ancla', () {
+  // En todos, `ancla` es lo que sacó el dado ancla: el número que se busca
+  // en el tablero.
+  group('evaluarJugada — junto a una casilla con el número del dado ancla', () {
     test('una casilla ocupada no se puede usar', () {
       expect(evaluarEn(tableroPartida1(), 'C1', ancla: 4, valor: 3), isA<CasillaOcupada>());
     });
 
-    test('pegada a una casilla con el número ancla, vale', () {
+    test('pegada a una casilla con el número buscado, vale', () {
       // B1 (verde) está a la izquierda de C1, que tiene el 4.
       expect(evaluarEn(tableroPartida1(), 'B1', ancla: 4, valor: 3), isA<JugadaValida>());
     });
 
-    test('lejos de toda casilla con el número ancla, no vale', () {
+    test('lejos de toda casilla con el número buscado, no vale', () {
       final resultado = evaluarEn(tableroPartida1(), 'A2', ancla: 4, valor: 3);
 
-      expect(resultado, isA<SinAncla>());
-      expect((resultado as SinAncla).ancla, 4);
+      expect(resultado, isA<SinVecinoConNumero>());
+      expect((resultado as SinVecinoConNumero).numero, 4);
     });
 
-    test('en diagonal al ancla no cuenta', () {
-      // D2 toca a C1 solo por la esquina.
-      expect(evaluarEn(tableroPartida1(), 'D2', ancla: 4, valor: 3), isA<SinAncla>());
+    test('en diagonal no cuenta', () {
+      // D2 toca el 4 de C1 solo por la esquina.
+      expect(evaluarEn(tableroPartida1(), 'D2', ancla: 4, valor: 3), isA<SinVecinoConNumero>());
     });
 
     test('en el borde del tablero, las vecinas que caen fuera se ignoran', () {
-      expect(evaluarEn(tableroPartida1(), 'A1', ancla: 4, valor: 1), isA<SinAncla>());
+      expect(evaluarEn(tableroPartida1(), 'A1', ancla: 4, valor: 1), isA<SinVecinoConNumero>());
       expect(
         evaluarEn(tableroPartida1(ademas: {'B1': 4}), 'A1', ancla: 4, valor: 1),
         isA<JugadaValida>(),
@@ -88,17 +90,17 @@ void main() {
   });
 
   group('hayJugada', () {
-    test('sin ninguna casilla con el número ancla no hay jugada', () {
+    test('sin ninguna casilla con el número del dado ancla no hay jugada', () {
       expect(hayJugada(Tablero.mapaOriginal(), ancla: 1, valor: 1), isFalse);
     });
 
-    test('al empezar, cada ancla tiene dónde jugar', () {
+    test('al empezar, saque lo que saque el dado ancla, hay dónde jugar', () {
       for (var ancla = 1; ancla <= 6; ancla++) {
         expect(hayJugada(tableroPartida1(), ancla: ancla, valor: 1), isTrue);
       }
     });
 
-    test('con una sola casilla libre, depende del ancla y de lo que acepte su zona', () {
+    test('con una sola casilla libre, depende del dado ancla y de lo que acepte su zona', () {
       // E5 es la última casilla libre: su zona roja ya tiene del 1 al 5, y sus
       // vecinas tienen 1 (E4, D5, F5) y 2 (E6).
       final tablero = llenoMenos('E5', valores: {'F5': 1, 'E6': 2, 'D6': 3, 'D7': 4, 'E7': 5});

@@ -39,8 +39,8 @@ int Function() dadoConCaras(List<int> caras) {
 }
 
 /// Un [PartidaBloc] sobre [tablero] (por defecto, el de la Partida 1) cuyos
-/// dados sacan [caras]. Por defecto salen 4 y 3: con el 4 de ancla, el 3 va
-/// junto a C1.
+/// dados sacan [caras]. Por defecto salen 4 y 3: con el 4 como dado ancla, el
+/// 3 va junto al 4 de C1.
 PartidaBloc partidaBloc({Tablero? tablero, List<int> caras = const [4, 3]}) =>
     PartidaBloc(tablero ?? tableroPartida1(), tirarDado: dadoConCaras(caras));
 

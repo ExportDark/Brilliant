@@ -7,6 +7,25 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-09 — El ancla es solo un dado
+
+- **Cambio de concepto, no de mecánica.** "Ancla" pasa a referirse **solo a uno de los dos
+  dados**. En el tablero no hay anclas: hay casillas con números. Con 2 y 4 y el 4 como
+  dado ancla, se buscan en el tablero las casillas que tienen un 4, y el 2 va pegado a
+  alguna de ellas, igual que antes. Ver [[Turnos y jugadas]].
+- **Pantalla:** se quitó la ⚓ de las casillas del tablero. En su lugar, las casillas que
+  tienen el número del dado ancla **iluminan su número**: va en negro sobre un círculo
+  blanco. La ⚓ queda solo debajo del dado ancla. Ver [[Interfaz del tablero]].
+- **Código:** `SinAncla` pasó a ser `SinVecinoConNumero`; `PartidaState.esAncla`, a
+  `tieneNumeroBuscado`; y el `esAncla` de `CeldaWidget` / `TableroWidget`, a
+  `numeroResaltado` / `numeroResaltadoEn`. El mensaje dice ahora "...de una casilla con 4".
+- **Tests:** los que hablaban de un ancla en el tablero se renombraron:
+  `numero_recien_anotado_test`, `jugar_junto_al_numero_nuevo_test` y
+  `lejos_del_numero_gana_test`. Se agregaron 3: el ancla se ve solo en los dados, y el
+  número resaltado va en negro sobre un círculo (y sin resaltar, en blanco y sin
+  círculo). Ver [[Pruebas]].
+- 180 tests.
+
 ## 2026-10-08 — Más pruebas de la regla del ancla
 
 - **Pruebas nuevas de la lógica del juego** (`02e2904`): un número recién anotado sirve

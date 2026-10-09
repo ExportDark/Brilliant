@@ -21,8 +21,9 @@ Ver también: [[Reglas del juego]] · [[Estado del proyecto]] · [[Pruebas]]
 ## Fin de la partida
 
 En el código, la partida termina cuando ninguna tirada posible tiene jugada: no hay
-combinación de ancla y número del 1 al 6 que quepa en ninguna casilla libre, pegada a un
-ancla, sin romper la regla de su región. Ver [[Turnos y jugadas]].
+combinación de dado ancla y número del 1 al 6 que quepa en ninguna casilla libre, pegada a
+una casilla con el número del dado ancla, sin romper la regla de su región. Ver
+[[Turnos y jugadas]].
 
 > [!important] Con las reglas actuales, el tablero siempre se llena (2026-10-08)
 > Las 10 partidas simuladas de [[Pruebas]] terminaron con **49 de 49 casillas**. Lo único
@@ -32,7 +33,7 @@ ancla, sin romper la regla de su región. Ver [[Turnos y jugadas]].
 >   algún número que todavía no tienen. La morada, una vez que eligió sus dos números,
 >   los puede repetir. La azul repite el suyo, y la verde acepta cualquiera.
 > - **Toda casilla vacía tarde o temprano queda pegada a una llena**, y cualquier número
->   puede salir de ancla.
+>   puede salir en el dado ancla.
 >
 > **Consecuencia para el puntaje:** "1 punto por casilla llenada correctamente" o "zona
 > completada" no distinguiría a nadie, porque todos llegan a llenar todo. Hay que puntuar
