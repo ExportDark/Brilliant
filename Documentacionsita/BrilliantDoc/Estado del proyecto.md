@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-09 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-13 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
@@ -41,11 +41,14 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Partidas completas simuladas** — 10 partidas con dados al azar (semillas fijas)
       jugadas hasta el final por el `PartidaBloc`: todas terminan y ninguna zona rompe su
       regla de color (`test/juego/partida_completa_test.dart`). Ver [[Pruebas]]
-- [x] **Un archivo por prueba** para los casos sueltos de la regla del ancla, con
-      ayudantes compartidos en `test/juego/ayudantes.dart`
+- [x] **Un archivo por prueba** para los casos sueltos, con ayudantes compartidos en
+      `test/juego/ayudantes.dart` y `test/ui/pantallas/ayudantes_pantallas.dart`
+- [x] **Tests de todo lo que faltaba** (2026-10-13) — 41 pruebas sueltas que cubren desde
+      el modelo hasta las pantallas: casillas exactas que se iluminan, el dado de verdad,
+      la preparación, las indicaciones y el arranque de la app. Ver [[Pruebas]]
 
 **Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
-tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 180 tests, todos
+tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 221 tests, todos
 pasando.
 
 ## Qué falta

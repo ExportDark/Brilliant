@@ -7,6 +7,33 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-13 — Tests de todo lo que faltaba
+
+- **41 tests nuevos** para cubrir lo que había quedado sin probar desde el inicio del
+  proyecto hasta la regla del dado ancla, cada uno en su propio archivo. Ver [[Pruebas]]:
+  - **Modelo:** `Region.conCasilla` / `sinCasilla`, `Celda.sinValor`, y cuántas vecinas
+    tiene cada casilla dentro del tablero.
+  - **Reglas:** la `descripcion` de cada color.
+  - **Preparación:** Aleatorio con una sola casilla vacía, Aleatorio reproducible con la
+    misma semilla, y que no se pueda reasignar tras confirmar.
+  - **Partida:** el dado de verdad saca del 1 al 6, el estado sin dado ancla, índice
+    negativo, tirar tras pasar, dado ancla sin jugada, ningún número en el tablero, y cómo
+    crece la iluminación al anotar.
+  - **Casillas iluminadas:** los conjuntos exactos para los 6 números iniciales, con
+    varias casillas con el número, en la esquina, con una vecina ocupada, y el amarillo
+    que bloquea desde lejos.
+  - **Interfaz:** borde grueso solo en iniciales, número negro en la seleccionada,
+    etiquetas A–G / 1–7, la selección que salta, las chips, solo iniciales tocables,
+    Aleatorio + Inicio, las indicaciones, Pasar turno en lugar de Tirar, la explicación
+    que se borra, casilla ocupada, la iluminación que se apaga al anotar, solo el número
+    exacto resaltado, y que la pantalla coincida con la validación.
+  - **App:** arranca en la pantalla de preparación.
+- Ayudantes nuevos: `posiblesEn` / `bloqueadasEn` / `casillasDonde` en
+  `test/juego/ayudantes.dart`, y `test/ui/pantallas/ayudantes_pantallas.dart` para los
+  tests de pantallas.
+- Ningún test destapó un bug: no se tocó código de `lib/`.
+- 221 tests.
+
 ## 2026-10-09 — El ancla es solo un dado
 
 - **Cambio de concepto, no de mecánica.** "Ancla" pasa a referirse **solo a uno de los dos

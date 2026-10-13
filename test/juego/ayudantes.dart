@@ -44,6 +44,27 @@ int Function() dadoConCaras(List<int> caras) {
 PartidaBloc partidaBloc({Tablero? tablero, List<int> caras = const [4, 3]}) =>
     PartidaBloc(tablero ?? tableroPartida1(), tirarDado: dadoConCaras(caras));
 
+/// Las casillas de [tablero] que cumplen [condicion], en notación del manual.
+Set<String> casillasDonde(Tablero tablero, bool Function(Posicion) condicion) => {
+      for (final celda in tablero.celdas)
+        if (condicion(celda.posicion)) celda.posicion.notacion,
+    };
+
+/// Dónde se puede anotar [valor] cuando el dado ancla sacó [ancla].
+Set<String> posiblesEn(Tablero tablero, {required int ancla, required int valor}) =>
+    casillasDonde(
+      tablero,
+      (posicion) => evaluarJugada(tablero, posicion, ancla: ancla, valor: valor) is JugadaValida,
+    );
+
+/// Las casillas junto a un número buscado donde la regla de color no deja
+/// anotar [valor]: las que la pantalla ilumina apenas.
+Set<String> bloqueadasEn(Tablero tablero, {required int ancla, required int valor}) =>
+    casillasDonde(
+      tablero,
+      (posicion) => evaluarJugada(tablero, posicion, ancla: ancla, valor: valor) is ReglaRota,
+    );
+
 /// [evaluarJugada] con la casilla escrita en notación del manual.
 ResultadoJugada evaluarEn(
   Tablero tablero,
