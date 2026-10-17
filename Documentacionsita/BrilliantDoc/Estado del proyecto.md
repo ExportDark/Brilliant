@@ -1,12 +1,13 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-13 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-17 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
 ## Qué está construido
 
-- [x] **Scaffold** del proyecto Flutter (solo plataformas `windows` y `web`)
+- [x] **Scaffold** del proyecto Flutter, con las plataformas `web`, `windows` y, desde el
+      2026-10-17, `android`
 - [x] **`Posicion`** — value object con notación del manual ([[Sistema de coordenadas]])
 - [x] **`Celda`** + `CeldaWidget` para renderizarla
 - [x] **Las 5 reglas de color** — rojo, amarillo, verde, azul, morado
@@ -46,10 +47,13 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Tests de todo lo que faltaba** (2026-10-13) — 41 pruebas sueltas que cubren desde
       el modelo hasta las pantallas: casillas exactas que se iluminan, el dado de verdad,
       la preparación, las indicaciones y el arranque de la app. Ver [[Pruebas]]
+- [x] **Versión Android** (2026-10-17) — APK instalable en el teléfono, solo vertical, con
+      el tablero que se adapta al ancho de la pantalla; probada en un emulador de 360 px.
+      Ver [[Versión Android]]
 
-**Ya se puede jugar una partida de principio a fin**, de la preparación hasta que ninguna
-tirada tiene jugada. Lo único que falta para cerrarla es el puntaje. 221 tests, todos
-pasando.
+**Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
+Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
+cerrarla es el puntaje. 242 tests, todos pasando.
 
 ## Qué falta
 
@@ -61,6 +65,7 @@ pasando.
       se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del dado
       ancla. Sirven para validar las reglas de color, no la del dado ancla
 - [ ] Afinar lo visual de la iluminación
+- [ ] Ícono propio para la app de Android (hoy usa el de Flutter)
 
 ## Cómo se viene trabajando
 

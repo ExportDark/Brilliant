@@ -7,6 +7,22 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-17 — Versión Android
+
+- **El tablero se adapta al ancho de la pantalla** (`96b8a4c`). Medía siempre 360 px y,
+  con los márgenes, necesitaba 392: en un celular de 360 se desbordaba 32 px. Ahora las
+  casillas miden el ancho disponible entre 7,5, con 48 px como máximo (43 en un celular de
+  360). Las pantallas van dentro de `SafeArea`. Se sumaron 21 widget tests de tamaños, y
+  se comprobó que fallan con el tablero fijo. Ver [[Interfaz del tablero]] y [[Pruebas]].
+- **Plataforma Android**: nombre "Brilliant", paquete `com.exportdark.brilliant`, solo
+  vertical. El APK (`app-arm64-v8a-release.apk`, 15,1 MB) se instala en el teléfono como
+  cualquier app. Se probó en un emulador de 360 px: preparación, partida, un turno
+  completo, y que no gire. Ver [[Versión Android]].
+- **Comandos corregidos:** para web se usa `-d edge`, porque en esta PC no hay Chrome, y
+  `-d windows` necesita Visual Studio, que no está instalado. Ver
+  [[Cómo trabajar en el proyecto]].
+- 242 tests.
+
 ## 2026-10-13 — Tests de todo lo que faltaba
 
 - **41 tests nuevos** para cubrir lo que había quedado sin probar desde el inicio del

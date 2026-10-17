@@ -34,3 +34,4 @@ Repositorio: https://github.com/ExportDark/Brilliant
 - [[Estado del proyecto]] — qué está construido y qué sigue
 - [[Historial de cambios]] — todo lo que se hizo, por fecha, con su porqué y su commit
 - [[Cómo trabajar en el proyecto]] — comandos, rutas y problemas conocidos
+- [[Versión Android]] — compilar el APK e instalarlo en el teléfono

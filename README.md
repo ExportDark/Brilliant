@@ -44,9 +44,13 @@ test/       tests, misma estructura que lib/
 ## Correr el proyecto
 
 ```
-flutter run -d chrome     # web
-flutter run -d windows    # escritorio
+flutter run -d edge                             # web, en Edge (Chrome sirve igual si está instalado)
+flutter build apk --release --split-per-abi     # Android: genera el APK para instalar en el teléfono
+flutter run -d windows                          # escritorio (necesita Visual Studio con C++)
 ```
+
+El APK para teléfonos Android modernos queda en
+`build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`.
 
 ## Tests
 
