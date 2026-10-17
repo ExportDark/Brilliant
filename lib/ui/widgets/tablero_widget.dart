@@ -12,6 +12,9 @@ import 'celda_widget.dart';
 /// llamando a [alTocar] con su posición. [iluminacionDe] decide cómo se
 /// resalta cada celda; sin él, ninguna se resalta. Las celdas para las que
 /// [numeroResaltadoEn] devuelve verdadero iluminan su número.
+///
+/// El tablero se adapta al ancho que tenga: las casillas miden hasta
+/// [tamanoMaximoCelda], y se achican si no caben, como en un celular angosto.
 class TableroWidget extends StatelessWidget {
   final Tablero tablero;
   final Posicion? seleccionada;
@@ -19,7 +22,7 @@ class TableroWidget extends StatelessWidget {
   final bool Function(Posicion)? esTocable;
   final Iluminacion Function(Posicion)? iluminacionDe;
   final bool Function(Posicion)? numeroResaltadoEn;
-  final double tamanoCelda;
+  final double tamanoMaximoCelda;
 
   const TableroWidget({
     super.key,
@@ -29,43 +32,62 @@ class TableroWidget extends StatelessWidget {
     this.esTocable,
     this.iluminacionDe,
     this.numeroResaltadoEn,
-    this.tamanoCelda = 48,
+    this.tamanoMaximoCelda = 48,
   });
+
+  /// Cuántas casillas de ancho ocupa el tablero entero: las 7 columnas más la
+  /// media casilla de los números de fila.
+  static const _anchoEnCasillas = Tablero.columnas + 0.5;
+
+  /// El tamaño de casilla que cabe en [anchoDisponible], sin pasar del máximo.
+  /// Se redondea hacia abajo para que no sobre ni medio píxel.
+  double _tamanoQueCabe(double anchoDisponible) {
+    if (!anchoDisponible.isFinite) return tamanoMaximoCelda;
+    final queCabe = (anchoDisponible / _anchoEnCasillas).floorToDouble();
+    return queCabe < tamanoMaximoCelda ? queCabe : tamanoMaximoCelda;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
+    return LayoutBuilder(
+      builder: (context, restricciones) {
+        final tamano = _tamanoQueCabe(restricciones.maxWidth);
+        final margen = tamano / 2;
+
+        return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _etiqueta('', ancho: _margen, alto: _margen),
-            for (var columna = 0; columna < Tablero.columnas; columna++)
-              _etiqueta(
-                String.fromCharCode('A'.codeUnitAt(0) + columna),
-                ancho: tamanoCelda,
-                alto: _margen,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _etiqueta('', ancho: margen, alto: margen),
+                for (var columna = 0; columna < Tablero.columnas; columna++)
+                  _etiqueta(
+                    String.fromCharCode('A'.codeUnitAt(0) + columna),
+                    ancho: tamano,
+                    alto: margen,
+                  ),
+              ],
+            ),
+            for (var fila = 0; fila < Tablero.filas; fila++)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _etiqueta('${fila + 1}', ancho: margen, alto: tamano),
+                  for (var columna = 0; columna < Tablero.columnas; columna++)
+                    _celda(Posicion(fila: fila, columna: columna), tamano),
+                ],
               ),
           ],
-        ),
-        for (var fila = 0; fila < Tablero.filas; fila++)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _etiqueta('${fila + 1}', ancho: _margen, alto: tamanoCelda),
-              for (var columna = 0; columna < Tablero.columnas; columna++)
-                _celda(Posicion(fila: fila, columna: columna)),
-            ],
-          ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _celda(Posicion posicion) {
+  Widget _celda(Posicion posicion, double tamano) {
     final celda = CeldaWidget(
       celda: tablero.celdaEn(posicion)!,
-      tamano: tamanoCelda,
+      tamano: tamano,
       seleccionada: posicion == seleccionada,
       iluminacion: iluminacionDe?.call(posicion) ?? Iluminacion.normal,
       numeroResaltado: numeroResaltadoEn?.call(posicion) ?? false,
@@ -80,9 +102,6 @@ class TableroWidget extends StatelessWidget {
       child: MouseRegion(cursor: SystemMouseCursors.click, child: celda),
     );
   }
-
-  /// Espacio que ocupan las letras de columna y los números de fila.
-  double get _margen => tamanoCelda / 2;
 
   Widget _etiqueta(String texto, {required double ancho, required double alto}) {
     return SizedBox(

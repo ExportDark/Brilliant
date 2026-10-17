@@ -117,62 +117,64 @@ class _VistaPartidaState extends State<_VistaPartida> {
 
         return Scaffold(
           appBar: AppBar(title: const Text('Brilliant — partida')),
-          body: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Turno ${state.turno}', style: textos.titleLarge),
-                  const SizedBox(height: 4),
-                  Text(_indicacion(state), style: textos.titleMedium),
-                  const SizedBox(height: 16),
-                  TableroWidget(
-                    tablero: state.tablero,
-                    iluminacionDe: (posicion) => _iluminacion(state, posicion),
-                    numeroResaltadoEn: state.tieneNumeroBuscado,
-                    esTocable: (posicion) =>
-                        state.valorAncla != null &&
-                        state.tablero.celdaEn(posicion)!.estaVacia,
-                    alTocar: (posicion) => _tocarCasilla(state, posicion),
-                  ),
-                  if (explicacion != null) ...[
+          body: SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Turno ${state.turno}', style: textos.titleLarge),
+                    const SizedBox(height: 4),
+                    Text(_indicacion(state), style: textos.titleMedium),
                     const SizedBox(height: 16),
-                    _Explicacion(explicacion),
-                  ],
-                  if (dados != null) ...[
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 16,
-                      children: [
-                        for (final (indice, valor) in dados.indexed)
-                          _Dado(
-                            key: ValueKey('dado-$indice'),
-                            valor: valor,
-                            anclado: indice == state.dadoElegido,
-                            alTocar: () => _enviar(DadoElegido(indice)),
-                          ),
-                      ],
+                    TableroWidget(
+                      tablero: state.tablero,
+                      iluminacionDe: (posicion) => _iluminacion(state, posicion),
+                      numeroResaltadoEn: state.tieneNumeroBuscado,
+                      esTocable: (posicion) =>
+                          state.valorAncla != null &&
+                          state.tablero.celdaEn(posicion)!.estaVacia,
+                      alTocar: (posicion) => _tocarCasilla(state, posicion),
                     ),
-                  ],
-                  const SizedBox(height: 24),
-                  if (state.sinJugada)
-                    FilledButton.tonal(
-                      onPressed: () => _enviar(const TurnoPasado()),
-                      child: const Text('Pasar turno', style: TextStyle(fontSize: 18)),
-                    )
-                  else
-                    FilledButton(
-                      onPressed: dados == null && !state.terminada
-                          ? () => _enviar(const DadosTirados())
-                          : null,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                    if (explicacion != null) ...[
+                      const SizedBox(height: 16),
+                      _Explicacion(explicacion),
+                    ],
+                    if (dados != null) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 16,
+                        children: [
+                          for (final (indice, valor) in dados.indexed)
+                            _Dado(
+                              key: ValueKey('dado-$indice'),
+                              valor: valor,
+                              anclado: indice == state.dadoElegido,
+                              alTocar: () => _enviar(DadoElegido(indice)),
+                            ),
+                        ],
                       ),
-                      child: const Text('Tirar dados', style: TextStyle(fontSize: 18)),
-                    ),
-                ],
+                    ],
+                    const SizedBox(height: 24),
+                    if (state.sinJugada)
+                      FilledButton.tonal(
+                        onPressed: () => _enviar(const TurnoPasado()),
+                        child: const Text('Pasar turno', style: TextStyle(fontSize: 18)),
+                      )
+                    else
+                      FilledButton(
+                        onPressed: dados == null && !state.terminada
+                            ? () => _enviar(const DadosTirados())
+                            : null,
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                        ),
+                        child: const Text('Tirar dados', style: TextStyle(fontSize: 18)),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

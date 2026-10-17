@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 221 tests, todos pasando (2026-10-13).
+las pruebas y qué se aprendió de ellas. 242 tests, todos pasando (2026-10-17).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -23,7 +23,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 52 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion` y `Tablero` (layout del manual, anotar y vaciar casillas) |
 | `test/reglas/` | 34 | Las funciones puras de cada restricción, las 5 clases de color y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 88 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan y las partidas completas simuladas |
-| `test/ui/` | 46 | `CeldaWidget`, `TableroWidget`, la pantalla de preparación y la de partida |
+| `test/ui/` | 67 | `CeldaWidget`, `TableroWidget`, la pantalla de preparación y la de partida, y las dos pantallas en 5 tamaños, del celular chico al escritorio |
 | `test/main/` | 1 | Que la app arranque en la pantalla de preparación |
 
 ## Cómo están organizadas
@@ -118,6 +118,24 @@ Todas las rutas son dentro de `test/`.
 | `ui/pantallas/partida/solo_el_numero_exacto_se_resalta_test.dart` | Solo se resalta el número exacto que sacó el dado ancla |
 | `ui/pantallas/partida/pantalla_coincide_con_la_validacion_test.dart` | La pantalla ilumina exactamente lo que la validación acepta y rechaza |
 | `main/arranca_en_preparacion_test.dart` | La app arranca en la pantalla de preparación |
+| `ui/widgets/tablero/se_adapta_al_ancho_test.dart` | Las casillas miden 48 si caben y se achican si no: 43 con 328 px, 38 con 288 px |
+
+### Tamaños de pantalla
+
+Cada uno se repite en 5 tamaños, de `tamanosDePantalla` (en
+`ayudantes_pantallas.dart`): celular chico 320×568, celular 360×640, celular grande
+412×915, tablet 768×1024 y escritorio 1280×800, en píxeles lógicos.
+
+| Archivo | Qué prueba |
+|---|---|
+| `ui/pantallas/tamanos/preparacion_sin_desbordes_test.dart` | La preparación se abre sin desbordarse |
+| `ui/pantallas/tamanos/partida_sin_desbordes_test.dart` | La partida no se desborda ni en su estado más alto: con dados, dado ancla y explicación |
+| `ui/pantallas/tamanos/tablero_entero_a_lo_ancho_test.dart` | Las 49 casillas caben a lo ancho de la pantalla |
+| `ui/pantallas/tamanos/turno_jugable_en_cada_tamano_test.dart` | Se puede jugar un turno entero, haciendo scroll si los botones quedan abajo |
+
+Se comprobó que detectan el problema de verdad: con el tablero fijo de 48 px, los 8 casos
+de celular fallan ("A RenderFlex overflowed by 32 pixels" a 360 de ancho y por 72 a 320),
+y con el tablero adaptable pasan todos. Ver [[Versión Android]].
 
 Tres de estos archivos se llamaban antes `ancla_recien_anotada_test.dart`,
 `jugar_junto_al_ancla_nueva_test.dart` y `lejos_del_ancla_gana_test.dart`. Se renombraron el

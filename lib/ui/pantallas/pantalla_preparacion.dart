@@ -113,90 +113,92 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
 
         return Scaffold(
           appBar: AppBar(title: const Text('Brilliant — preparación')),
-          body: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    state.completa
-                        ? 'Listo: oprime Inicio para empezar la partida.'
-                        : 'Toca una casilla inicial y elige su número. Faltan $faltan.',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  TableroWidget(
-                    tablero: _tableroBase.conValores(state.valores),
-                    seleccionada: seleccionada,
-                    esTocable: state.casillas.contains,
-                    alTocar: _seleccionar,
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      for (final casilla in state.casillas)
-                        ChoiceChip(
-                          key: ValueKey('resumen-${casilla.notacion}'),
-                          label: Text('${casilla.notacion} = ${state.valorDe(casilla) ?? '—'}'),
-                          selected: casilla == seleccionada,
-                          onSelected: (_) => _seleccionar(casilla),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      for (final valor in valoresPosibles)
-                        FilledButton.tonal(
-                          key: ValueKey('numero-$valor'),
-                          onPressed: _puedeElegir(state, valor)
-                              ? () => _asignar(state, valor)
-                              : null,
-                          child: Text('$valor', style: const TextStyle(fontSize: 18)),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      OutlinedButton(
-                        onPressed: seleccionada != null && state.valorDe(seleccionada) != null
-                            ? _quitar
-                            : null,
-                        child: const Text('Quitar'),
-                      ),
-                      OutlinedButton(
-                        onPressed: state.valores.isNotEmpty ? () => _reiniciar(state) : null,
-                        child: const Text('Reiniciar'),
-                      ),
-                      OutlinedButton(
-                        onPressed: () => _bloc.add(const RepartoAleatorio()),
-                        child: const Text('Aleatorio'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    // Sin todas las casillas llenas no se puede empezar. El bloc
-                    // tampoco confirmaría, pero así el jugador lo ve de entrada.
-                    onPressed: state.completa
-                        ? () => _bloc.add(const PreparacionConfirmada())
-                        : null,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
+          body: SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      state.completa
+                          ? 'Listo: oprime Inicio para empezar la partida.'
+                          : 'Toca una casilla inicial y elige su número. Faltan $faltan.',
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    child: const Text('Inicio', style: TextStyle(fontSize: 20)),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    TableroWidget(
+                      tablero: _tableroBase.conValores(state.valores),
+                      seleccionada: seleccionada,
+                      esTocable: state.casillas.contains,
+                      alTocar: _seleccionar,
+                    ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        for (final casilla in state.casillas)
+                          ChoiceChip(
+                            key: ValueKey('resumen-${casilla.notacion}'),
+                            label: Text('${casilla.notacion} = ${state.valorDe(casilla) ?? '—'}'),
+                            selected: casilla == seleccionada,
+                            onSelected: (_) => _seleccionar(casilla),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        for (final valor in valoresPosibles)
+                          FilledButton.tonal(
+                            key: ValueKey('numero-$valor'),
+                            onPressed: _puedeElegir(state, valor)
+                                ? () => _asignar(state, valor)
+                                : null,
+                            child: Text('$valor', style: const TextStyle(fontSize: 18)),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        OutlinedButton(
+                          onPressed: seleccionada != null && state.valorDe(seleccionada) != null
+                              ? _quitar
+                              : null,
+                          child: const Text('Quitar'),
+                        ),
+                        OutlinedButton(
+                          onPressed: state.valores.isNotEmpty ? () => _reiniciar(state) : null,
+                          child: const Text('Reiniciar'),
+                        ),
+                        OutlinedButton(
+                          onPressed: () => _bloc.add(const RepartoAleatorio()),
+                          child: const Text('Aleatorio'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      // Sin todas las casillas llenas no se puede empezar. El bloc
+                      // tampoco confirmaría, pero así el jugador lo ve de entrada.
+                      onPressed: state.completa
+                          ? () => _bloc.add(const PreparacionConfirmada())
+                          : null,
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
+                      ),
+                      child: const Text('Inicio', style: TextStyle(fontSize: 20)),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

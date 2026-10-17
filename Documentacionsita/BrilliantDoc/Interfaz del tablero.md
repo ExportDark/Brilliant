@@ -12,8 +12,13 @@ Ver también: [[Turnos y jugadas]] · [[Preparación de la partida]] · [[Tabler
 
 ## La grilla
 
-- 7×7 casillas de 48 px, con las letras de columna (A–G) arriba y los números de fila
-  (1–7) a la izquierda, igual que en el manual.
+- 7×7 casillas de hasta 48 px, con las letras de columna (A–G) arriba y los números de
+  fila (1–7) a la izquierda, igual que en el manual.
+- **El tablero se adapta al ancho de la pantalla.** Ocupa 7,5 casillas de ancho (las 7
+  columnas más media casilla para los números de fila), así que cada casilla mide el ancho
+  disponible entre 7,5, redondeado hacia abajo y con 48 px como máximo. En la PC siempre
+  caben 48 px. En un celular de 360 px, descontados los 16 px de margen de cada lado,
+  quedan 328 px y las casillas miden 43. En uno de 320 px, miden 38.
 - Cada casilla tiene el color de su zona: amarillo, verde, morado, azul o rojo.
 - **La cuadrícula siempre es negra.** Las 6 casillas iniciales llevan un borde más grueso
   (3 px en vez de 1), también negro.
@@ -67,6 +72,11 @@ número buscado, o la regla de la zona con lo que la zona ya tiene. Ver
   pasó a aclarar el relleno. Las bloqueadas, en vez de oscurecerse, se iluminan un poco.
 - **2026-10-04, regla del ancla:** las casillas con el número del dado ancla llevaban un ⚓
   chiquito en la esquina.
+- **2026-10-17, versión para celular:** el tablero medía siempre 360 px (7,5 casillas de
+  48), y con los márgenes de la pantalla necesitaba 392 px: en un celular de 360 se
+  desbordaba 32 px. Se hizo que las casillas se achiquen para caber, y las dos pantallas
+  se envolvieron en `SafeArea` para no quedar debajo de la barra de navegación de Android.
+  Ver [[Versión Android]].
 - **2026-10-09, el ancla es solo un dado:** se quitó la ⚓ del tablero, porque en el
   tablero no hay anclas, solo números. En su lugar, esas casillas iluminan su número.
 - **Cómo se pinta:** `CeldaWidget` no sabe nada de dados ni de reglas. Recibe

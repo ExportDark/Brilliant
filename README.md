@@ -152,6 +152,9 @@ Opcionalmente recibe `seleccionada` (la casilla resaltada), `alTocar` y `esTocab
 (qué casillas responden al toque), `iluminacionDe` (cómo se resalta cada casilla) y
 `numeroResaltadoEn` (qué casillas iluminan su número).
 
+El tablero se adapta al ancho que tenga: las casillas miden hasta 48 px y se achican para
+caber, por ejemplo en un celular de 360 px.
+
 ## Módulo: preparación de la partida (`lib/juego/`)
 
 Antes de tirar el primer dado, el jugador reparte los números del **1 al 6** entre las
