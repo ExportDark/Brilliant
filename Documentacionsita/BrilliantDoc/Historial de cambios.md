@@ -7,9 +7,42 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-18 — Interfaz suave
+
+- **Rediseño de la interfaz**, para que sea lo más amigable posible: un estilo suave, sin
+  tanto detalle pero pulido. Se eligieron fichas redondeadas, dados con puntos y colores
+  suaves. La lógica del juego no cambió. Ver [[Interfaz del tablero]].
+  - **Tema propio** (`lib/ui/tema.dart`): fondo crema, acento lavanda, botones
+    redondeados y una paleta suave para las 5 zonas. El número elige su color según el
+    fondo para que siempre se lea.
+  - **Sin coordenadas a la vista**: se quitaron las letras A–G y los números 1–7 del
+    tablero, las chips "C1 = 4" de la preparación y el "C2 ·" de los mensajes. En el
+    código siguen existiendo.
+  - **Sin cuadrícula negra**, que se había pedido el 2026-10-04: las casillas son fichas
+    redondeadas, separadas, sobre una base. Las iniciales llevan un aro tenue de su color.
+  - **Casillas encendidas**: las que se pueden usar llevan aro blanco y brillo lavanda,
+    porque con los colores suaves una casilla solo aclarada parecía apagada. Los cambios
+    de iluminación son una transición suave.
+  - **Dados con puntos** (`DadoWidget`), y el dado ancla con aro y la palabra "ancla".
+  - **Preparación:** "Prepara tu tablero", cuántos faltan, los números como fichas
+    redondas en una sola fila, y Aleatorio / Quitar / Reiniciar como acciones discretas.
+    Ver [[Preparación de la partida]].
+  - **Partida:** barra de progreso con "12 de 49 casillas", mensajes sin coordenadas en un
+    recuadro suave, "Tirar dados" escondido mientras hay dados en la mesa, y una tarjeta
+    de fin de partida con **Jugar otra vez**, que vuelve a la preparación. Ver
+    [[Turnos y jugadas]].
+  - El contenido de las pantallas va arriba en vez de centrado, para que el tablero no
+    salte cuando aparecen los dados o la explicación.
+- Se revisó en Edge (PC y celular) y en el emulador Android de 360 px, y se recompiló el
+  APK.
+- 4 tests renombrados porque probaban cosas que ya no se ven, varios actualizados a los
+  textos nuevos, y 8 nuevos: los puntos del dado, la barra de progreso y el fin de partida
+  con "Jugar otra vez". Ver [[Pruebas]].
+- 252 tests.
+
 ## 2026-10-18 — Camino feliz
 
-- **Unit test del happy path**: una partida entera, de la preparación al final, sin
+- **Unit test del happy path** (`4ed780c`): una partida entera, de la preparación al final, sin
   pantalla. Encadena `PreparacionBloc` → tablero → `PartidaBloc`, con dados sin azar que
   recorren las 36 combinaciones, y termina con las 49 casillas llenas y cada zona
   cumpliendo las reglas del manual, revisadas a mano en el test. Dura siempre 73 turnos.

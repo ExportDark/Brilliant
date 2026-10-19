@@ -11,7 +11,7 @@ void main() {
   ) async {
     await abrirPreparacion(tester);
 
-    await tocar(tester, find.widgetWithText(OutlinedButton, 'Aleatorio'));
+    await tocar(tester, find.widgetWithText(TextButton, 'Aleatorio'));
     await tocar(tester, find.widgetWithText(FilledButton, 'Inicio'));
 
     expect(find.byType(PantallaPartida), findsOneWidget);

@@ -60,3 +60,7 @@ todas esa notación. Tenerla en el código significa que:
 
 Está testeada de ida y vuelta para las 49 casillas del tablero y para las 6 casillas
 iniciales.
+
+**Al jugador no se le muestra** (decisión del 2026-10-18): no hay letras ni números
+alrededor del tablero, ni coordenadas en los mensajes. La notación es para el código, los
+tests y esta documentación. Ver [[Interfaz del tablero]].

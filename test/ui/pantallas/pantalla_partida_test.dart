@@ -4,6 +4,7 @@ import 'package:brilliant/modelo/posicion.dart';
 import 'package:brilliant/modelo/tablero.dart';
 import 'package:brilliant/ui/pantallas/pantalla_partida.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
+import 'package:brilliant/ui/widgets/dado_widget.dart';
 import 'package:brilliant/ui/widgets/tablero_widget.dart';
 
 Posicion _pos(String notacion) => Posicion.desdeNotacion(notacion);
@@ -84,14 +85,14 @@ void main() {
       expect(_dadoEn(0), findsNothing);
     });
 
-    testWidgets('tirar muestra los dos dados y ya no deja volver a tirar', (tester) async {
+    testWidgets('tirar muestra los dos dados y el botón de tirar desaparece', (tester) async {
       await _abrir(tester);
 
       await _tocar(tester, _tirar);
 
-      expect(find.descendant(of: _dadoEn(0), matching: find.text('4')), findsOneWidget);
-      expect(find.descendant(of: _dadoEn(1), matching: find.text('3')), findsOneWidget);
-      expect(_habilitado(tester, _tirar), isFalse);
+      expect(tester.widget<DadoWidget>(_dadoEn(0)).valor, 4);
+      expect(tester.widget<DadoWidget>(_dadoEn(1)).valor, 3);
+      expect(_tirar, findsNothing);
     });
 
     testWidgets('sin dado ancla elegido no se ilumina ni se resalta nada', (tester) async {
@@ -155,7 +156,7 @@ void main() {
 
       await _tocar(tester, _casilla('A2'));
 
-      expect(find.textContaining('A2 no está junto a ningún 4'), findsOneWidget);
+      expect(find.textContaining('Esa casilla no está junto a ningún\u00A04'), findsOneWidget);
       expect(_celdaEn(tester, 'A2').celda.valor, isNull);
     });
 
@@ -165,7 +166,7 @@ void main() {
 
       await _tocar(tester, _casilla('C2'));
 
-      expect(find.textContaining('C2 · Zona azul — Todos iguales'), findsOneWidget);
+      expect(find.textContaining('Zona azul — Todos iguales'), findsOneWidget);
       expect(find.textContaining('Ya tiene: 4'), findsOneWidget);
       expect(_celdaEn(tester, 'C2').celda.valor, isNull);
     });
@@ -201,8 +202,12 @@ void main() {
     testWidgets('cuando ninguna casilla acepta nada, la partida termina', (tester) async {
       await _abrir(tester, tablero: _llenoMenos('E5'));
 
-      expect(find.textContaining('Fin de la partida: llenaste 48 de 49'), findsOneWidget);
-      expect(_habilitado(tester, _tirar), isFalse);
+      // Quedó una casilla libre que nadie puede llenar: no es tablero completo.
+      expect(find.byKey(const ValueKey('fin-de-partida')), findsOneWidget);
+      expect(find.text('Partida terminada'), findsOneWidget);
+      expect(find.text('Fin de la partida'), findsOneWidget);
+      expect(find.text('48 de 49 casillas'), findsOneWidget);
+      expect(_tirar, findsNothing);
     });
   });
 }

@@ -1,65 +1,117 @@
 # Interfaz del tablero
 
-Cómo se dibuja el tablero y cómo se resaltan las casillas. Es lo que hacen `CeldaWidget`
-y `TableroWidget` (`lib/ui/widgets/`), y lo usan las dos pantallas.
+Cómo se ve la app: los colores, el tablero, las casillas y los dados. Lo dibujan
+`CeldaWidget`, `TableroWidget` y `DadoWidget` (`lib/ui/widgets/`), con el tema de
+`lib/ui/tema.dart`, y lo usan las dos pantallas.
 
 Ver también: [[Turnos y jugadas]] · [[Preparación de la partida]] · [[Tablero y regiones]]
 
-> [!note] Lo visual se va a afinar
-> Lo de esta nota es la primera versión, acordada el 2026-10-04. Se quedó en que después
-> se trabaja mejor la parte visual; las intensidades están en constantes fáciles de
-> cambiar.
+> [!note] Diseño actual
+> Lo de esta nota es el rediseño del 2026-10-18: un estilo suave, sin tanto detalle,
+> pensado para que sea lo más amigable posible. **Al jugador nunca se le muestran
+> coordenadas.** Las letras y números del manual (C1, F2…) siguen existiendo en el código
+> (`Posicion.notacion`, las keys de los tests), pero no se ven en pantalla.
 
-## La grilla
+## El tema
 
-- 7×7 casillas de hasta 48 px, con las letras de columna (A–G) arriba y los números de
-  fila (1–7) a la izquierda, igual que en el manual.
-- **El tablero se adapta al ancho de la pantalla.** Ocupa 7,5 casillas de ancho (las 7
-  columnas más media casilla para los números de fila), así que cada casilla mide el ancho
-  disponible entre 7,5, redondeado hacia abajo y con 48 px como máximo. En la PC siempre
-  caben 48 px. En un celular de 360 px, descontados los 16 px de margen de cada lado,
-  quedan 328 px y las casillas miden 43. En uno de 320 px, miden 38.
-- Cada casilla tiene el color de su zona: amarillo, verde, morado, azul o rojo.
-- **La cuadrícula siempre es negra.** Las 6 casillas iniciales llevan un borde más grueso
-  (3 px en vez de 1), también negro.
-- El número anotado va al centro, en blanco y negrita.
+Todo sale de `lib/ui/tema.dart`, que se aplica en `main.dart` con `theme: temaBrilliant()`.
 
-## Cómo se resalta una casilla
+- **Fondo crema** (`Paleta.fondo`, `#FAF7F2`) y barra superior lisa del mismo tono, con
+  el título "Brilliant" al centro.
+- Textos en tinta oscura (`Paleta.tinta`) y suave (`Paleta.tintaSuave`) para las
+  indicaciones.
+- Un color de **acento lavanda** (`Paleta.acento`, `#6A5FB0`) para lo que importa: el
+  dado ancla, el brillo de las casillas iluminadas, la cuenta de lo que falta.
+- **Botones redondeados**: el principal (Inicio, Tirar dados, Jugar otra vez) es una
+  píldora de 52 px de alto como mínimo; las acciones secundarias son botones de texto con
+  ícono.
 
-Para resaltar una casilla **nunca se pinta el borde**: se **ilumina el relleno**, que se
-aclara hacia el blanco sin perder el color de su zona.
+### Los colores de las zonas
 
-| Caso | Cuánto se aclara | Dónde se usa |
-|---|---|---|
-| Normal | nada | — |
-| `Iluminacion.posible` | mucho (`_aclaradoFuerte = 0.55`) | Partida: ahí se puede anotar el dado |
-| `Iluminacion.bloqueada` | poco (`_aclaradoSuave = 0.25`) | Partida: junto a una casilla con el número del dado ancla, pero la regla de color no lo acepta |
-| `seleccionada` | mucho, igual que `posible` | Preparación: la casilla donde va a caer el próximo número |
+Colores suaves en vez de los colores puros:
 
-Sobre una casilla muy aclarada el número blanco ya no se lee, así que ahí va en negro.
+| Zona | Color |
+|---|---|
+| rojo | coral `#F28B82` |
+| morado | lavanda `#B79CED` |
+| azul | celeste `#7FB7F0` |
+| verde | salvia `#8FCB9B` |
+| amarillo | mantequilla `#F6D365` |
 
-Las dos constantes están al principio de `lib/ui/widgets/celda_widget.dart`.
+Están en `coloresDeZona`. El color del número (tinta oscura o blanco) **se elige según el
+fondo** con `tintaSobre()`, que usa `ThemeData.estimateBrightnessForColor`, para que
+siempre se lea. Con esta paleta, sobre todas las zonas va la tinta oscura.
 
-## El número iluminado
+## El tablero
+
+- **Sin cuadrícula y sin coordenadas.** Las 49 casillas son fichas redondeadas, separadas
+  4 px entre sí, apoyadas sobre una base redondeada de tono arena (`Paleta.baseTablero`)
+  con 6 px de borde.
+- **Se adapta al ancho de la pantalla.** Cada ficha mide lo que cabe: el ancho disponible
+  menos el borde de la base, entre 7, menos la separación, redondeado hacia abajo y con
+  48 px como máximo.
+
+  | Pantalla | Ancho para el tablero | Ficha |
+  |---|---|---|
+  | PC (las pantallas miden 480 como máximo) | 480 | 48 |
+  | Celular de 360 px | 336 | 42 |
+  | Celular de 320 px | 296 | 36 |
+
+  Los 336 y 296 salen de descontar los 12 px de margen de cada lado de la pantalla.
+
+## Las casillas
+
+- Cada casilla es una **ficha con esquinas redondeadas** del color de su zona, sin borde.
+- Las 6 casillas iniciales llevan un **aro tenue** de 2 px, en un tono más oscuro de su
+  propio color. En la preparación, "las casillas con aro" son las que se llenan.
+- El número va al centro, en negrita, a un 42 % del tamaño de la ficha.
+
+### Cómo se resalta una casilla
+
+Para resaltar una casilla se **ilumina**: se aclara hacia el blanco sin perder el color de
+su zona. Las que se pueden usar, además, quedan **encendidas**: llevan un aro blanco de
+3 px y un brillo lavanda alrededor. Sin ese aro y ese brillo, una casilla aclarada con
+colores suaves parecía apagada en vez de iluminada.
+
+| Caso | Cuánto se aclara | Aro y brillo | Dónde se usa |
+|---|---|---|---|
+| Normal | nada | no | — |
+| `Iluminacion.posible` | mucho (`_aclaradoFuerte = 0.4`) | sí | Partida: ahí se puede anotar el dado |
+| `Iluminacion.bloqueada` | poco (`_aclaradoSuave = 0.25`) | no | Partida: junto a una casilla con el número del dado ancla, pero la regla de color no lo acepta |
+| `seleccionada` | mucho, igual que `posible` | sí | Preparación: la casilla donde va a caer el próximo número |
+
+El cambio es una **transición suave** de 160 ms (`AnimatedContainer`). Solo se animan el
+color y el aro. El tamaño queda fuera de la animación: si se animara, al achicar la
+ventana el tablero se desbordaría mientras dura la transición.
+
+Las constantes están al principio de `lib/ui/widgets/celda_widget.dart`.
+
+### El número iluminado
 
 En la partida, las casillas que tienen el número que sacó el dado ancla **iluminan su
-número**: va en negro sobre un círculo blanco, al centro de la casilla. Así se ve rápido
-junto a qué casillas se puede jugar, sin tocar el color de la casilla ni la cuadrícula.
-Es `numeroResaltado` en `CeldaWidget`.
+número**: va en tinta oscura sobre un círculo blanco, al centro de la casilla. Así se ve
+rápido junto a qué casillas se puede jugar. Es `numeroResaltado` en `CeldaWidget`.
 
 **En el tablero no hay ninguna ⚓**: el ancla es solo un dado. Ver [[Turnos y jugadas]].
 
 ## Los dados
 
-Cuadros de 64 px con el número. El dado ancla lleva borde ámbar grueso, fondo ámbar claro
-y un ⚓ debajo. Es el único lugar donde aparece el ancla. El borde ámbar es del dado, no
-de la cuadrícula.
+`DadoWidget` dibuja cada dado **como un dado de verdad**: un cuadro blanco redondeado de
+68 px, con sombra suave y **los puntos** de su cara (de 1 a 6), repartidos en una grilla
+de 3×3.
+
+- **El dado ancla** lleva un aro lavanda de 3 px, fondo lavanda muy claro, un poco más de
+  sombra y, debajo, ⚓ con la palabra **"ancla"**, que aparece con un fundido. Es el único
+  lugar de la app donde aparece el ancla.
+- Para lectores de pantalla (y para los tests), cada dado es un botón con la etiqueta
+  "Dado: 4".
 
 ## La explicación
 
 Al tocar una casilla vacía donde no se puede jugar, aparece debajo del tablero un
-recuadro rojo claro con el motivo. Puede ser que no está junto a ninguna casilla con el
-número buscado, o la regla de la zona con lo que la zona ya tiene. Ver
+**recuadro suave color arena** (`Paleta.aviso`, no rojo de error) con un ícono de
+información y el motivo, sin coordenadas. Puede ser que no está junto a ninguna casilla
+con el número buscado, o la regla de la zona con lo que la zona ya tiene. Ver
 [[Turnos y jugadas]].
 
 ## Cómo se decidió
@@ -72,13 +124,24 @@ número buscado, o la regla de la zona con lo que la zona ya tiene. Ver
   pasó a aclarar el relleno. Las bloqueadas, en vez de oscurecerse, se iluminan un poco.
 - **2026-10-04, regla del ancla:** las casillas con el número del dado ancla llevaban un ⚓
   chiquito en la esquina.
+- **2026-10-09, el ancla es solo un dado:** se quitó la ⚓ del tablero, porque en el
+  tablero no hay anclas, solo números. En su lugar, esas casillas iluminan su número.
 - **2026-10-17, versión para celular:** el tablero medía siempre 360 px (7,5 casillas de
   48), y con los márgenes de la pantalla necesitaba 392 px: en un celular de 360 se
   desbordaba 32 px. Se hizo que las casillas se achiquen para caber, y las dos pantallas
   se envolvieron en `SafeArea` para no quedar debajo de la barra de navegación de Android.
   Ver [[Versión Android]].
-- **2026-10-09, el ancla es solo un dado:** se quitó la ⚓ del tablero, porque en el
-  tablero no hay anclas, solo números. En su lugar, esas casillas iluminan su número.
+- **2026-10-18, rediseño suave:** se pidió que la app fuera lo más amigable posible, con
+  un estilo suave y pulido, y **sin mostrar coordenadas**. Se eligieron fichas
+  redondeadas, dados con puntos y colores suaves.
+  - **Se quitó la cuadrícula negra**, que se había pedido el 2026-10-04: las fichas
+    separadas sobre una base ya marcan dónde termina cada casilla.
+  - **Se quitaron las letras A–G y los números 1–7** alrededor del tablero, las chips
+    "C1 = 4" de la preparación y el "C2 ·" de los mensajes.
+  - Las casillas iniciales pasaron del borde negro grueso a un aro tenue de su color.
+  - Al probar las capturas, las casillas aclaradas se veían desteñidas. Se les agregó el
+    aro blanco con brillo, y el aclarado fuerte bajó de 0,55 a 0,4.
+  - Los dados pasaron de un cuadro con el número a un dado con puntos.
 - **Cómo se pinta:** `CeldaWidget` no sabe nada de dados ni de reglas. Recibe
   `iluminacion`, `seleccionada` y `numeroResaltado`, y `TableroWidget` se los reparte con
   `iluminacionDe` y `numeroResaltadoEn`. Quien decide qué se ilumina es la pantalla, a

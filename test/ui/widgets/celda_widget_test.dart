@@ -3,15 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/modelo/celda.dart';
 import 'package:brilliant/modelo/color5.dart';
 import 'package:brilliant/modelo/posicion.dart';
+import 'package:brilliant/ui/tema.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
 
 const _celda = Celda(posicion: Posicion(fila: 1, columna: 0), color: Color5.verde);
 
-/// La decoración con la que se dibuja [widget].
+/// La decoración con la que se dibuja [widget], ya terminada la transición
+/// suave de color.
 Future<BoxDecoration> _decoracion(WidgetTester tester, CeldaWidget widget) async {
   await tester.pumpWidget(MaterialApp(home: Center(child: widget)));
+  await tester.pumpAndSettle();
   final contenedor = tester.widget<Container>(
-    find.descendant(of: find.byType(CeldaWidget), matching: find.byType(Container)),
+    find.descendant(of: find.byType(CeldaWidget), matching: find.byType(Container)).first,
   );
   return contenedor.decoration! as BoxDecoration;
 }
@@ -21,7 +24,7 @@ Future<double> _luminancia(WidgetTester tester, CeldaWidget widget) async =>
 
 void main() {
   group('CeldaWidget', () {
-    testWidgets('la cuadrícula es negra sin importar cómo se resalte', (tester) async {
+    testWidgets('es una ficha redondeada, sin cuadrícula negra', (tester) async {
       final variantes = [
         const CeldaWidget(celda: _celda),
         const CeldaWidget(celda: _celda, seleccionada: true),
@@ -30,8 +33,9 @@ void main() {
       ];
 
       for (final variante in variantes) {
-        final borde = (await _decoracion(tester, variante)).border! as Border;
-        expect(borde.top.color, Colors.black);
+        final decoracion = await _decoracion(tester, variante);
+        expect(decoracion.borderRadius, isNotNull);
+        expect((decoracion.border as Border?)?.top.color, isNot(Colors.black));
       }
     });
 
@@ -65,18 +69,40 @@ void main() {
       expect(seleccionada, posible);
     });
 
-    testWidgets('el número resaltado va en negro sobre un círculo claro', (tester) async {
+    testWidgets('las encendidas llevan aro blanco y brillo; la bloqueada y la normal no', (
+      tester,
+    ) async {
+      for (final encendida in [
+        const CeldaWidget(celda: _celda, iluminacion: Iluminacion.posible),
+        const CeldaWidget(celda: _celda, seleccionada: true),
+      ]) {
+        final decoracion = await _decoracion(tester, encendida);
+        expect((decoracion.border! as Border).top.color, Colors.white);
+        expect(decoracion.boxShadow, isNotEmpty);
+      }
+
+      for (final apagada in [
+        const CeldaWidget(celda: _celda),
+        const CeldaWidget(celda: _celda, iluminacion: Iluminacion.bloqueada),
+      ]) {
+        expect((await _decoracion(tester, apagada)).boxShadow, isNull);
+      }
+    });
+
+    testWidgets('el número resaltado va oscuro sobre un círculo claro', (tester) async {
       await _mostrarConNumero(tester, numeroResaltado: true);
 
       expect(_circulos(tester), hasLength(1));
-      expect(tester.widget<Text>(find.text('4')).style!.color, Colors.black87);
+      expect(tester.widget<Text>(find.text('4')).style!.color, Paleta.tinta);
     });
 
-    testWidgets('sin resaltar, el número va en blanco y sin círculo', (tester) async {
+    testWidgets('sin resaltar, el número va sin círculo y oscuro sobre el azul suave', (
+      tester,
+    ) async {
       await _mostrarConNumero(tester, numeroResaltado: false);
 
       expect(_circulos(tester), isEmpty);
-      expect(tester.widget<Text>(find.text('4')).style!.color, Colors.white);
+      expect(tester.widget<Text>(find.text('4')).style!.color, Paleta.tinta);
     });
   });
 }

@@ -14,7 +14,7 @@ void main() {
     expect(botonPasar, findsOneWidget);
     expect(botonTirar, findsNothing);
     expect(
-      find.text('No hay jugada con ningún dado como ancla: pasa el turno.'),
+      find.text('Ningún dado tiene jugada. Pasa el turno.'),
       findsOneWidget,
     );
   });

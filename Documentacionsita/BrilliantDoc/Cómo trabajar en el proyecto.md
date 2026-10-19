@@ -54,10 +54,13 @@ le sacan capturas, que es como se verificó cada cambio visual:
    ventana: `chromium.launch({ channel: 'msedge', headless: true })`.
 4. Flutter web dibuja todo en un canvas. Para poder encontrar botones hay que activar la
    semántica haciendo clic en `flt-semantics-placeholder` desde JavaScript.
-   - Los botones son `flt-semantics[role="button"]` con su texto adentro.
-   - Las chips del resumen (`C1 = 4`) tienen el texto en `aria-label`.
-   - Las casillas del tablero no tienen etiqueta: se tocan por coordenadas, a partir de
-     la etiqueta de columna "A". Son 48 px por casilla.
+   - Los botones son `flt-semantics[role="button"]` con su texto adentro. Los dados
+     también: su texto es "Dado: 4".
+   - Las casillas del tablero no tienen etiqueta ni hay letras A–G alrededor desde el
+     rediseño del 2026-10-18: se tocan por coordenadas. El tablero va centrado, cada
+     ficha mide `min(48, floor((min(ancho − 24, 480) − 12) / 7 − 4))` px, de una a otra
+     hay la ficha más 4 px, y la base tiene 6 px de borde. Para la altura sirve de
+     referencia otro elemento que sí tenga etiqueta, como los dados.
 5. Revisar las capturas y cerrar el servidor del puerto 8765.
 
 ## Leer el PDF del manual
@@ -102,6 +105,26 @@ El bloqueo se resolvió solo después de unos días. Si vuelve a aparecer, `dart
 sirve como verificación de respaldo (confirma que todo compila, aunque no que los tests
 pasen), y se puede revisar en Configuración → Privacidad y seguridad → Seguridad de
 Windows → Control de aplicaciones y del explorador.
+
+## Problema conocido: el APK falla a veces dentro de OneDrive
+
+A veces `flutter build apk` termina con:
+
+```
+Gradle task assembleRelease failed with exit code 1
+```
+
+sin ningún error de compilación. Pasó dos veces el 2026-10-18, y las dos veces volver a
+correr el mismo comando funcionó. Corriendo Gradle directo (`android/gradlew.bat`) no
+mostraba ningún error.
+
+Lo más probable es OneDrive: el proyecto está en una carpeta sincronizada, y mientras
+Gradle escribe en `build/` y `android/.gradle/`, OneDrive abre esos archivos para subirlos
+y Gradle los encuentra bloqueados. Qué hacer:
+
+- **Volver a correr el comando.** Hasta ahora siempre alcanzó.
+- Si pasa seguido, pausar la sincronización de OneDrive mientras se compila, o mover el
+  proyecto a una carpeta fuera de OneDrive (por ejemplo `C:\src\Brilliant`).
 
 ## Convenciones del proyecto
 

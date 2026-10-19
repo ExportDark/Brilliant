@@ -61,13 +61,12 @@ void main() {
       expect(_habilitado(tester, _inicio), isFalse);
     });
 
-    testWidgets('el número elegido aparece en el tablero y en el resumen', (tester) async {
+    testWidgets('el número elegido aparece en su casilla del tablero', (tester) async {
       await _abrir(tester);
 
       await _asignar(tester, 'C1', 4);
 
       expect(_textoEnTablero(tester, 'C1'), '4');
-      expect(find.text('C1 = 4'), findsOneWidget);
     });
 
     testWidgets('quitar un número vacía la casilla', (tester) async {
@@ -75,10 +74,9 @@ void main() {
       await _asignar(tester, 'C1', 4);
 
       await _tocar(tester, find.byKey(const ValueKey('casilla-C1')));
-      await _tocar(tester, find.widgetWithText(OutlinedButton, 'Quitar'));
+      await _tocar(tester, find.widgetWithText(TextButton, 'Quitar'));
 
       expect(_textoEnTablero(tester, 'C1'), '');
-      expect(find.text('C1 = —'), findsOneWidget);
     });
 
     testWidgets('un número ya usado no se puede elegir para otra casilla', (tester) async {
@@ -124,11 +122,10 @@ void main() {
       await _abrir(tester);
       await _asignar(tester, 'C1', 4);
 
-      await _tocar(tester, find.widgetWithText(OutlinedButton, 'Aleatorio'));
+      await _tocar(tester, find.widgetWithText(TextButton, 'Aleatorio'));
 
       expect(_habilitado(tester, _inicio), isTrue);
-      expect(find.text('C1 = 4'), findsOneWidget);
-      expect(find.textContaining('= —'), findsNothing);
+      expect(_textoEnTablero(tester, 'C1'), '4');
       final numeros = {for (final casilla in casillasIniciales) _textoEnTablero(tester, casilla)};
       expect(numeros, {'1', '2', '3', '4', '5', '6'});
     });
@@ -137,7 +134,7 @@ void main() {
       await _abrir(tester);
       await _repartir(tester);
 
-      await _tocar(tester, find.widgetWithText(OutlinedButton, 'Reiniciar'));
+      await _tocar(tester, find.widgetWithText(TextButton, 'Reiniciar'));
 
       expect(_habilitado(tester, _inicio), isFalse);
       for (final casilla in casillasIniciales) {

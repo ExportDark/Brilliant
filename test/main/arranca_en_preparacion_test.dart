@@ -12,6 +12,6 @@ void main() {
     await tester.pumpWidget(const BrilliantApp());
 
     expect(find.byType(PantallaPreparacion), findsOneWidget);
-    expect(find.text('Brilliant — preparación'), findsOneWidget);
+    expect(find.text('Prepara tu tablero'), findsOneWidget);
   });
 }

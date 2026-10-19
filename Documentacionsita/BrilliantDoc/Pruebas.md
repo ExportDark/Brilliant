@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 243 tests, todos pasando (2026-10-18).
+las pruebas y qué se aprendió de ellas. 252 tests, todos pasando (2026-10-18).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -23,7 +23,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 52 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion` y `Tablero` (layout del manual, anotar y vaciar casillas) |
 | `test/reglas/` | 34 | Las funciones puras de cada restricción, las 5 clases de color y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 89 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, las partidas completas simuladas y el camino feliz |
-| `test/ui/` | 67 | `CeldaWidget`, `TableroWidget`, la pantalla de preparación y la de partida, y las dos pantallas en 5 tamaños, del celular chico al escritorio |
+| `test/ui/` | 76 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la pantalla de preparación y la de partida, y las dos pantallas en 5 tamaños, del celular chico al escritorio |
 | `test/main/` | 1 | Que la app arranque en la pantalla de preparación |
 
 ## Cómo están organizadas
@@ -104,11 +104,12 @@ Todas las rutas son dentro de `test/`.
 
 | Archivo | Qué prueba |
 |---|---|
-| `ui/widgets/celda/borde_grueso_solo_iniciales_test.dart` | Solo las casillas iniciales llevan el borde grueso |
-| `ui/widgets/celda/numero_negro_en_seleccionada_test.dart` | En la casilla seleccionada, muy iluminada, el número va en negro |
-| `ui/widgets/tablero/etiquetas_de_notacion_test.dart` | Se ven las letras A–G y los números 1–7 |
+| `ui/widgets/celda/aro_solo_en_iniciales_test.dart` | Solo las casillas iniciales llevan el aro tenue de 2 px, y no es negro |
+| `ui/widgets/celda/numero_legible_sobre_cada_color_test.dart` | `tintaSobre`: el número va oscuro sobre los 5 colores suaves y blanco sobre un fondo oscuro |
+| `ui/widgets/tablero/sin_coordenadas_test.dart` | El tablero no muestra las letras A–G ni los números 1–7 |
+| `ui/widgets/dado/puntos_segun_el_valor_test.dart` | Del 1 al 6, el dado tiene tantos puntos como su valor y se anuncia como "Dado: N" (6 casos) |
 | `ui/pantallas/preparacion/seleccion_salta_a_la_siguiente_test.dart` | Al poner un número, la selección salta a la siguiente casilla vacía |
-| `ui/pantallas/preparacion/chip_selecciona_casilla_test.dart` | Tocar una chip del resumen selecciona su casilla |
+| `ui/pantallas/preparacion/tocar_casilla_inicial_la_selecciona_test.dart` | Tocar una casilla inicial la selecciona |
 | `ui/pantallas/preparacion/solo_iniciales_tocables_test.dart` | Solo se pueden tocar las 6 casillas iniciales |
 | `ui/pantallas/preparacion/aleatorio_e_inicio_test.dart` | Aleatorio y luego Inicio arranca la partida con los 6 números |
 | `ui/pantallas/partida/indicaciones_test.dart` | La indicación acompaña cada paso del turno |
@@ -118,8 +119,10 @@ Todas las rutas son dentro de `test/`.
 | `ui/pantallas/partida/tras_colocar_nada_iluminado_test.dart` | Al anotar se apaga toda la iluminación del turno |
 | `ui/pantallas/partida/solo_el_numero_exacto_se_resalta_test.dart` | Solo se resalta el número exacto que sacó el dado ancla |
 | `ui/pantallas/partida/pantalla_coincide_con_la_validacion_test.dart` | La pantalla ilumina exactamente lo que la validación acepta y rechaza |
+| `ui/pantallas/partida/barra_de_progreso_test.dart` | La barra de progreso cuenta las casillas llenas: 6 de 49 al empezar, 7 de 49 tras una jugada |
+| `ui/pantallas/partida/fin_de_partida_y_jugar_otra_vez_test.dart` | Con el tablero lleno sale "¡Tablero completo!", y "Jugar otra vez" vuelve a la preparación |
 | `main/arranca_en_preparacion_test.dart` | La app arranca en la pantalla de preparación |
-| `ui/widgets/tablero/se_adapta_al_ancho_test.dart` | Las casillas miden 48 si caben y se achican si no: 43 con 328 px, 38 con 288 px |
+| `ui/widgets/tablero/se_adapta_al_ancho_test.dart` | Las fichas miden 48 si caben y se achican si no: 42 con 336 px, 36 con 296 px |
 
 ### Tamaños de pantalla
 
@@ -141,6 +144,23 @@ y con el tablero adaptable pasan todos. Ver [[Versión Android]].
 Tres de estos archivos se llamaban antes `ancla_recien_anotada_test.dart`,
 `jugar_junto_al_ancla_nueva_test.dart` y `lejos_del_ancla_gana_test.dart`. Se renombraron el
 2026-10-09, cuando el ancla pasó a ser solo un dado.
+
+Otros cuatro cambiaron con el rediseño del 2026-10-18, porque probaban cosas que ya no
+se ven. Ver [[Interfaz del tablero]].
+
+| Antes | Ahora | Por qué |
+|---|---|---|
+| `celda/borde_grueso_solo_iniciales_test` | `celda/aro_solo_en_iniciales_test` | Ya no hay cuadrícula negra: las iniciales llevan un aro tenue de su color |
+| `celda/numero_negro_en_seleccionada_test` | `celda/numero_legible_sobre_cada_color_test` | El color del número depende del fondo |
+| `tablero/etiquetas_de_notacion_test` | `tablero/sin_coordenadas_test` | Al jugador ya no se le muestran coordenadas |
+| `preparacion/chip_selecciona_casilla_test` | `preparacion/tocar_casilla_inicial_la_selecciona_test` | Se quitaron las chips del resumen |
+
+También se actualizaron a propósito los tests que leían textos o formas que cambiaron:
+los mensajes sin "C2 ·", los dados como `DadoWidget(valor)`, las acciones de la
+preparación como botones de texto, y `celda_widget_test`, que ahora prueba la ficha
+redondeada, el orden de iluminación y el aro blanco con brillo de las encendidas. Como la
+casilla anima su color, esos tests esperan a que termine la transición
+(`pumpAndSettle`) antes de mirarlo.
 
 ## Los dados en las pruebas
 

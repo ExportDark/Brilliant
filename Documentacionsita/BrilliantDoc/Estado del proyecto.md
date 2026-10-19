@@ -18,8 +18,8 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Anotar valores en el tablero** — `Tablero.conValor` / `conValores` / `sinValor`,
       `Region.conCasilla` / `sinCasilla`, `Celda.sinValor`, todos devolviendo copias
       nuevas sin mutar nada
-- [x] **`TableroWidget`** — la grilla 7×7 con el color de cada región, el número anotado
-      en cada casilla y la notación A–G / 1–7 en los bordes
+- [x] **`TableroWidget`** — las 7×7 fichas con el color de cada región y el número
+      anotado en cada casilla, sin coordenadas a la vista
 - [x] **`PreparacionBloc`** — el reparto de los valores iniciales, que no deja empezar
       la partida hasta tener las 6 casillas llenas ([[Preparación de la partida]])
 - [x] **Pantalla de preparación** — el jugador reparte los 1-6 tocando las casillas del
@@ -36,7 +36,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Pantalla de partida** — tirar los dados, elegir el dado ancla, iluminar el número
       de las casillas que lo tienen, iluminar dónde cabe el otro dado (y apenas dónde la
       regla de color lo impide), explicar al tocar por qué no se puede; pasar turno y fin
-      de partida. La cuadrícula siempre es negra, y la ⚓ solo aparece en los dados
+      de partida. La ⚓ solo aparece en los dados
 - [x] **El ancla es solo un dado** (2026-10-09) — en el tablero no hay anclas, solo
       casillas con números; el código, los tests y la pantalla ya hablan así
 - [x] **Partidas completas simuladas** — 10 partidas con dados al azar (semillas fijas)
@@ -50,10 +50,17 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Versión Android** (2026-10-17) — APK instalable en el teléfono, solo vertical, con
       el tablero que se adapta al ancho de la pantalla; probada en un emulador de 360 px.
       Ver [[Versión Android]]
+- [x] **Camino feliz** (2026-10-18) — una partida entera sin pantalla, de la preparación
+      al tablero lleno, con dados que recorren las 36 combinaciones. Ver [[Pruebas]]
+- [x] **Interfaz suave** (2026-10-18) — tema crema con colores suaves, fichas
+      redondeadas sin cuadrícula negra, **ninguna coordenada a la vista**, dados con
+      puntos (`DadoWidget`), casillas encendidas con aro blanco y brillo, barra de
+      progreso y una tarjeta de fin de partida con "Jugar otra vez". Ver
+      [[Interfaz del tablero]]
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 243 tests, todos pasando.
+cerrarla es el puntaje. 252 tests, todos pasando.
 
 ## Qué falta
 
@@ -64,7 +71,6 @@ cerrarla es el puntaje. 243 tests, todos pasando.
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual. Ojo: esas partidas
       se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del dado
       ancla. Sirven para validar las reglas de color, no la del dado ancla
-- [ ] Afinar lo visual de la iluminación
 - [ ] Ícono propio para la app de Android (hoy usa el de Flutter)
 
 ## Cómo se viene trabajando

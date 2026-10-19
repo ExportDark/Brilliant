@@ -20,7 +20,7 @@ Repositorio: https://github.com/ExportDark/Brilliant
 - [[Reglas de color en código]] — el contrato `ReglaColor` y las funciones puras
 - [[Preparación de la partida]] — repartir los valores iniciales antes de jugar
 - [[Turnos y jugadas]] — los dados, la regla del ancla y la validación de cada jugada
-- [[Interfaz del tablero]] — la cuadrícula negra, cómo se iluminan las casillas y el ⚓
+- [[Interfaz del tablero]] — el tema suave, cómo se iluminan las casillas y los dados
 - [[Pruebas]] — qué cubren los tests, cómo están organizados y las partidas simuladas
 
 ## Decisiones de diseño

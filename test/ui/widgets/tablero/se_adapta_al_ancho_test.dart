@@ -17,11 +17,14 @@ Future<double> _tamanoDeCasillaCon(WidgetTester tester, double ancho) async {
 }
 
 void main() {
-  testWidgets('TableroWidget: las casillas miden 48 si caben y se achican si no', (tester) async {
-    // El tablero ocupa 7,5 casillas de ancho: 7 columnas y media de etiquetas.
+  testWidgets('TableroWidget: las fichas miden 48 si caben y se achican si no', (tester) async {
+    // El tablero ocupa 7 fichas, 4 px de separación por ficha y 6 px de
+    // relleno de cada lado: con 48 px por ficha, 376 px en total.
     expect(await _tamanoDeCasillaCon(tester, 600), 48);
-    expect(await _tamanoDeCasillaCon(tester, 360), 48);
-    expect(await _tamanoDeCasillaCon(tester, 328), 43);
-    expect(await _tamanoDeCasillaCon(tester, 288), 38);
+    expect(await _tamanoDeCasillaCon(tester, 376), 48);
+    // Un celular de 360 px, menos 12 px de margen de cada lado.
+    expect(await _tamanoDeCasillaCon(tester, 336), 42);
+    // Un celular de 320 px.
+    expect(await _tamanoDeCasillaCon(tester, 296), 36);
   });
 }

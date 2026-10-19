@@ -6,16 +6,17 @@ import '../../juego/preparacion_event.dart';
 import '../../juego/preparacion_state.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
+import '../tema.dart';
 import '../widgets/tablero_widget.dart';
 import 'pantalla_partida.dart';
 
 /// La pantalla donde el jugador reparte los números del 1 al 6 entre las
 /// casillas iniciales, antes de tirar el primer dado.
 ///
-/// Se toca una casilla inicial (en el tablero o en el resumen) y después un
-/// número, o "Aleatorio" para que el azar complete lo que falta. El botón
-/// "Inicio" solo se habilita con todas las casillas llenas;
-/// al oprimirlo se pasa a la [PantallaPartida] con los valores ya fijos.
+/// Se toca una casilla inicial (las que tienen aro) y después un número, o
+/// "Aleatorio" para que el azar complete lo que falta. El botón "Inicio" solo
+/// se habilita con todas las casillas llenas; al oprimirlo se pasa a la
+/// [PantallaPartida] con los valores ya fijos.
 class PantallaPreparacion extends StatelessWidget {
   const PantallaPreparacion({super.key});
 
@@ -96,6 +97,18 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
     return state.disponibles.contains(valor) || state.valorDe(casilla) == valor;
   }
 
+  String _indicacion(PreparacionState state) {
+    if (state.completa) return '¡Listo! Toca Inicio para empezar.';
+    return 'Toca una casilla con aro y elige su número.';
+  }
+
+  /// Cuántos números faltan por repartir, o `null` si ya están todos.
+  String? _cuantosFaltan(PreparacionState state) {
+    final faltan = state.casillas.length - state.valores.length;
+    if (faltan == 0) return null;
+    return faltan == 1 ? 'Falta 1' : 'Faltan $faltan';
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<PreparacionBloc, PreparacionState>(
@@ -109,101 +122,172 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
       },
       builder: (context, state) {
         final seleccionada = _seleccionada;
-        final faltan = state.casillas.length - state.valores.length;
+        final textos = Theme.of(context).textTheme;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Brilliant — preparación')),
+          appBar: AppBar(title: const Text('Brilliant')),
           body: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      state.completa
-                          ? 'Listo: oprime Inicio para empezar la partida.'
-                          : 'Toca una casilla inicial y elige su número. Faltan $faltan.',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 16),
-                    TableroWidget(
-                      tablero: _tableroBase.conValores(state.valores),
-                      seleccionada: seleccionada,
-                      esTocable: state.casillas.contains,
-                      alTocar: _seleccionar,
-                    ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        for (final casilla in state.casillas)
-                          ChoiceChip(
-                            key: ValueKey('resumen-${casilla.notacion}'),
-                            label: Text('${casilla.notacion} = ${state.valorDe(casilla) ?? '—'}'),
-                            selected: casilla == seleccionada,
-                            onSelected: (_) => _seleccionar(casilla),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        for (final valor in valoresPosibles)
-                          FilledButton.tonal(
-                            key: ValueKey('numero-$valor'),
-                            onPressed: _puedeElegir(state, valor)
-                                ? () => _asignar(state, valor)
-                                : null,
-                            child: Text('$valor', style: const TextStyle(fontSize: 18)),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 8,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        OutlinedButton(
-                          onPressed: seleccionada != null && state.valorDe(seleccionada) != null
-                              ? _quitar
-                              : null,
-                          child: const Text('Quitar'),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Prepara tu tablero',
+                        style: textos.headlineSmall?.copyWith(
+                          color: Paleta.tinta,
+                          fontWeight: FontWeight.w700,
                         ),
-                        OutlinedButton(
-                          onPressed: state.valores.isNotEmpty ? () => _reiniciar(state) : null,
-                          child: const Text('Reiniciar'),
-                        ),
-                        OutlinedButton(
-                          onPressed: () => _bloc.add(const RepartoAleatorio()),
-                          child: const Text('Aleatorio'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    FilledButton(
-                      // Sin todas las casillas llenas no se puede empezar. El bloc
-                      // tampoco confirmaría, pero así el jugador lo ve de entrada.
-                      onPressed: state.completa
-                          ? () => _bloc.add(const PreparacionConfirmada())
-                          : null,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
                       ),
-                      child: const Text('Inicio', style: TextStyle(fontSize: 20)),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      Text(
+                        _indicacion(state),
+                        textAlign: TextAlign.center,
+                        style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
+                      ),
+                      if (_cuantosFaltan(state) case final cuantos?) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          cuantos,
+                          style: textos.bodyMedium?.copyWith(
+                            color: Paleta.acento,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      TableroWidget(
+                        tablero: _tableroBase.conValores(state.valores),
+                        seleccionada: seleccionada,
+                        esTocable: state.casillas.contains,
+                        alTocar: _seleccionar,
+                      ),
+                      const SizedBox(height: 20),
+                      // Los 6 números siempre en una fila: en un celular angosto
+                      // las fichas se achican para caber.
+                      LayoutBuilder(
+                        builder: (context, restricciones) {
+                          const separacion = 10.0;
+                          final queCabe =
+                              (restricciones.maxWidth - separacion * 5) / valoresPosibles.length;
+                          final tamano = queCabe < 52 ? queCabe.floorToDouble() : 52.0;
+
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            spacing: separacion,
+                            children: [
+                              for (final valor in valoresPosibles)
+                                _FichaDeNumero(
+                                  valor: valor,
+                                  tamano: tamano,
+                                  alElegir: _puedeElegir(state, valor)
+                                      ? () => _asignar(state, valor)
+                                      : null,
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _Accion(
+                            icono: Icons.casino_outlined,
+                            texto: 'Aleatorio',
+                            alTocar: () => _bloc.add(const RepartoAleatorio()),
+                          ),
+                          _Accion(
+                            icono: Icons.backspace_outlined,
+                            texto: 'Quitar',
+                            alTocar: seleccionada != null && state.valorDe(seleccionada) != null
+                                ? _quitar
+                                : null,
+                          ),
+                          _Accion(
+                            icono: Icons.refresh_rounded,
+                            texto: 'Reiniciar',
+                            alTocar: state.valores.isNotEmpty ? () => _reiniciar(state) : null,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      FilledButton(
+                        // Sin todas las casillas llenas no se puede empezar. El bloc
+                        // tampoco confirmaría, pero así el jugador lo ve de entrada.
+                        onPressed: state.completa
+                            ? () => _bloc.add(const PreparacionConfirmada())
+                            : null,
+                        style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Inicio'),
+                            SizedBox(width: 8),
+                            Icon(Icons.arrow_forward_rounded),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// Uno de los números del 1 al 6 para repartir, como una ficha redonda. Los
+/// que ya se usaron se ven apagados y no se pueden tocar.
+class _FichaDeNumero extends StatelessWidget {
+  final int valor;
+  final double tamano;
+  final VoidCallback? alElegir;
+
+  const _FichaDeNumero({required this.valor, required this.tamano, required this.alElegir});
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.tonal(
+      key: ValueKey('numero-$valor'),
+      onPressed: alElegir,
+      style: FilledButton.styleFrom(
+        shape: const CircleBorder(),
+        fixedSize: Size.square(tamano),
+        minimumSize: Size.square(tamano),
+        // Sin el margen de toque extra de 48 px que Flutter agrega por
+        // defecto: si no, en un celular angosto las 6 fichas no caben en fila.
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: EdgeInsets.zero,
+        textStyle: TextStyle(fontSize: tamano * 0.4, fontWeight: FontWeight.w700),
+      ),
+      child: Text('$valor'),
+    );
+  }
+}
+
+/// Una acción secundaria de la preparación: discreta, con ícono y texto.
+class _Accion extends StatelessWidget {
+  final IconData icono;
+  final String texto;
+  final VoidCallback? alTocar;
+
+  const _Accion({required this.icono, required this.texto, required this.alTocar});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: alTocar,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [Icon(icono, size: 20), const SizedBox(width: 6), Text(texto)],
+      ),
     );
   }
 }

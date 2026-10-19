@@ -8,8 +8,11 @@ import '../../juego/validacion_jugada.dart';
 import '../../modelo/color5.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
+import '../tema.dart';
 import '../widgets/celda_widget.dart';
+import '../widgets/dado_widget.dart';
 import '../widgets/tablero_widget.dart';
+import 'pantalla_preparacion.dart';
 
 /// La pantalla donde se juega la partida, turno por turno.
 ///
@@ -20,7 +23,8 @@ import '../widgets/tablero_widget.dart';
 /// las vecinas donde el otro dado cabe, y apenas las que su zona no lo
 /// acepta. Tocar una iluminada anota el número; tocar cualquier otra casilla
 /// vacía explica, debajo del tablero, por qué no se puede. Si no hay jugada
-/// con ningún dado como ancla, se pasa el turno.
+/// con ningún dado como ancla, se pasa el turno. Al terminar, una tarjeta
+/// dice en cuántos turnos se jugó y ofrece jugar otra vez.
 class PantallaPartida extends StatelessWidget {
   final Tablero tablero;
 
@@ -74,13 +78,13 @@ class _VistaPartidaState extends State<_VistaPartida> {
 
   String _explicarRegla(Posicion posicion, ReglaRota rota) {
     final tipo = rota.region.tipo;
-    return '${posicion.notacion} · Zona ${_nombreZona(tipo.color)} — '
-        '${tipo.regla.descripcion}. Ya tiene: ${rota.valoresEnZona.join(', ')}';
+    return 'Zona ${_nombreZona(tipo.color)} — ${tipo.regla.descripcion}. '
+        'Ya tiene: ${rota.valoresEnZona.join(', ')}';
   }
 
   String _explicarVecino(Posicion posicion, int numero, int valor) {
-    return '${posicion.notacion} no está junto a ningún $numero: el $valor va arriba, '
-        'abajo, a la izquierda o a la derecha de una casilla con $numero.';
+    return 'Esa casilla no está junto a ningún$_espacioFijo$numero: el $valor va arriba, '
+        'abajo o a un lado de un$_espacioFijo$numero.';
   }
 
   Iluminacion _iluminacion(PartidaState state, Posicion posicion) {
@@ -92,19 +96,21 @@ class _VistaPartidaState extends State<_VistaPartida> {
   }
 
   String _indicacion(PartidaState state) {
-    if (state.terminada) {
-      return 'Fin de la partida: llenaste ${state.casillasLlenas} de '
-          '${Tablero.filas * Tablero.columnas} casillas.';
-    }
     if (state.dados == null) return 'Tira los dados.';
-    if (state.sinJugada) return 'No hay jugada con ningún dado como ancla: pasa el turno.';
+    if (state.sinJugada) return 'Ningún dado tiene jugada. Pasa el turno.';
 
     final buscado = state.valorAncla;
     final valor = state.valorAColocar;
     if (buscado == null || valor == null) {
-      return 'Elige el dado ancla: el otro se pone junto a una casilla con ese número.';
+      return 'Toca un dado para usarlo de ancla: el otro va junto a una casilla con ese número.';
     }
-    return 'Pon el $valor junto a un $buscado (arriba, abajo, izquierda o derecha).';
+    return 'Pon el $valor en una casilla iluminada, junto a un$_espacioFijo$buscado.';
+  }
+
+  void _jugarOtraVez() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const PantallaPreparacion()),
+    );
   }
 
   @override
@@ -116,64 +122,88 @@ class _VistaPartidaState extends State<_VistaPartida> {
         final textos = Theme.of(context).textTheme;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Brilliant — partida')),
+          appBar: AppBar(title: const Text('Brilliant')),
           body: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Turno ${state.turno}', style: textos.titleLarge),
-                    const SizedBox(height: 4),
-                    Text(_indicacion(state), style: textos.titleMedium),
-                    const SizedBox(height: 16),
-                    TableroWidget(
-                      tablero: state.tablero,
-                      iluminacionDe: (posicion) => _iluminacion(state, posicion),
-                      numeroResaltadoEn: state.tieneNumeroBuscado,
-                      esTocable: (posicion) =>
-                          state.valorAncla != null &&
-                          state.tablero.celdaEn(posicion)!.estaVacia,
-                      alTocar: (posicion) => _tocarCasilla(state, posicion),
-                    ),
-                    if (explicacion != null) ...[
-                      const SizedBox(height: 16),
-                      _Explicacion(explicacion),
-                    ],
-                    if (dados != null) ...[
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 16,
-                        children: [
-                          for (final (indice, valor) in dados.indexed)
-                            _Dado(
-                              key: ValueKey('dado-$indice'),
-                              valor: valor,
-                              anclado: indice == state.dadoElegido,
-                              alTocar: () => _enviar(DadoElegido(indice)),
-                            ),
-                        ],
+            // Arriba y no centrado en vertical: así el tablero no se mueve
+            // cuando aparecen los dados o la explicación.
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _Encabezado(
+                        titulo: state.terminada ? 'Partida terminada' : 'Turno ${state.turno}',
+                        casillasLlenas: state.casillasLlenas,
                       ),
-                    ],
-                    const SizedBox(height: 24),
-                    if (state.sinJugada)
-                      FilledButton.tonal(
-                        onPressed: () => _enviar(const TurnoPasado()),
-                        child: const Text('Pasar turno', style: TextStyle(fontSize: 18)),
-                      )
-                    else
-                      FilledButton(
-                        onPressed: dados == null && !state.terminada
-                            ? () => _enviar(const DadosTirados())
-                            : null,
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                      if (!state.terminada) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          _indicacion(state),
+                          textAlign: TextAlign.center,
+                          style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
                         ),
-                        child: const Text('Tirar dados', style: TextStyle(fontSize: 18)),
+                      ],
+                      const SizedBox(height: 14),
+                      TableroWidget(
+                        tablero: state.tablero,
+                        iluminacionDe: (posicion) => _iluminacion(state, posicion),
+                        numeroResaltadoEn: state.tieneNumeroBuscado,
+                        esTocable: (posicion) =>
+                            state.valorAncla != null &&
+                            state.tablero.celdaEn(posicion)!.estaVacia,
+                        alTocar: (posicion) => _tocarCasilla(state, posicion),
                       ),
-                  ],
+                      if (explicacion != null) ...[
+                        const SizedBox(height: 12),
+                        _Explicacion(explicacion),
+                      ],
+                      if (state.terminada) ...[
+                        const SizedBox(height: 20),
+                        _FinDePartida(
+                          tableroLleno: state.casillasLlenas == Tablero.filas * Tablero.columnas,
+                          turnos: state.turno - 1,
+                          alJugarOtraVez: _jugarOtraVez,
+                        ),
+                      ] else ...[
+                        if (dados != null) ...[
+                          const SizedBox(height: 18),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 20,
+                            children: [
+                              for (final (indice, valor) in dados.indexed)
+                                DadoWidget(
+                                  key: ValueKey('dado-$indice'),
+                                  valor: valor,
+                                  anclado: indice == state.dadoElegido,
+                                  alTocar: () => _enviar(DadoElegido(indice)),
+                                ),
+                            ],
+                          ),
+                        ],
+                        // Con los dados en la mesa no hace falta ningún botón,
+                        // salvo para pasar el turno cuando no hay jugada.
+                        if (state.sinJugada) ...[
+                          const SizedBox(height: 20),
+                          FilledButton.tonal(
+                            onPressed: () => _enviar(const TurnoPasado()),
+                            style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
+                            child: const _TextoConIcono(Icons.skip_next_rounded, 'Pasar turno'),
+                          ),
+                        ] else if (dados == null) ...[
+                          const SizedBox(height: 20),
+                          FilledButton(
+                            onPressed: () => _enviar(const DadosTirados()),
+                            style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
+                            child: const _TextoConIcono(Icons.casino_rounded, 'Tirar dados'),
+                          ),
+                        ],
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -183,6 +213,117 @@ class _VistaPartidaState extends State<_VistaPartida> {
     );
   }
 }
+
+/// El turno en curso (o que la partida terminó) y cuántas casillas van llenas,
+/// con una barra de progreso fina.
+class _Encabezado extends StatelessWidget {
+  final String titulo;
+  final int casillasLlenas;
+
+  const _Encabezado({required this.titulo, required this.casillasLlenas});
+
+  @override
+  Widget build(BuildContext context) {
+    final textos = Theme.of(context).textTheme;
+    const total = Tablero.filas * Tablero.columnas;
+
+    return Column(
+      children: [
+        Text(
+          titulo,
+          style: textos.headlineSmall?.copyWith(color: Paleta.tinta, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: 220,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              key: const ValueKey('progreso'),
+              value: casillasLlenas / total,
+              minHeight: 6,
+              backgroundColor: Paleta.baseTablero,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '$casillasLlenas de $total casillas',
+          style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
+        ),
+      ],
+    );
+  }
+}
+
+/// La tarjeta del final: cómo terminó la partida y el botón para empezar otra.
+class _FinDePartida extends StatelessWidget {
+  final bool tableroLleno;
+  final int turnos;
+  final VoidCallback alJugarOtraVez;
+
+  const _FinDePartida({
+    required this.tableroLleno,
+    required this.turnos,
+    required this.alJugarOtraVez,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textos = Theme.of(context).textTheme;
+
+    return Container(
+      key: const ValueKey('fin-de-partida'),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 16, offset: Offset(0, 4))],
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.emoji_events_rounded, size: 44, color: Color(0xFFE0A93B)),
+          const SizedBox(height: 8),
+          Text(
+            tableroLleno ? '¡Tablero completo!' : 'Fin de la partida',
+            style: textos.titleLarge?.copyWith(color: Paleta.tinta, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Lo jugaste en $turnos turnos.',
+            style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
+          ),
+          const SizedBox(height: 18),
+          FilledButton(
+            onPressed: alJugarOtraVez,
+            child: const _TextoConIcono(Icons.replay_rounded, 'Jugar otra vez'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// El contenido de un botón: un ícono y su texto.
+class _TextoConIcono extends StatelessWidget {
+  final IconData icono;
+  final String texto;
+
+  const _TextoConIcono(this.icono, this.texto);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [Icon(icono), const SizedBox(width: 8), Text(texto)],
+    );
+  }
+}
+
+/// Un espacio que no se corta: así un número nunca queda solo en la línea
+/// de abajo ("junto a un" / "4.").
+const _espacioFijo = '\u00A0';
 
 String _nombreZona(Color5 color) {
   return switch (color) {
@@ -194,65 +335,8 @@ String _nombreZona(Color5 color) {
   };
 }
 
-/// Un dado de la tirada. El que es ancla lleva borde ámbar y un ancla debajo.
-class _Dado extends StatelessWidget {
-  final int valor;
-  final bool anclado;
-  final VoidCallback alTocar;
-
-  const _Dado({
-    super.key,
-    required this.valor,
-    required this.anclado,
-    required this.alTocar,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final forma = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-      side: BorderSide(
-        color: anclado ? Colors.amber.shade700 : Colors.black54,
-        width: anclado ? 4 : 2,
-      ),
-    );
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Semantics(
-          button: true,
-          selected: anclado,
-          child: Material(
-            color: anclado ? Colors.amber.shade100 : Colors.white,
-            shape: forma,
-            child: InkWell(
-              customBorder: forma,
-              onTap: alTocar,
-              child: SizedBox(
-                width: 64,
-                height: 64,
-                child: Center(
-                  child: Text(
-                    '$valor',
-                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Visibility.maintain(
-          visible: anclado,
-          child: Icon(Icons.anchor, size: 20, color: Colors.amber.shade800),
-        ),
-      ],
-    );
-  }
-}
-
-/// El recuadro que explica por qué la casilla tocada no acepta el número.
+/// El recuadro suave que explica por qué la casilla tocada no acepta el
+/// número.
 class _Explicacion extends StatelessWidget {
   final String texto;
 
@@ -260,23 +344,21 @@ class _Explicacion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colores = Theme.of(context).colorScheme;
-
     return ConstrainedBox(
       key: const ValueKey('explicacion'),
       constraints: const BoxConstraints(maxWidth: 420),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: colores.errorContainer,
-          borderRadius: BorderRadius.circular(8),
+          color: Paleta.aviso,
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
-            Icon(Icons.block, color: colores.onErrorContainer),
-            const SizedBox(width: 8),
+            const Icon(Icons.info_outline_rounded, color: Paleta.avisoTinta),
+            const SizedBox(width: 10),
             Expanded(
-              child: Text(texto, style: TextStyle(color: colores.onErrorContainer)),
+              child: Text(texto, style: const TextStyle(color: Paleta.avisoTinta, height: 1.3)),
             ),
           ],
         ),

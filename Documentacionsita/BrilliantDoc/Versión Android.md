@@ -31,11 +31,15 @@ Deja tres archivos en `build/app/outputs/flutter-apk/`:
 | Archivo | Tamaño | Para qué |
 |---|---|---|
 | `app-arm64-v8a-release.apk` | 15,1 MB | **El del teléfono**: cualquier Android de los últimos años |
-| `app-armeabi-v7a-release.apk` | 12,6 MB | Teléfonos muy viejos, de 32 bits |
+| `app-armeabi-v7a-release.apk` | 12,5 MB | Teléfonos muy viejos, de 32 bits |
 | `app-x86_64-release.apk` | 16,5 MB | Emuladores en la PC |
 
 La primera compilación tardó unos 7 minutos, porque Gradle descargó e instaló solo lo que
 faltaba del SDK (NDK 28, Build-Tools 36 y CMake). Las siguientes tardan segundos.
+
+Si falla con `Gradle task assembleRelease failed with exit code 1` y ningún error más, se
+vuelve a correr: es OneDrive bloqueando archivos de la compilación. Ver
+[[Cómo trabajar en el proyecto]].
 
 ### Qué hace falta en la PC
 
@@ -83,6 +87,11 @@ Device Manager de Android Studio. En él se instaló el APK de x86_64 y se jugó
 - en la partida se tiran los dados, el dado ancla ilumina el número buscado y sus
   vecinas, y anotar pasa al turno 2;
 - aunque se fuerce la pantalla a horizontal, la app se queda en vertical.
+
+Con el rediseño del 2026-10-18 se recompiló y se volvió a probar en el mismo emulador.
+Todo cabe a 360 px: el tablero de fichas de 42 px, los seis números en una fila, los
+dados con sus puntos, las casillas encendidas, la explicación y la barra de progreso. Ver
+[[Interfaz del tablero]].
 
 Para volver a usarlo:
 

@@ -18,13 +18,15 @@ Construcción incremental, módulo por módulo:
 - [x] Reglas de color: rojo, amarillo, verde, azul, morado
 - [x] `TipoRegion`, `Region`, `extraerValores`
 - [x] `Tablero` completo (7×7, 9 regiones)
-- [x] `TableroWidget`: la grilla 7×7 con los números anotados
+- [x] `TableroWidget`: las 7×7 fichas con los números anotados
 - [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
 - [x] Pantalla de preparación: repartir los 6 números en el tablero y botón **Inicio**
 - [x] Motor de partida (`PartidaBloc`): dados, regla del dado ancla, turnos, validación de
       jugadas
 - [x] Pantalla de partida: dados, números buscados iluminados, jugadas iluminadas y la regla
       explicada
+- [x] Interfaz suave: tema propio, fichas redondeadas, dados con puntos, sin coordenadas a
+      la vista
 - [ ] Puntuación
 
 ## Estructura
@@ -35,8 +37,9 @@ lib/
   reglas/   reglas de colocación por color
   juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
   ui/
-    widgets/    CeldaWidget, TableroWidget
+    widgets/    CeldaWidget, TableroWidget, DadoWidget
     pantallas/  PantallaPreparacion, PantallaPartida
+    tema.dart   colores y estilo de la app
   main.dart
 test/       tests, misma estructura que lib/
 ```
@@ -81,12 +84,13 @@ Entidad inmutable que representa una casilla del tablero:
 
 `conValor(nuevoValor)` devuelve una copia con el valor anotado, sin mutar la original.
 
-`CeldaWidget` (`lib/ui/widgets/celda_widget.dart`) la renderiza como un cuadro del color
-de su zona, con borde grueso si es inicial y el valor centrado. La cuadrícula siempre es
-negra: para resaltar una casilla se **ilumina su relleno**, que se aclara hacia el
-blanco. Con `seleccionada` o `Iluminacion.posible` se aclara mucho; con
-`Iluminacion.bloqueada`, solo un poco. Con `numeroResaltado` el número se ilumina: va en
-negro sobre un círculo blanco.
+`CeldaWidget` (`lib/ui/widgets/celda_widget.dart`) la renderiza como una ficha redondeada
+del color de su zona, sin borde, con el valor centrado; si es inicial, lleva un aro tenue
+en un tono más oscuro de su color. Para resaltar una casilla se **ilumina**: se aclara
+hacia el blanco. Con `seleccionada` o `Iluminacion.posible` se aclara mucho y queda
+encendida, con aro blanco y brillo; con `Iluminacion.bloqueada`, solo se aclara un poco.
+El cambio es una transición suave. Con `numeroResaltado` el número se ilumina: va en
+tinta oscura sobre un círculo blanco.
 
 ## Módulo: regla de color rojo (`lib/reglas/`)
 
@@ -145,9 +149,9 @@ Para anotar: `conValor(posicion, valor)`, `conValores({posicion: valor, ...})` y
 
 ## Módulo: TableroWidget (`lib/ui/widgets/tablero_widget.dart`)
 
-Dibuja la grilla completa de un `Tablero`: las 49 celdas con el color de su región y el
-número que tengan anotado, más las letras de columna (A–G) y los números de fila (1–7)
-para leer cada casilla con la notación del manual.
+Dibuja un `Tablero` completo: las 49 fichas con el color de su región y el número que
+tengan anotado, separadas entre sí sobre una base redondeada. **No muestra coordenadas**:
+la notación del manual (C1, F2…) solo existe en el código.
 
 Como se dibuja siempre a partir de un `Tablero`, para mostrar lo que el jugador va
 poniendo basta con pasarle `tablero.conValores(...)`: cada número aparece en su celda.
@@ -156,8 +160,18 @@ Opcionalmente recibe `seleccionada` (la casilla resaltada), `alTocar` y `esTocab
 (qué casillas responden al toque), `iluminacionDe` (cómo se resalta cada casilla) y
 `numeroResaltadoEn` (qué casillas iluminan su número).
 
-El tablero se adapta al ancho que tenga: las casillas miden hasta 48 px y se achican para
-caber, por ejemplo en un celular de 360 px.
+El tablero se adapta al ancho que tenga: las fichas miden hasta 48 px y se achican para
+caber, por ejemplo a 42 px en un celular de 360 px.
+
+## Módulo: tema y dados (`lib/ui/`)
+
+- `tema.dart`: `temaBrilliant()`, el tema de la app (fondo crema, acento lavanda,
+  botones redondeados); `Paleta`, sus colores; `coloresDeZona`, los colores suaves de
+  las 5 zonas; y `tintaSobre(fondo)`, que elige tinta oscura o blanco para que el número
+  siempre se lea.
+- `widgets/dado_widget.dart`: `DadoWidget`, un dado blanco redondeado con los puntos de su
+  cara. Con `anclado` lleva un aro de acento y debajo ⚓ "ancla": es el único lugar
+  donde aparece el ancla. Para lectores de pantalla es un botón "Dado: 4".
 
 ## Módulo: preparación de la partida (`lib/juego/`)
 
@@ -236,17 +250,20 @@ las 6 casillas iniciales, viendo en el tablero qué número va quedando en cada 
 
 - `pantalla_preparacion.dart`: `PantallaPreparacion` crea el `PreparacionBloc` (vía
   `flutter_bloc`) con las casillas iniciales del mapa y dibuja su estado:
+  - "Prepara tu tablero", qué hacer y cuántos números faltan;
   - el `TableroWidget` con lo repartido hasta ahora (`tablero.conValores(state.valores)`),
-    con la casilla seleccionada iluminada;
-  - un resumen `C1 = 4 · F2 = — · ...` con una chip por casilla inicial;
-  - los botones del 1 al 6, donde los números ya usados salen deshabilitados;
-  - **Quitar**, **Reiniciar** y **Aleatorio** (completa al azar lo que falta);
+    con la casilla seleccionada encendida. No hay resumen aparte: lo repartido se ve en
+    el tablero;
+  - los números del 1 al 6 como fichas redondas en una fila, donde los ya usados salen
+    apagados;
+  - **Aleatorio** (completa al azar lo que falta), **Quitar** y **Reiniciar**, como
+    acciones discretas;
   - el botón **Inicio**, habilitado solo cuando `state.completa`.
 - Al oprimir Inicio el bloc confirma el reparto y la app pasa a `PantallaPartida` con el
   tablero y los 6 valores ya fijos.
 
-Para asignar un número se toca una casilla inicial (en el tablero o en el resumen) y
-después el número. La selección salta sola a la siguiente casilla vacía. Qué casilla está
+Para asignar un número se toca una casilla inicial (las que tienen aro) y después el
+número. La selección salta sola a la siguiente casilla vacía. Qué casilla está
 seleccionada es estado de la pantalla, no del bloc: al reparto no le importa qué se está
 mirando.
 
@@ -258,22 +275,27 @@ bloc no confirma un reparto incompleto.
 `PantallaPartida` crea el `PartidaBloc` con el tablero que dejó la preparación y dibuja
 cada turno:
 
-1. **Tirar dados** saca los dos dados.
-2. Se toca un dado para hacerlo **dado ancla** (borde ámbar y un ⚓ debajo). Mientras no
-   se coloque, se puede cambiar al otro. Es el único lugar donde aparece el ancla.
+Arriba van el turno y una barra de progreso con las casillas llenas ("12 de 49
+casillas").
+
+1. **Tirar dados** saca los dos dados, dibujados con sus puntos. El botón se esconde
+   mientras haya dados en la mesa.
+2. Se toca un dado para hacerlo **dado ancla** (aro lavanda y ⚓ "ancla" debajo).
+   Mientras no se coloque, se puede cambiar al otro. Es el único lugar donde aparece el
+   ancla.
 3. Las casillas del tablero que tienen el número del dado ancla **iluminan su número**
-   (en negro sobre un círculo blanco). Sus vecinas donde el otro dado cabe se
-   **iluminan** (mucho más claras), y las vecinas cuya zona no lo acepta se aclaran
-   apenas. La cuadrícula sigue negra.
-4. Tocar una casilla iluminada anota el número y pasa al siguiente turno. Tocar cualquier
-   otra casilla vacía explica debajo del tablero por qué no se puede, por ejemplo:
-   - *"A2 no está junto a ningún 4: el 2 va arriba, abajo, a la izquierda o a la derecha
-     de una casilla con 4."*
-   - *"C2 · Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene:
-     4"*
-5. Si no hay jugada con ningún dado como ancla, aparece **Pasar turno**. Cuando ninguna
-   tirada posible tiene jugada, la pantalla anuncia el fin de la partida y cuántas
-   casillas se llenaron.
+   (en tinta oscura sobre un círculo blanco). Sus vecinas donde el otro dado cabe se
+   **encienden** (más claras, con aro blanco y brillo), y las vecinas cuya zona no lo
+   acepta se aclaran apenas.
+4. Tocar una casilla encendida anota el número y pasa al siguiente turno. Tocar cualquier
+   otra casilla vacía explica debajo del tablero por qué no se puede, sin coordenadas,
+   por ejemplo:
+   - *"Esa casilla no está junto a ningún 4: el 2 va arriba, abajo o a un lado de un 4."*
+   - *"Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*
+5. Si no hay jugada con ningún dado como ancla, aparece **Pasar turno** en lugar de
+   Tirar dados. Cuando ninguna tirada posible tiene jugada, aparece una tarjeta con
+   "¡Tablero completo!", en cuántos turnos se jugó y el botón **Jugar otra vez**, que
+   vuelve a la preparación.
 
 Qué casillas se iluminan sale de `state.evaluar(posicion)`, es decir, de la misma
 validación que usa el bloc para aceptar o rechazar la jugada. La pantalla no decide nada

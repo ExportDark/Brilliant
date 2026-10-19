@@ -67,12 +67,14 @@ La regla de color es la misma pregunta de siempre,
 `region.tipo.regla.puedeAgregar(extraerValores(region), valor)`.
 
 `SinVecinoConNumero` y `ReglaRota` traen lo necesario para explicarle al jugador **por
-qué** no puede ponerlo ahí. La pantalla arma mensajes como:
+qué** no puede ponerlo ahí. La pantalla arma mensajes como estos, **sin coordenadas**:
 
-- *"A2 no está junto a ningún 4: el 2 va arriba, abajo, a la izquierda o a la derecha de
-  una casilla con 4."*
-- *"C2 · Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*,
-  con la `descripcion` de cada regla.
+- *"Esa casilla no está junto a ningún 4: el 2 va arriba, abajo o a un lado de un 4."*
+- *"Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*, con
+  la `descripcion` de cada regla.
+
+Entre "un" y el número va un espacio que no se corta (` `), para que el número nunca
+quede solo en la línea de abajo.
 
 `hayJugada(tablero, ancla: a, valor: v)` dice si alguna casilla acepta `v` cuando el dado
 ancla sacó `a`. Con eso se calculan "no hay jugada" y "la partida terminó".
@@ -115,24 +117,42 @@ Lo demás se calcula a partir de esos campos:
 `PantallaPartida` (`lib/ui/pantallas/pantalla_partida.dart`) crea el `PartidaBloc` con
 `BlocProvider` y dibuja su estado, de arriba abajo:
 
-- **El turno** y una indicación de qué hacer: tirar, elegir el dado ancla, "pon el 2 junto
-  a un 4", pasar el turno o, al final, cuántas casillas se llenaron.
+- **El turno** ("Turno 3", o "Partida terminada" al final), y debajo una **barra de
+  progreso** fina con la cuenta de casillas llenas: "12 de 49 casillas".
+- **Una indicación** de qué hacer:
+
+  | Momento | Indicación |
+  |---|---|
+  | Antes de tirar | "Tira los dados." |
+  | Sin dado ancla | "Toca un dado para usarlo de ancla: el otro va junto a una casilla con ese número." |
+  | Con dado ancla | "Pon el 2 en una casilla iluminada, junto a un 4." |
+  | Sin jugada | "Ningún dado tiene jugada. Pasa el turno." |
+
 - **El tablero.** Las casillas que tienen el número del dado ancla **iluminan su número**:
-  va en negro sobre un círculo claro. Cada casilla vacía se ilumina según
+  va en tinta oscura sobre un círculo blanco. Cada casilla vacía se ilumina según
   `state.evaluar(posicion)`:
-  - mucho (`Iluminacion.posible`) si es una jugada válida
+  - mucho, y queda encendida con aro blanco y brillo (`Iluminacion.posible`), si es una
+    jugada válida
   - apenas (`Iluminacion.bloqueada`) si está junto a una casilla con el número pero la
     regla de su zona no lo permite
   - nada si no está junto a ninguna casilla con el número
 
-  La cuadrícula siempre es negra: lo que cambia es el relleno de la casilla, que se aclara
-  hacia el blanco. **En el tablero no aparece ninguna ⚓.** Ver [[Interfaz del tablero]].
+  **En el tablero no aparece ninguna ⚓ ni ninguna coordenada.** Ver
+  [[Interfaz del tablero]].
 - **La explicación.** Al tocar una casilla vacía donde no se puede, aparece debajo del
-  tablero por qué: no está junto a ninguna casilla con el número, o la regla de la zona lo
-  impide. Al tocar una iluminada se anota el número.
-- **Los dos dados.** Se toca uno para hacerlo dado ancla: lleva borde ámbar y un ⚓ debajo.
-  Es el único lugar donde aparece el ancla.
-- **Tirar dados**, o **Pasar turno** cuando no hay jugada.
+  tablero, en un recuadro suave con ícono de información, por qué: no está junto a
+  ninguna casilla con el número, o la regla de la zona lo impide. Al tocar una iluminada
+  se anota el número.
+- **Los dos dados**, dibujados con sus puntos (`DadoWidget`). Se toca uno para hacerlo
+  dado ancla: lleva aro lavanda y debajo ⚓ "ancla". Es el único lugar donde aparece el
+  ancla.
+- **Tirar dados**, que solo se ve mientras no hay dados en la mesa: con la tirada
+  pendiente, lo que toca es elegir el ancla y colocar. Cuando no hay jugada, en su lugar
+  aparece **Pasar turno**.
+- **Al terminar**, una tarjeta con un trofeo: "¡Tablero completo!" (o "Fin de la partida"
+  si quedaron casillas libres, algo que solo pasa en los tests), "Lo jugaste en 73
+  turnos." y el botón **Jugar otra vez**, que vuelve a la preparación con un tablero
+  nuevo.
 
 La explicación que se está mostrando es estado de la pantalla, no del bloc, igual que la
 casilla seleccionada en la preparación. Se borra al tirar, al cambiar de dado ancla y al

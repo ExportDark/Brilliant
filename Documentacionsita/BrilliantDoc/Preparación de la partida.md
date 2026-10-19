@@ -79,25 +79,35 @@ final.
 ## La pantalla
 
 `PantallaPreparacion` (`lib/ui/pantallas/pantalla_preparacion.dart`) es con la que arranca
-la app. Crea el bloc con `BlocProvider` (de `flutter_bloc`) y dibuja su estado:
+la app. Crea el bloc con `BlocProvider` (de `flutter_bloc`) y dibuja su estado, de arriba
+abajo:
 
+- **"Prepara tu tablero"** y una indicación corta: "Toca una casilla con aro y elige su
+  número." y, en otra línea y en color de acento, cuántos faltan ("Faltan 3", "Falta 1").
+  Con todo repartido dice "¡Listo! Toca Inicio para empezar."
 - **El tablero completo**, con lo repartido hasta ahora anotado en cada casilla
   (`tablero.conValores(state.valores)`). Así el jugador ve en qué posición queda cada
-  número. Solo las 6 casillas iniciales responden al toque, y la seleccionada se ilumina
-  (su color se aclara; la cuadrícula sigue negra).
-- **Un resumen** con una chip por casilla: `C1 = 4`, `F2 = —`… Tocar una chip también
-  selecciona su casilla.
-- **Los números del 1 al 6.** Los ya usados en otra casilla salen deshabilitados, así que
-  el jugador nunca llega a intentar un repetido.
-- **Quitar**, que vacía la casilla seleccionada, y **Reiniciar**.
-- **Aleatorio**, que manda `RepartoAleatorio`: el azar completa lo que falta.
-- **Inicio**, habilitado solo cuando `state.completa`. Al oprimirlo manda
-  `PreparacionConfirmada`, y cuando el estado pasa a `confirmada` la app navega a
-  `PantallaPartida` con el tablero y los 6 valores ya fijos.
+  número. **No hay coordenadas ni resumen aparte**: lo repartido se ve directo en el
+  tablero. Solo las 6 casillas iniciales (las que tienen aro) responden al toque, y la
+  seleccionada se ilumina y queda encendida, con aro blanco y brillo. Ver
+  [[Interfaz del tablero]].
+- **Los números del 1 al 6**, como fichas redondas, siempre en una fila: en un celular
+  angosto se achican para caber. Los ya usados en otra casilla salen apagados y no se
+  pueden tocar, así que el jugador nunca llega a intentar un repetido.
+- Tres **acciones secundarias**, discretas, con ícono y texto:
+  - **Aleatorio**, que manda `RepartoAleatorio`: el azar completa lo que falta.
+  - **Quitar**, que vacía la casilla seleccionada.
+  - **Reiniciar**.
+- **Inicio**, el botón principal, grande, habilitado solo cuando `state.completa`. Al
+  oprimirlo manda `PreparacionConfirmada`, y cuando el estado pasa a `confirmada` la app
+  navega a `PantallaPartida` con el tablero y los 6 valores ya fijos.
 
-Para asignar, se toca una casilla y luego un número. Después la selección salta sola a la
-siguiente casilla vacía, con lo que repartir los 6 son 6 toques de número si se sigue el
-orden.
+Para asignar, se toca una casilla con aro y luego un número. Después la selección salta
+sola a la siguiente casilla vacía, con lo que repartir los 6 son 6 toques de número si se
+sigue el orden.
+
+Hasta el 2026-10-18 había además una chip por casilla con su coordenada (`C1 = 4`,
+`F2 = —`…). Se quitó en el rediseño, porque al jugador ya no se le muestran coordenadas.
 
 Qué casilla está seleccionada lo guarda la pantalla, no el bloc. Es estado de la interfaz:
 al reparto no le importa qué casilla se está mirando.

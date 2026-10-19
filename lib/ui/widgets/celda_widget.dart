@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../../modelo/celda.dart';
-import '../../modelo/color5.dart';
-
-const _colorPorColor5 = {
-  Color5.amarillo: Colors.yellow,
-  Color5.verde: Colors.green,
-  Color5.morado: Colors.purple,
-  Color5.azul: Colors.blue,
-  Color5.rojo: Colors.red,
-};
+import '../tema.dart';
 
 /// Cuánto se acerca al blanco el color de la zona al iluminar una casilla:
-/// mucho para las que se pueden usar, poco para las que la regla bloquea.
-const _aclaradoFuerte = 0.55;
+/// más para las que se pueden usar, poco para las que la regla bloquea.
+const _aclaradoFuerte = 0.4;
 const _aclaradoSuave = 0.25;
+
+/// Cuánto más oscuro que la zona es el aro de las casillas iniciales.
+const _oscurecidoDelAro = 0.3;
 
 /// Cómo se resalta una celda mientras se busca dónde anotar el dado.
 enum Iluminacion {
@@ -28,13 +23,15 @@ enum Iluminacion {
   bloqueada,
 }
 
-/// Representa visualmente una [Celda]: fondo del color de su zona, borde
-/// grueso si es una casilla inicial, y el valor anotado (si tiene).
+/// Representa visualmente una [Celda] como una ficha redondeada del color de
+/// su zona, con el valor anotado (si tiene). Las casillas iniciales llevan un
+/// aro tenue en un tono más oscuro de su propio color.
 ///
-/// La cuadrícula siempre es negra: para resaltar una casilla se ilumina su
-/// relleno, que se aclara hacia el blanco. [seleccionada] (la casilla donde
-/// va a caer el próximo número) y [Iluminacion.posible] se aclaran mucho;
-/// [Iluminacion.bloqueada], solo un poco.
+/// Para resaltar una casilla se ilumina: [seleccionada] (la casilla donde va
+/// a caer el próximo número) e [Iluminacion.posible] se aclaran y además
+/// llevan un aro blanco con un brillo suave, para que se vean encendidas y no
+/// desteñidas; [Iluminacion.bloqueada] solo se aclara un poco. El cambio es
+/// una transición suave.
 ///
 /// Con [numeroResaltado], el número de la casilla se ilumina: va sobre un
 /// círculo claro. Se usa para las casillas que tienen el número que sacó el
@@ -63,27 +60,54 @@ class CeldaWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final aclarado = _aclarado;
+    final colorZona = coloresDeZona[celda.color]!;
+    final fondo = Color.lerp(colorZona, Colors.white, _aclarado)!;
+    final encendida = seleccionada || iluminacion == Iluminacion.posible;
     final numero = Text(
       celda.valor?.toString() ?? '',
       style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        // Sobre un fondo muy aclarado, o sobre el círculo del número
-        // resaltado, el blanco ya no se lee.
-        color: aclarado >= _aclaradoFuerte || numeroResaltado
-            ? Colors.black87
-            : Colors.white,
+        fontSize: tamano * 0.42,
+        fontWeight: FontWeight.w700,
+        // Sobre el círculo del número resaltado va siempre oscuro; si no,
+        // depende de qué tan claro sea el fondo.
+        color: numeroResaltado ? Paleta.tinta : tintaSobre(fondo),
       ),
     );
 
-    return Container(
-      width: tamano,
-      height: tamano,
+    // Solo se anima el color y el aro. El tamaño va fuera de la animación:
+    // si cambiara animado (por ejemplo, al achicar la ventana), el tablero se
+    // desbordaría mientras dura la transición.
+    return SizedBox.square(
+      dimension: tamano,
+      child: _fichaAnimada(colorZona, fondo, encendida, numero),
+    );
+  }
+
+  Widget _fichaAnimada(Color colorZona, Color fondo, bool encendida, Widget numero) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      curve: Curves.easeOut,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Color.lerp(_colorPorColor5[celda.color], Colors.white, aclarado),
-        border: Border.all(width: celda.esInicial ? 3 : 1),
+        color: fondo,
+        borderRadius: BorderRadius.circular(tamano * 0.24),
+        border: encendida
+            ? Border.all(color: Colors.white, width: 3)
+            : celda.esInicial
+                ? Border.all(
+                    color: Color.lerp(colorZona, Colors.black, _oscurecidoDelAro)!,
+                    width: 2,
+                  )
+                : null,
+        boxShadow: encendida
+            ? [
+                BoxShadow(
+                  color: Paleta.acento.withValues(alpha: 0.45),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
       ),
       child: numeroResaltado ? _NumeroResaltado(tamano: tamano * 0.68, child: numero) : numero,
     );
