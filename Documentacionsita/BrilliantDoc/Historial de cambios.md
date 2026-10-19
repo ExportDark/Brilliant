@@ -7,6 +7,18 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-18 — Camino feliz
+
+- **Unit test del happy path**: una partida entera, de la preparación al final, sin
+  pantalla. Encadena `PreparacionBloc` → tablero → `PartidaBloc`, con dados sin azar que
+  recorren las 36 combinaciones, y termina con las 49 casillas llenas y cada zona
+  cumpliendo las reglas del manual, revisadas a mano en el test. Dura siempre 73 turnos.
+  Se comprobó que falla si la preparación entrega mal los números o si una regla deja
+  pasar repetidos. Ver [[Pruebas]].
+- El jugador automático y la verificación de zonas pasaron de `partida_completa_test` a
+  los ayudantes compartidos.
+- 243 tests.
+
 ## 2026-10-17 — Versión Android
 
 - **El tablero se adapta al ancho de la pantalla** (`96b8a4c`). Medía siempre 360 px y,

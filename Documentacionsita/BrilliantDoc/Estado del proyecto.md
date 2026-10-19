@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-17 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-18 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
@@ -53,7 +53,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 242 tests, todos pasando.
+cerrarla es el puntaje. 243 tests, todos pasando.
 
 ## Qué falta
 

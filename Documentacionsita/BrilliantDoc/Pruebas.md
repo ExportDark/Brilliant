@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 242 tests, todos pasando (2026-10-17).
+las pruebas y qué se aprendió de ellas. 243 tests, todos pasando (2026-10-18).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -22,7 +22,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 |---|---|---|
 | `test/modelo/` | 52 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion` y `Tablero` (layout del manual, anotar y vaciar casillas) |
 | `test/reglas/` | 34 | Las funciones puras de cada restricción, las 5 clases de color y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
-| `test/juego/` | 88 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan y las partidas completas simuladas |
+| `test/juego/` | 89 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, las partidas completas simuladas y el camino feliz |
 | `test/ui/` | 67 | `CeldaWidget`, `TableroWidget`, la pantalla de preparación y la de partida, y las dos pantallas en 5 tamaños, del celular chico al escritorio |
 | `test/main/` | 1 | Que la app arranque en la pantalla de preparación |
 
@@ -42,7 +42,8 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
     la Partida 1: C1=4, F2=1, B4=2, E4=5, C6=3, E7=6), `llenoMenos('E5')`,
     `soloCabeElSeisEnE5()`, `dadoConCaras([4, 3])`, `partidaBloc()`, `evaluarEn()`, y
     `posiblesEn()` / `bloqueadasEn()` / `casillasDonde()`, que dan en notación las casillas
-    que se iluminan.
+    que se iluminan. Para partidas enteras: `enviar()`, `jugarHastaElFinal()` (el jugador
+    automático), `expectZonasCumplenSusReglas()` y `dadosConTodasLasCombinaciones()`.
   - `test/ui/pantallas/ayudantes_pantallas.dart`: `abrirPreparacion()`, `abrirPartida()`,
     `tocar()`, `tirarYElegirAncla()`, `celdaEn()`, `celdasDibujadasDonde()` y los
     buscadores de botones, dados y casillas.
@@ -173,6 +174,36 @@ Las 10 corren en alrededor de un segundo.
 > le falta un número de la corrida, la morada ya eligió sus dos números, la azul repite
 > el suyo) y toda casilla vacía tarde o temprano queda junto a una llena. Por eso contar
 > casillas llenas no distinguiría a nadie. Ver [[Puntuación]].
+
+## Camino feliz: una partida entera
+
+`test/juego/camino_feliz/partida_entera_test.dart` es el **happy path** del juego: una
+partida en la que todo sale bien, de punta a punta, sin pantalla. Es el único unit test
+que encadena los dos blocs:
+
+1. **Preparación.** `PreparacionBloc` reparte los números de la Partida 1 (C1=4, F2=1,
+   B4=2, E4=5, C6=3, E7=6) y se confirma.
+2. **Paso a la partida.** El tablero se arma igual que al oprimir Inicio:
+   `Tablero.mapaOriginal().conValores(preparacion.state.valores)`.
+3. **Partida.** `PartidaBloc` con dados **sin azar** que recorren las 36 combinaciones de
+   dos dados en orden, (1,1), (1,2), …, (6,6), y vuelven a empezar
+   (`dadosConTodasLasCombinaciones()`). Como el dado ancla puede ser cualquiera de los
+   dos, toda jugada que haga falta sale a más tardar en 36 turnos, así que la partida
+   siempre avanza. El jugador automático es `jugarHastaElFinal()`.
+4. **Final.** Termina con **las 49 casillas llenas**, los 6 iniciales en su lugar, y
+   cada zona cumpliendo las reglas del manual: las rojas con del 1 al 6, la amarilla sin
+   repetir, cada azul con un solo número y cada morada con dos como máximo.
+
+Como no hay azar, la partida es siempre la misma: **73 turnos**, con 43 números anotados
+y 30 turnos pasados.
+
+> [!tip] Las reglas del final se revisan a mano
+> El final no usa las clases de reglas del código para juzgarse: revisa cada color con su
+> regla escrita directo en el test. Se comprobó rompiendo el código a propósito. Si la
+> regla de "todos diferentes" dejara pasar repetidos, este test falla ("la zona #1
+> (amarillo) con [1, 2, 3, 1, 2]: no puede repetir"); una verificación que usara la
+> misma regla rota no lo notaría. Si la preparación entregara mal los números, también
+> falla.
 
 ## Verificación en la app real
 
