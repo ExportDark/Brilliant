@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brilliant/main.dart';
 import 'package:brilliant/modelo/tablero.dart';
 import 'package:brilliant/ui/pantallas/pantalla_partida.dart';
 import 'package:brilliant/ui/pantallas/pantalla_preparacion.dart';
@@ -26,6 +27,16 @@ void _superficie(WidgetTester tester, Size tamano) {
   tester.view.physicalSize = tamano;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
+}
+
+/// Abre la app entera, como al lanzarla, con dados que decide [tirarDado].
+Future<void> abrirApp(
+  WidgetTester tester, {
+  required int Function() tirarDado,
+  Size tamano = const Size(1000, 1400),
+}) async {
+  _superficie(tester, tamano);
+  await tester.pumpWidget(BrilliantApp(tirarDado: tirarDado));
 }
 
 Future<void> abrirPreparacion(WidgetTester tester, {Size tamano = const Size(1000, 1400)}) async {

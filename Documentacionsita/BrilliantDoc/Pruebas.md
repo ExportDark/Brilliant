@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 252 tests, todos pasando (2026-10-18).
+las pruebas y qué se aprendió de ellas. 253 tests, todos pasando (2026-10-19).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -23,7 +23,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 52 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion` y `Tablero` (layout del manual, anotar y vaciar casillas) |
 | `test/reglas/` | 34 | Las funciones puras de cada restricción, las 5 clases de color y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 89 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, las partidas completas simuladas y el camino feliz |
-| `test/ui/` | 76 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la pantalla de preparación y la de partida, y las dos pantallas en 5 tamaños, del celular chico al escritorio |
+| `test/ui/` | 77 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la pantalla de preparación y la de partida, las dos pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla |
 | `test/main/` | 1 | Que la app arranque en la pantalla de preparación |
 
 ## Cómo están organizadas
@@ -44,7 +44,8 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
     `posiblesEn()` / `bloqueadasEn()` / `casillasDonde()`, que dan en notación las casillas
     que se iluminan. Para partidas enteras: `enviar()`, `jugarHastaElFinal()` (el jugador
     automático), `expectZonasCumplenSusReglas()` y `dadosConTodasLasCombinaciones()`.
-  - `test/ui/pantallas/ayudantes_pantallas.dart`: `abrirPreparacion()`, `abrirPartida()`,
+  - `test/ui/pantallas/ayudantes_pantallas.dart`: `abrirApp()` (la app entera, con dados
+    fijos), `abrirPreparacion()`, `abrirPartida()`,
     `tocar()`, `tirarYElegirAncla()`, `celdaEn()`, `celdasDibujadasDonde()` y los
     buscadores de botones, dados y casillas.
 
@@ -224,6 +225,38 @@ y 30 turnos pasados.
 > (amarillo) con [1, 2, 3, 1, 2]: no puede repetir"); una verificación que usara la
 > misma regla rota no lo notaría. Si la preparación entregara mal los números, también
 > falla.
+
+### El mismo camino, tocando la pantalla
+
+`test/ui/camino_feliz/partida_entera_por_la_pantalla_test.dart` es el happy path como
+**widget test**: juega la misma partida, pero tocando la app como una persona, sin
+mandarle nada a los blocs.
+
+1. Abre la app entera (`BrilliantApp`, con `abrirApp()`), con los mismos dados sin azar.
+2. En la preparación toca cada casilla con aro y su número (los de la Partida 1), y
+   comprueba que cada número aparece en el tablero y que Inicio se habilita.
+3. Toca **Inicio** y juega turno por turno. Toca **Tirar dados**. Si aparece **Pasar
+   turno**, lo toca. Si no, toca el primer dado como ancla y, si no se enciende ninguna
+   casilla, el segundo. Después toca la primera casilla encendida y comprueba que ahí
+   quedó el número del otro dado, que el turno avanza y que la barra cuenta una casilla
+   más.
+4. Al final ve "¡Tablero completo!", "49 de 49 casillas" y en cuántos turnos se jugó,
+   los 6 iniciales en su lugar, y ninguna zona rompiendo su regla.
+5. Toca **Jugar otra vez** y vuelve a una preparación vacía.
+
+Dura **56 turnos** (43 anotados y 13 pasados), no 73 como el unit test, porque elige otra
+casilla: la primera encendida en el orden en que se lee el tablero, mientras que el
+jugador del unit test toma la primera de `tablero.celdas`, que va zona por zona. Son dos
+partidas distintas, y las dos llenan el tablero. Corre en unos 9 segundos.
+
+Para que los dados lleguen fijos desde el arranque, `BrilliantApp` y
+`PantallaPreparacion` reciben un `tirarDado` opcional que pasan a la partida, igual que
+`PantallaPartida`. En la app no se pasa, y los dados salen al azar.
+
+> [!tip] Se comprobó que detecta errores de la pantalla
+> Si la pantalla encendiera también las casillas que rompen la regla de su zona, el test
+> falla en el turno 4 ("en E2 tenía que quedar el 4"): toca una casilla encendida y el
+> bloc no la acepta. El unit test no lo notaría, porque no mira la pantalla.
 
 ## Verificación en la app real
 

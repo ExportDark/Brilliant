@@ -7,6 +7,18 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-19 — Camino feliz por la pantalla
+
+- **El happy path como widget test**: abre la app entera, reparte los 6 números tocando
+  casillas y fichas, toca Inicio, juega la partida completa tocando Tirar dados, el dado
+  ancla y una casilla encendida (o Pasar turno), llega a "¡Tablero completo!" y toca
+  "Jugar otra vez". Dura 56 turnos. Se comprobó que falla si la pantalla enciende una
+  casilla que el bloc no acepta. Ver [[Pruebas]].
+- `BrilliantApp` y `PantallaPreparacion` reciben un `tirarDado` opcional que pasan a la
+  partida, para que el test juegue con dados fijos desde el arranque. En la app siguen
+  saliendo al azar. Ver [[Turnos y jugadas]].
+- 253 tests.
+
 ## 2026-10-18 — Interfaz suave
 
 - **Rediseño de la interfaz**, para que sea lo más amigable posible: un estilo suave, sin

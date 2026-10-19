@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-18 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-19 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
@@ -52,6 +52,8 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       Ver [[Versión Android]]
 - [x] **Camino feliz** (2026-10-18) — una partida entera sin pantalla, de la preparación
       al tablero lleno, con dados que recorren las 36 combinaciones. Ver [[Pruebas]]
+- [x] **Camino feliz por la pantalla** (2026-10-19) — la misma idea como widget test:
+      la app entera, jugada tocando, de la preparación a "Jugar otra vez". Ver [[Pruebas]]
 - [x] **Interfaz suave** (2026-10-18) — tema crema con colores suaves, fichas
       redondeadas sin cuadrícula negra, **ninguna coordenada a la vista**, dados con
       puntos (`DadoWidget`), casillas encendidas con aro blanco y brillo, barra de
@@ -60,7 +62,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 252 tests, todos pasando.
+cerrarla es el puntaje. 253 tests, todos pasando.
 
 ## Qué falta
 

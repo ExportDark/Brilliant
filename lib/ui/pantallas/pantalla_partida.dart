@@ -37,13 +37,16 @@ class PantallaPartida extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PartidaBloc(tablero, tirarDado: tirarDado),
-      child: const _VistaPartida(),
+      child: _VistaPartida(tirarDado: tirarDado),
     );
   }
 }
 
 class _VistaPartida extends StatefulWidget {
-  const _VistaPartida();
+  /// Se le pasa a la preparación de la partida siguiente, al jugar otra vez.
+  final int Function()? tirarDado;
+
+  const _VistaPartida({required this.tirarDado});
 
   @override
   State<_VistaPartida> createState() => _VistaPartidaState();
@@ -109,7 +112,7 @@ class _VistaPartidaState extends State<_VistaPartida> {
 
   void _jugarOtraVez() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const PantallaPreparacion()),
+      MaterialPageRoute(builder: (_) => PantallaPreparacion(tirarDado: widget.tirarDado)),
     );
   }
 

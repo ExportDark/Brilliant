@@ -8,7 +8,10 @@ void main() {
 }
 
 class BrilliantApp extends StatelessWidget {
-  const BrilliantApp({super.key});
+  /// Decide qué sale en los dados. Sin él salen al azar; los tests lo fijan.
+  final int Function()? tirarDado;
+
+  const BrilliantApp({super.key, this.tirarDado});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class BrilliantApp extends StatelessWidget {
       title: 'Brilliant',
       debugShowCheckedModeBanner: false,
       theme: temaBrilliant(),
-      home: const PantallaPreparacion(),
+      home: PantallaPreparacion(tirarDado: tirarDado),
     );
   }
 }

@@ -18,7 +18,11 @@ import 'pantalla_partida.dart';
 /// se habilita con todas las casillas llenas; al oprimirlo se pasa a la
 /// [PantallaPartida] con los valores ya fijos.
 class PantallaPreparacion extends StatelessWidget {
-  const PantallaPreparacion({super.key});
+  /// Decide qué sale en los dados de la partida que arranca desde aquí. Sin él
+  /// salen al azar; los tests lo fijan.
+  final int Function()? tirarDado;
+
+  const PantallaPreparacion({super.key, this.tirarDado});
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +30,15 @@ class PantallaPreparacion extends StatelessWidget {
       create: (_) => PreparacionBloc(
         casillasIniciales.map(Posicion.desdeNotacion).toList(),
       ),
-      child: const _VistaPreparacion(),
+      child: _VistaPreparacion(tirarDado: tirarDado),
     );
   }
 }
 
 class _VistaPreparacion extends StatefulWidget {
-  const _VistaPreparacion();
+  final int Function()? tirarDado;
+
+  const _VistaPreparacion({required this.tirarDado});
 
   @override
   State<_VistaPreparacion> createState() => _VistaPreparacionState();
@@ -116,7 +122,10 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
       listener: (context, state) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => PantallaPartida(tablero: _tableroBase.conValores(state.valores)),
+            builder: (_) => PantallaPartida(
+              tablero: _tableroBase.conValores(state.valores),
+              tirarDado: widget.tirarDado,
+            ),
           ),
         );
       },

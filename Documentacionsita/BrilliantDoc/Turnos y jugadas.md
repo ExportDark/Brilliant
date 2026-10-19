@@ -169,6 +169,11 @@ El constructor recibe `tirarDado`, una función que devuelve una cara del 1 al 6
 tests es una secuencia fija, para saber exactamente qué sale y probar casos como "no hay
 jugada" sin depender de la suerte.
 
+Desde el 2026-10-19 también la reciben `BrilliantApp` y `PantallaPreparacion`, que la pasan
+a la partida que arranca con Inicio. "Jugar otra vez" se la devuelve a la preparación
+nueva. Así un test puede abrir la app entera y jugar con dados fijos de punta a punta. Ver
+[[Pruebas]].
+
 ## Decisión: "pasar" es un evento explícito
 
 Cuando no hay jugada, el bloc no pasa el turno solo: espera `TurnoPasado`. Así el jugador ve

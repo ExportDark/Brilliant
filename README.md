@@ -300,4 +300,14 @@ casillas").
 Qué casillas se iluminan sale de `state.evaluar(posicion)`, es decir, de la misma
 validación que usa el bloc para aceptar o rechazar la jugada. La pantalla no decide nada
 por su cuenta. `PantallaPartida` recibe un `tirarDado` opcional, para que los tests fijen
-qué sale en los dados.
+qué sale en los dados. `BrilliantApp` y `PantallaPreparacion` también lo reciben y lo pasan
+a la partida, así un test puede jugar la app entera con dados fijos.
+
+## Tests del camino feliz
+
+Hay dos, y los dos juegan una partida entera de la preparación al tablero lleno:
+
+- `test/juego/camino_feliz/partida_entera_test.dart`: un **unit test** que maneja los blocs
+  directo, sin pantalla.
+- `test/ui/camino_feliz/partida_entera_por_la_pantalla_test.dart`: un **widget test** que
+  abre la app y juega tocando, hasta "¡Tablero completo!" y "Jugar otra vez".
