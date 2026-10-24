@@ -62,11 +62,13 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Los 4 mapas oficiales en el modelo** (2026-10-24) — `nivel1` a `nivel4`, con el
       gris y el naranja, sus casillas iniciales, y las partidas simuladas y el camino
       feliz corriendo en los cuatro. Ver [[Mapas]]
-- [ ] **Elegir el mapa en la app** — una pantalla "Elige un mapa" al abrir
+- [x] **Elegir el mapa en la app** (2026-10-24) — la app abre en "Elige un mapa", con
+      los 4 niveles en miniatura. "Jugar otra vez" repite el mismo mapa, y salir a mitad
+      de partida pide confirmación. Ver [[Mapas]]
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 326 tests, todos pasando.
+cerrarla es el puntaje. 357 tests, todos pasando.
 
 ## Qué falta
 

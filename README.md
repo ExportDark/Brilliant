@@ -27,6 +27,7 @@ Construcción incremental, módulo por módulo:
       explicada
 - [x] Interfaz suave: tema propio, fichas redondeadas, dados con puntos, sin coordenadas a
       la vista
+- [x] Los 4 mapas oficiales, y una pantalla para elegir uno al abrir la app
 - [ ] Puntuación
 
 ## Estructura
@@ -38,7 +39,7 @@ lib/
   juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
   ui/
     widgets/    CeldaWidget, TableroWidget, DadoWidget
-    pantallas/  PantallaPreparacion, PantallaPartida
+    pantallas/  PantallaEleccionDeMapa, PantallaPreparacion, PantallaPartida
     tema.dart   colores y estilo de la app
   main.dart
 test/       tests, misma estructura que lib/
@@ -250,10 +251,18 @@ Reglas que hace cumplir:
 4. La partida termina cuando ninguna combinación de dado ancla y número del 1 al 6 tiene
    jugada.
 
+## Módulo: elección de mapa (`lib/ui/pantallas/pantalla_eleccion_de_mapa.dart`)
+
+Es la pantalla con la que arranca la app: "Elige un mapa" y los 4 mapas oficiales en
+tarjetas de dos columnas, cada una con su tablero vacío en miniatura (el mismo
+`TableroWidget`), su nombre ("Nivel 3") y cuántas zonas tiene. Al tocar una tarjeta se
+pasa a la preparación de ese mapa.
+
 ## Módulo: pantalla de preparación (`lib/ui/pantallas/`)
 
-Es la pantalla con la que arranca la app. El jugador reparte los números del 1 al 6 entre
-las 6 casillas iniciales, viendo en el tablero qué número va quedando en cada posición.
+El jugador reparte los números del 1 al 6 entre las 6 casillas iniciales del mapa que
+eligió, viendo en el tablero qué número va quedando en cada posición. La barra superior
+dice el nivel, y la flecha de atrás vuelve a elegir mapa.
 
 - `pantalla_preparacion.dart`: `PantallaPreparacion` crea el `PreparacionBloc` (vía
   `flutter_bloc`) con las casillas iniciales del mapa y dibuja su estado:
@@ -280,7 +289,8 @@ bloc no confirma un reparto incompleto.
 ## Módulo: pantalla de partida (`lib/ui/pantallas/pantalla_partida.dart`)
 
 `PantallaPartida` crea el `PartidaBloc` con el tablero que dejó la preparación y dibuja
-cada turno:
+cada turno. La barra superior dice el nivel. Salir a mitad de partida con la flecha de
+atrás pide confirmación ("¿Salir de la partida?"), para no perder lo jugado sin querer.
 
 Arriba van el turno y una barra de progreso con las casillas llenas ("12 de 49
 casillas").
@@ -307,14 +317,17 @@ casillas").
 Qué casillas se iluminan sale de `state.evaluar(posicion)`, es decir, de la misma
 validación que usa el bloc para aceptar o rechazar la jugada. La pantalla no decide nada
 por su cuenta. `PantallaPartida` recibe un `tirarDado` opcional, para que los tests fijen
-qué sale en los dados. `BrilliantApp` y `PantallaPreparacion` también lo reciben y lo pasan
-a la partida, así un test puede jugar la app entera con dados fijos.
+qué sale en los dados. `BrilliantApp`, `PantallaEleccionDeMapa` y `PantallaPreparacion`
+también lo reciben y lo pasan a la partida, así un test puede jugar la app entera con
+dados fijos.
 
 ## Tests del camino feliz
 
-Hay dos, y los dos juegan una partida entera de la preparación al tablero lleno:
+Hay dos, y los dos juegan una partida entera de la preparación al tablero lleno, en cada
+uno de los 4 mapas:
 
 - `test/juego/camino_feliz/partida_entera_test.dart`: un **unit test** que maneja los blocs
   directo, sin pantalla.
 - `test/ui/camino_feliz/partida_entera_por_la_pantalla_test.dart`: un **widget test** que
-  abre la app y juega tocando, hasta "¡Tablero completo!" y "Jugar otra vez".
+  abre la app, elige el mapa y juega tocando, hasta "¡Tablero completo!" y "Jugar otra
+  vez".

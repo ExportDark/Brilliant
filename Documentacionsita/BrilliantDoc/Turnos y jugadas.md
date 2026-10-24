@@ -72,8 +72,10 @@ qué** no puede ponerlo ahí. La pantalla arma mensajes como estos, **sin coorde
 - *"Esa casilla no está junto a ningún 4: el 2 va arriba, abajo o a un lado de un 4."*
 - *"Zona azul — Todos iguales: todas las casillas llevan el mismo número. Ya tiene: 4"*, con
   la `descripcion` de cada regla.
+- *"Zona naranja — Solo del 4 al 6."* Una zona naranja rechaza los números de fuera de
+  su rango aunque esté vacía; como no tiene nada, el mensaje no dice "Ya tiene".
 
-Entre "un" y el número va un espacio que no se corta (` `), para que el número nunca
+Entre "un" y el número va un espacio que no se corta (`\u00A0`), para que el número nunca
 quede solo en la línea de abajo.
 
 `hayJugada(tablero, ancla: a, valor: v)` dice si alguna casilla acepta `v` cuando el dado
@@ -114,8 +116,9 @@ Lo demás se calcula a partir de esos campos:
 
 ## La pantalla
 
-`PantallaPartida` (`lib/ui/pantallas/pantalla_partida.dart`) crea el `PartidaBloc` con
-`BlocProvider` y dibuja su estado, de arriba abajo:
+`PantallaPartida` (`lib/ui/pantallas/pantalla_partida.dart`) recibe el tablero preparado y
+su `Mapa`, crea el `PartidaBloc` con `BlocProvider` y dibuja su estado. La barra superior
+dice el nivel. De arriba abajo:
 
 - **El turno** ("Turno 3", o "Partida terminada" al final), y debajo una **barra de
   progreso** fina con la cuenta de casillas llenas: "12 de 49 casillas".
@@ -151,8 +154,13 @@ Lo demás se calcula a partir de esos campos:
   aparece **Pasar turno**.
 - **Al terminar**, una tarjeta con un trofeo: "¡Tablero completo!" (o "Fin de la partida"
   si quedaron casillas libres, algo que solo pasa en los tests), "Lo jugaste en 73
-  turnos." y el botón **Jugar otra vez**, que vuelve a la preparación con un tablero
-  nuevo.
+  turnos." y el botón **Jugar otra vez**, que vuelve a la preparación del **mismo mapa**
+  con un tablero nuevo.
+
+**Salir a mitad de partida pide confirmación.** La flecha de atrás (o el botón de atrás
+de Android) vuelve a elegir mapa, pero antes pregunta "¿Salir de la partida?" con
+"Seguir jugando" y "Salir", para no perder lo jugado con un toque sin querer. Con la
+partida terminada sale sin preguntar. Es un `PopScope` con `canPop: state.terminada`.
 
 La explicación que se está mostrando es estado de la pantalla, no del bloc, igual que la
 casilla seleccionada en la preparación. Se borra al tirar, al cambiar de dado ancla y al
@@ -169,8 +177,8 @@ El constructor recibe `tirarDado`, una función que devuelve una cara del 1 al 6
 tests es una secuencia fija, para saber exactamente qué sale y probar casos como "no hay
 jugada" sin depender de la suerte.
 
-Desde el 2026-10-19 también la reciben `BrilliantApp` y `PantallaPreparacion`, que la pasan
-a la partida que arranca con Inicio. "Jugar otra vez" se la devuelve a la preparación
+Desde el 2026-10-19 también la reciben `BrilliantApp` y `PantallaPreparacion` (y, desde
+el 2026-10-24, `PantallaEleccionDeMapa`), que la pasan a la partida que arranca con Inicio. "Jugar otra vez" se la devuelve a la preparación
 nueva. Así un test puede abrir la app entera y jugar con dados fijos de punta a punta. Ver
 [[Pruebas]].
 

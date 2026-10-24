@@ -6,6 +6,7 @@ import '../../juego/partida_event.dart';
 import '../../juego/partida_state.dart';
 import '../../juego/validacion_jugada.dart';
 import '../../modelo/color_zona.dart';
+import '../../modelo/mapa.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
@@ -24,29 +25,42 @@ import 'pantalla_preparacion.dart';
 /// acepta. Tocar una iluminada anota el número; tocar cualquier otra casilla
 /// vacía explica, debajo del tablero, por qué no se puede. Si no hay jugada
 /// con ningún dado como ancla, se pasa el turno. Al terminar, una tarjeta
-/// dice en cuántos turnos se jugó y ofrece jugar otra vez.
+/// dice en cuántos turnos se jugó y ofrece jugar otra vez el mismo [mapa].
+///
+/// Salir a mitad de partida (con la flecha de atrás) pide confirmación, para
+/// no perder lo jugado con un toque sin querer.
 class PantallaPartida extends StatelessWidget {
   final Tablero tablero;
+
+  /// El mapa de [tablero]: se vuelve a preparar al jugar otra vez.
+  final Mapa mapa;
 
   /// Decide qué sale en cada dado. Sin él salen al azar; los tests lo fijan.
   final int Function()? tirarDado;
 
-  const PantallaPartida({super.key, required this.tablero, this.tirarDado});
+  const PantallaPartida({
+    super.key,
+    required this.tablero,
+    this.mapa = nivel1,
+    this.tirarDado,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PartidaBloc(tablero, tirarDado: tirarDado),
-      child: _VistaPartida(tirarDado: tirarDado),
+      child: _VistaPartida(mapa: mapa, tirarDado: tirarDado),
     );
   }
 }
 
 class _VistaPartida extends StatefulWidget {
+  final Mapa mapa;
+
   /// Se le pasa a la preparación de la partida siguiente, al jugar otra vez.
   final int Function()? tirarDado;
 
-  const _VistaPartida({required this.tirarDado});
+  const _VistaPartida({required this.mapa, required this.tirarDado});
 
   @override
   State<_VistaPartida> createState() => _VistaPartidaState();
@@ -81,8 +95,12 @@ class _VistaPartidaState extends State<_VistaPartida> {
 
   String _explicarRegla(Posicion posicion, ReglaRota rota) {
     final tipo = rota.region.tipo;
-    return 'Zona ${_nombreZona(tipo.color)} — ${tipo.regla.descripcion}. '
-        'Ya tiene: ${rota.valoresEnZona.join(', ')}';
+    // Una zona naranja rechaza números de fuera de su rango aunque esté vacía:
+    // ahí no hay nada que decir de lo que ya tiene.
+    final yaTiene = rota.valoresEnZona.isEmpty
+        ? ''
+        : ' Ya tiene: ${rota.valoresEnZona.join(', ')}';
+    return 'Zona ${_nombreZona(tipo.color)} — ${tipo.regla.descripcion}.$yaTiene';
   }
 
   String _explicarVecino(Posicion posicion, int numero, int valor) {
@@ -110,9 +128,33 @@ class _VistaPartidaState extends State<_VistaPartida> {
     return 'Pon el $valor en una casilla iluminada, junto a un$_espacioFijo$buscado.';
   }
 
+  /// Pregunta si de verdad quiere dejar la partida. Devuelve si dijo que sí.
+  Future<bool> _confirmarSalida() async {
+    final salir = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Salir de la partida?'),
+        content: const Text('Se pierde lo que llevas jugado.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Seguir jugando'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Salir'),
+          ),
+        ],
+      ),
+    );
+    return salir ?? false;
+  }
+
   void _jugarOtraVez() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => PantallaPreparacion(tirarDado: widget.tirarDado)),
+      MaterialPageRoute(
+        builder: (_) => PantallaPreparacion(mapa: widget.mapa, tirarDado: widget.tirarDado),
+      ),
     );
   }
 
@@ -124,88 +166,97 @@ class _VistaPartidaState extends State<_VistaPartida> {
         final explicacion = _explicacion;
         final textos = Theme.of(context).textTheme;
 
-        return Scaffold(
-          appBar: AppBar(title: const Text('Brilliant')),
-          body: SafeArea(
-            // Arriba y no centrado en vertical: así el tablero no se mueve
-            // cuando aparecen los dados o la explicación.
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _Encabezado(
-                        titulo: state.terminada ? 'Partida terminada' : 'Turno ${state.turno}',
-                        casillasLlenas: state.casillasLlenas,
-                      ),
-                      if (!state.terminada) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          _indicacion(state),
-                          textAlign: TextAlign.center,
-                          style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
+        return PopScope(
+          // A mitad de partida, salir pide confirmación; ya terminada, no.
+          canPop: state.terminada,
+          onPopInvokedWithResult: (salio, _) async {
+            if (salio) return;
+            final navegador = Navigator.of(context);
+            if (await _confirmarSalida()) navegador.pop();
+          },
+          child: Scaffold(
+            appBar: AppBar(title: Text(widget.mapa.nombre)),
+            body: SafeArea(
+              // Arriba y no centrado en vertical: así el tablero no se mueve
+              // cuando aparecen los dados o la explicación.
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _Encabezado(
+                          titulo: state.terminada ? 'Partida terminada' : 'Turno ${state.turno}',
+                          casillasLlenas: state.casillasLlenas,
                         ),
-                      ],
-                      const SizedBox(height: 14),
-                      TableroWidget(
-                        tablero: state.tablero,
-                        iluminacionDe: (posicion) => _iluminacion(state, posicion),
-                        numeroResaltadoEn: state.tieneNumeroBuscado,
-                        esTocable: (posicion) =>
-                            state.valorAncla != null &&
-                            state.tablero.celdaEn(posicion)!.estaVacia,
-                        alTocar: (posicion) => _tocarCasilla(state, posicion),
-                      ),
-                      if (explicacion != null) ...[
-                        const SizedBox(height: 12),
-                        _Explicacion(explicacion),
-                      ],
-                      if (state.terminada) ...[
-                        const SizedBox(height: 20),
-                        _FinDePartida(
-                          tableroLleno: state.casillasLlenas == Tablero.filas * Tablero.columnas,
-                          turnos: state.turno - 1,
-                          alJugarOtraVez: _jugarOtraVez,
-                        ),
-                      ] else ...[
-                        if (dados != null) ...[
-                          const SizedBox(height: 18),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            spacing: 20,
-                            children: [
-                              for (final (indice, valor) in dados.indexed)
-                                DadoWidget(
-                                  key: ValueKey('dado-$indice'),
-                                  valor: valor,
-                                  anclado: indice == state.dadoElegido,
-                                  alTocar: () => _enviar(DadoElegido(indice)),
-                                ),
-                            ],
+                        if (!state.terminada) ...[
+                          const SizedBox(height: 10),
+                          Text(
+                            _indicacion(state),
+                            textAlign: TextAlign.center,
+                            style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
                           ),
                         ],
-                        // Con los dados en la mesa no hace falta ningún botón,
-                        // salvo para pasar el turno cuando no hay jugada.
-                        if (state.sinJugada) ...[
+                        const SizedBox(height: 14),
+                        TableroWidget(
+                          tablero: state.tablero,
+                          iluminacionDe: (posicion) => _iluminacion(state, posicion),
+                          numeroResaltadoEn: state.tieneNumeroBuscado,
+                          esTocable: (posicion) =>
+                              state.valorAncla != null &&
+                              state.tablero.celdaEn(posicion)!.estaVacia,
+                          alTocar: (posicion) => _tocarCasilla(state, posicion),
+                        ),
+                        if (explicacion != null) ...[
+                          const SizedBox(height: 12),
+                          _Explicacion(explicacion),
+                        ],
+                        if (state.terminada) ...[
                           const SizedBox(height: 20),
-                          FilledButton.tonal(
-                            onPressed: () => _enviar(const TurnoPasado()),
-                            style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
-                            child: const _TextoConIcono(Icons.skip_next_rounded, 'Pasar turno'),
+                          _FinDePartida(
+                            tableroLleno: state.casillasLlenas == Tablero.filas * Tablero.columnas,
+                            turnos: state.turno - 1,
+                            alJugarOtraVez: _jugarOtraVez,
                           ),
-                        ] else if (dados == null) ...[
-                          const SizedBox(height: 20),
-                          FilledButton(
-                            onPressed: () => _enviar(const DadosTirados()),
-                            style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
-                            child: const _TextoConIcono(Icons.casino_rounded, 'Tirar dados'),
-                          ),
+                        ] else ...[
+                          if (dados != null) ...[
+                            const SizedBox(height: 18),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 20,
+                              children: [
+                                for (final (indice, valor) in dados.indexed)
+                                  DadoWidget(
+                                    key: ValueKey('dado-$indice'),
+                                    valor: valor,
+                                    anclado: indice == state.dadoElegido,
+                                    alTocar: () => _enviar(DadoElegido(indice)),
+                                  ),
+                              ],
+                            ),
+                          ],
+                          // Con los dados en la mesa no hace falta ningún botón,
+                          // salvo para pasar el turno cuando no hay jugada.
+                          if (state.sinJugada) ...[
+                            const SizedBox(height: 20),
+                            FilledButton.tonal(
+                              onPressed: () => _enviar(const TurnoPasado()),
+                              style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
+                              child: const _TextoConIcono(Icons.skip_next_rounded, 'Pasar turno'),
+                            ),
+                          ] else if (dados == null) ...[
+                            const SizedBox(height: 20),
+                            FilledButton(
+                              onPressed: () => _enviar(const DadosTirados()),
+                              style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
+                              child: const _TextoConIcono(Icons.casino_rounded, 'Tirar dados'),
+                            ),
+                          ],
                         ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),

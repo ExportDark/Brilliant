@@ -12,41 +12,44 @@ import '../widgets/tablero_widget.dart';
 import 'pantalla_partida.dart';
 
 /// La pantalla donde el jugador reparte los números del 1 al 6 entre las
-/// casillas iniciales, antes de tirar el primer dado.
+/// casillas iniciales de [mapa], antes de tirar el primer dado.
 ///
 /// Se toca una casilla inicial (las que tienen aro) y después un número, o
 /// "Aleatorio" para que el azar complete lo que falta. El botón "Inicio" solo
 /// se habilita con todas las casillas llenas; al oprimirlo se pasa a la
 /// [PantallaPartida] con los valores ya fijos.
 class PantallaPreparacion extends StatelessWidget {
+  final Mapa mapa;
+
   /// Decide qué sale en los dados de la partida que arranca desde aquí. Sin él
   /// salen al azar; los tests lo fijan.
   final int Function()? tirarDado;
 
-  const PantallaPreparacion({super.key, this.tirarDado});
+  const PantallaPreparacion({super.key, this.mapa = nivel1, this.tirarDado});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PreparacionBloc(
-        nivel1.casillasIniciales.map(Posicion.desdeNotacion).toList(),
+        mapa.casillasIniciales.map(Posicion.desdeNotacion).toList(),
       ),
-      child: _VistaPreparacion(tirarDado: tirarDado),
+      child: _VistaPreparacion(mapa: mapa, tirarDado: tirarDado),
     );
   }
 }
 
 class _VistaPreparacion extends StatefulWidget {
+  final Mapa mapa;
   final int Function()? tirarDado;
 
-  const _VistaPreparacion({required this.tirarDado});
+  const _VistaPreparacion({required this.mapa, required this.tirarDado});
 
   @override
   State<_VistaPreparacion> createState() => _VistaPreparacionState();
 }
 
 class _VistaPreparacionState extends State<_VistaPreparacion> {
-  final _tableroBase = Tablero.mapaOriginal();
+  late final _tableroBase = Tablero.desdeMapa(widget.mapa);
 
   /// La casilla donde va a caer el próximo número. Es estado de la pantalla,
   /// no del reparto: el bloc no necesita saber qué casilla se está mirando.
@@ -125,6 +128,7 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
           MaterialPageRoute(
             builder: (_) => PantallaPartida(
               tablero: _tableroBase.conValores(state.valores),
+              mapa: widget.mapa,
               tirarDado: widget.tirarDado,
             ),
           ),
@@ -135,7 +139,7 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
         final textos = Theme.of(context).textTheme;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Brilliant')),
+          appBar: AppBar(title: Text(widget.mapa.nombre)),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),

@@ -7,6 +7,25 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-24 — Elegir el mapa en la app
+
+- **La app abre en "Elige un mapa"** (`PantallaEleccionDeMapa`): los 4 niveles en
+  tarjetas de dos columnas, cada una con su tablero en miniatura, su nombre y cuántas
+  zonas tiene. Al tocar una se pasa a la preparación de ese mapa. Ver
+  [[Interfaz del tablero]].
+- La preparación y la partida reciben el `Mapa`, y su barra superior dice el nivel.
+  **"Jugar otra vez" repite el mismo mapa**, y la flecha de atrás vuelve a elegir.
+- **Salir a mitad de partida pide confirmación** ("¿Salir de la partida?"), porque
+  ahora la partida tiene flecha de atrás, y en Android un toque sin querer la perdería.
+  Con la partida terminada sale sin preguntar.
+- Con la regla naranja, una zona vacía ya puede rechazar un número. En ese caso la
+  explicación no dice "Ya tiene:": queda "Zona naranja — Solo del 4 al 6.".
+- El camino feliz por la pantalla corre en los 4 mapas, y hay tests de la elección, de
+  la flecha de atrás, de la confirmación y de la explicación naranja. Ver [[Pruebas]].
+- Se revisó en Edge (PC y celular) y en el emulador Android de 360 px, y se recompiló el
+  APK.
+- 357 tests.
+
 ## 2026-10-24 — Los 4 mapas oficiales, en el modelo
 
 - **Los 4 mapas** de las tarjetas ("Level 1" a "Level 4") en `lib/modelo/mapa.dart`, y
@@ -25,7 +44,6 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
   tamaños, iniciales, y que el Nivel 1 sea el mapa de siempre. Se comprobó que fallan
   si una zona se transcribe con otro color o si la regla naranja acepta cualquier
   número. Ver [[Pruebas]].
-- Todavía no se puede elegir el mapa en la app: la preparación sigue usando el Nivel 1.
 - 326 tests.
 
 ## 2026-10-24 — El modelo, listo para más de un mapa

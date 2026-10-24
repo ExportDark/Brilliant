@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/main.dart';
+import 'package:brilliant/modelo/mapa.dart';
 import 'package:brilliant/modelo/tablero.dart';
 import 'package:brilliant/ui/pantallas/pantalla_partida.dart';
 import 'package:brilliant/ui/pantallas/pantalla_preparacion.dart';
@@ -29,25 +30,33 @@ void _superficie(WidgetTester tester, Size tamano) {
   addTearDown(tester.view.reset);
 }
 
-/// Abre la app entera, como al lanzarla, con dados que decide [tirarDado].
+/// Abre la app entera, como al lanzarla, con dados que decide [tirarDado]
+/// (sin él, al azar).
 Future<void> abrirApp(
   WidgetTester tester, {
-  required int Function() tirarDado,
+  int Function()? tirarDado,
   Size tamano = const Size(1000, 1400),
 }) async {
   _superficie(tester, tamano);
   await tester.pumpWidget(BrilliantApp(tirarDado: tirarDado));
 }
 
-Future<void> abrirPreparacion(WidgetTester tester, {Size tamano = const Size(1000, 1400)}) async {
+/// Abre la preparación de [mapa] (por defecto, el Nivel 1).
+Future<void> abrirPreparacion(
+  WidgetTester tester, {
+  Mapa mapa = nivel1,
+  Size tamano = const Size(1000, 1400),
+}) async {
   _superficie(tester, tamano);
-  await tester.pumpWidget(const MaterialApp(home: PantallaPreparacion()));
+  await tester.pumpWidget(MaterialApp(home: PantallaPreparacion(mapa: mapa)));
 }
 
-/// Abre la partida sobre [tablero] (por defecto, el de la Partida 1) con
-/// dados que sacan [caras] (por defecto 4 y 3).
+/// Abre la partida de [mapa] (por defecto, el Nivel 1) sobre [tablero] (por
+/// defecto, el mapa con los números de la Partida 1) con dados que sacan
+/// [caras] (por defecto 4 y 3).
 Future<void> abrirPartida(
   WidgetTester tester, {
+  Mapa mapa = nivel1,
   Tablero? tablero,
   List<int> caras = const [4, 3],
   Size tamano = const Size(1000, 1400),
@@ -56,7 +65,8 @@ Future<void> abrirPartida(
   await tester.pumpWidget(
     MaterialApp(
       home: PantallaPartida(
-        tablero: tablero ?? tableroPartida1(),
+        tablero: tablero ?? tableroPreparado(mapa),
+        mapa: mapa,
         tirarDado: dadoConCaras(caras),
       ),
     ),
@@ -67,6 +77,9 @@ Future<void> tocar(WidgetTester tester, Finder objetivo) async {
   await tester.tap(objetivo);
   await tester.pumpAndSettle();
 }
+
+/// La tarjeta de [mapa] en la pantalla de elección.
+Finder tarjetaDe(Mapa mapa) => find.byKey(ValueKey('mapa-${mapa.nivel}'));
 
 final botonTirar = find.widgetWithText(FilledButton, 'Tirar dados');
 

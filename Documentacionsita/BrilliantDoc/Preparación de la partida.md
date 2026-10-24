@@ -7,7 +7,8 @@ Ver también: [[Tablero y regiones]] · [[Reglas del juego]] · [[Arquitectura g
 ## En qué consiste
 
 Antes de tirar el primer dado, el jugador anota los números del **1 al 6** en las **6
-casillas iniciales** del tablero (C1, F2, B4, E4, C6, E7), **sin repetir ninguno**. Cada
+casillas iniciales** del mapa que eligió (en el Nivel 1: C1, F2, B4, E4, C6, E7; las de
+los otros mapas están en [[Mapas]]), **sin repetir ninguno**. Cada
 casilla se queda con un número distinto.
 
 No es un trámite: cuatro de esas casillas caen dentro de regiones que tienen regla, y el
@@ -78,9 +79,11 @@ final.
 
 ## La pantalla
 
-`PantallaPreparacion` (`lib/ui/pantallas/pantalla_preparacion.dart`) es con la que arranca
-la app. Crea el bloc con `BlocProvider` (de `flutter_bloc`) y dibuja su estado, de arriba
-abajo:
+`PantallaPreparacion` (`lib/ui/pantallas/pantalla_preparacion.dart`) se abre al elegir un
+mapa en la pantalla de inicio. Recibe el `Mapa` (por defecto, el Nivel 1), crea el bloc
+con sus casillas iniciales usando `BlocProvider` (de `flutter_bloc`) y dibuja su estado.
+La barra superior dice el nivel ("Nivel 2"), y su flecha de atrás vuelve a elegir mapa.
+De arriba abajo:
 
 - **"Prepara tu tablero"** y una indicación corta: "Toca una casilla con aro y elige su
   número." y, en otra línea y en color de acento, cuántos faltan ("Faltan 3", "Falta 1").

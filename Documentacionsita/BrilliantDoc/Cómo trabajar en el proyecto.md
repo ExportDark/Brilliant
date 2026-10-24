@@ -55,7 +55,9 @@ le sacan capturas, que es como se verificó cada cambio visual:
 4. Flutter web dibuja todo en un canvas. Para poder encontrar botones hay que activar la
    semántica haciendo clic en `flt-semantics-placeholder` desde JavaScript.
    - Los botones son `flt-semantics[role="button"]` con su texto adentro. Los dados
-     también: su texto es "Dado: 4".
+     también: su texto es "Dado: 4". Desde el 2026-10-24 la app abre en la elección de
+     mapa: las tarjetas también son botones, con "Nivel 3" en su texto, y la flecha de
+     atrás es el botón "Back".
    - Las casillas del tablero no tienen etiqueta ni hay letras A–G alrededor desde el
      rediseño del 2026-10-18: se tocan por coordenadas. El tablero va centrado, cada
      ficha mide `min(48, floor((min(ancho − 24, 480) − 12) / 7 − 4))` px, de una a otra

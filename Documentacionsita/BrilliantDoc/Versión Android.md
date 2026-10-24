@@ -30,9 +30,9 @@ Deja tres archivos en `build/app/outputs/flutter-apk/`:
 
 | Archivo | Tamaño | Para qué |
 |---|---|---|
-| `app-arm64-v8a-release.apk` | 15,1 MB | **El del teléfono**: cualquier Android de los últimos años |
-| `app-armeabi-v7a-release.apk` | 12,5 MB | Teléfonos muy viejos, de 32 bits |
-| `app-x86_64-release.apk` | 16,5 MB | Emuladores en la PC |
+| `app-arm64-v8a-release.apk` | 15,2 MB | **El del teléfono**: cualquier Android de los últimos años |
+| `app-armeabi-v7a-release.apk` | 12,6 MB | Teléfonos muy viejos, de 32 bits |
+| `app-x86_64-release.apk` | 16,6 MB | Emuladores en la PC |
 
 La primera compilación tardó unos 7 minutos, porque Gradle descargó e instaló solo lo que
 faltaba del SDK (NDK 28, Build-Tools 36 y CMake). Las siguientes tardan segundos.
@@ -92,6 +92,10 @@ Con el rediseño del 2026-10-18 se recompiló y se volvió a probar en el mismo 
 Todo cabe a 360 px: el tablero de fichas de 42 px, los seis números en una fila, los
 dados con sus puntos, las casillas encendidas, la explicación y la barra de progreso. Ver
 [[Interfaz del tablero]].
+
+Con los 4 mapas (2026-10-24) se volvió a probar: la elección de mapa cabe a 360 px con
+las 4 miniaturas, el Nivel 2 se prepara y se juega un turno, y el botón de atrás de
+Android pide confirmación antes de salir de la partida. Ver [[Mapas]].
 
 Para volver a usarlo:
 

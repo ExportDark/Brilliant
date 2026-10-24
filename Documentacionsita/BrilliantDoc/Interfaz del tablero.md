@@ -1,8 +1,8 @@
 # Interfaz del tablero
 
-Cómo se ve la app: los colores, el tablero, las casillas y los dados. Lo dibujan
-`CeldaWidget`, `TableroWidget` y `DadoWidget` (`lib/ui/widgets/`), con el tema de
-`lib/ui/tema.dart`, y lo usan las dos pantallas.
+Cómo se ve la app: los colores, el tablero, las casillas, los dados y la elección de
+mapa. Lo dibujan `CeldaWidget`, `TableroWidget` y `DadoWidget` (`lib/ui/widgets/`), con
+el tema de `lib/ui/tema.dart`, y lo usan las tres pantallas.
 
 Ver también: [[Turnos y jugadas]] · [[Preparación de la partida]] · [[Tablero y regiones]]
 
@@ -17,7 +17,8 @@ Ver también: [[Turnos y jugadas]] · [[Preparación de la partida]] · [[Tabler
 Todo sale de `lib/ui/tema.dart`, que se aplica en `main.dart` con `theme: temaBrilliant()`.
 
 - **Fondo crema** (`Paleta.fondo`, `#FAF7F2`) y barra superior lisa del mismo tono, con
-  el título "Brilliant" al centro.
+  el título al centro: "Brilliant" en la elección de mapa, y el nivel ("Nivel 2") en la
+  preparación y en la partida.
 - Textos en tinta oscura (`Paleta.tinta`) y suave (`Paleta.tintaSuave`) para las
   indicaciones.
 - Un color de **acento lavanda** (`Paleta.acento`, `#6A5FB0`) para lo que importa: el
@@ -37,10 +38,30 @@ Colores suaves en vez de los colores puros:
 | azul | celeste `#7FB7F0` |
 | verde | salvia `#8FCB9B` |
 | amarillo | mantequilla `#F6D365` |
+| gris | gris cálido `#C9C2B8` |
+| naranja | naranja suave `#F5A65B` |
+
+El gris y el naranja solo aparecen en algunos mapas (ver [[Mapas]]). El naranja está
+entre el coral y la mantequilla, para no confundirse con ninguno de los dos. El gris es
+más oscuro que la base del tablero, para que sus casillas no se pierdan sobre ella.
 
 Están en `coloresDeZona`. El color del número (tinta oscura o blanco) **se elige según el
 fondo** con `tintaSobre()`, que usa `ThemeData.estimateBrightnessForColor`, para que
 siempre se lea. Con esta paleta, sobre todas las zonas va la tinta oscura.
+
+## La elección de mapa
+
+`PantallaEleccionDeMapa` es la pantalla con la que arranca la app: "Elige un mapa" y
+las 4 tarjetas, siempre en dos columnas. Cada tarjeta es blanca, redondeada y con una
+sombra suave, y lleva:
+
+- **la miniatura del mapa:** el mismo `TableroWidget` de la partida, vacío y sin toque,
+  con las casillas iniciales marcadas con su aro;
+- **el nombre** ("Nivel 3") y cuántas zonas tiene.
+
+Como `TableroWidget` se adapta al ancho, las miniaturas se achican solas: en la PC las
+fichas miden unos 24 px, y en un celular de 360 px, unos 14. Al tocar una tarjeta se
+pasa a la preparación de ese mapa. Ver [[Mapas]].
 
 ## El tablero
 
@@ -142,6 +163,8 @@ con el número buscado, o la regla de la zona con lo que la zona ya tiene. Ver
   - Al probar las capturas, las casillas aclaradas se veían desteñidas. Se les agregó el
     aro blanco con brillo, y el aclarado fuerte bajó de 0,55 a 0,4.
   - Los dados pasaron de un cuadro con el número a un dado con puntos.
+- **2026-10-24, los 4 mapas:** se sumaron el gris y el naranja a la paleta, y la
+  pantalla de elección de mapa con miniaturas. Ver [[Mapas]].
 - **Cómo se pinta:** `CeldaWidget` no sabe nada de dados ni de reglas. Recibe
   `iluminacion`, `seleccionada` y `numeroResaltado`, y `TableroWidget` se los reparte con
   `iluminacionDe` y `numeroResaltadoEn`. Quien decide qué se ilumina es la pantalla, a

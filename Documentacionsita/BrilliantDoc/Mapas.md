@@ -68,6 +68,14 @@ zonas están en [[Tablero y regiones]].
 Como el amarillo del Nivel 1, varias zonas tienen casillas sueltas que cuentan como una
 sola zona: la gris de los niveles 2 y 3, y la amarilla, la verde y la azul del Nivel 4.
 
+## En la app
+
+La app abre en **"Elige un mapa"**, con las 4 tarjetas y su tablero en miniatura. Al
+tocar una se pasa a la preparación de ese mapa, y de ahí a la partida. La barra superior
+de las dos dice el nivel. "Jugar otra vez" repite el mismo mapa, y la flecha de atrás
+vuelve a elegir (a mitad de partida, pregunta antes). Ver [[Interfaz del tablero]] y
+[[Turnos y jugadas]].
+
 ## Las reglas, por símbolo
 
 En las tarjetas, cada zona tiene un símbolo al costado. La regla depende del símbolo, y

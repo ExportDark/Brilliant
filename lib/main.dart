@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'ui/pantallas/pantalla_preparacion.dart';
+import 'ui/pantallas/pantalla_eleccion_de_mapa.dart';
 import 'ui/tema.dart';
 
 void main() {
@@ -19,7 +19,7 @@ class BrilliantApp extends StatelessWidget {
       title: 'Brilliant',
       debugShowCheckedModeBanner: false,
       theme: temaBrilliant(),
-      home: PantallaPreparacion(tirarDado: tirarDado),
+      home: PantallaEleccionDeMapa(tirarDado: tirarDado),
     );
   }
 }

@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 326 tests, todos pasando (2026-10-24).
+las pruebas y qué se aprendió de ellas. 357 tests, todos pasando (2026-10-24).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -23,8 +23,8 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 78 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
 | `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 124 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
-| `test/ui/` | 77 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la pantalla de preparación y la de partida, las dos pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla |
-| `test/main/` | 1 | Que la app arranque en la pantalla de preparación |
+| `test/ui/` | 108 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla en los 4 mapas |
+| `test/main/` | 1 | Que la app arranque en la pantalla para elegir el mapa |
 
 ## Cómo están organizadas
 
@@ -138,8 +138,14 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/pantallas/partida/solo_el_numero_exacto_se_resalta_test.dart` | Solo se resalta el número exacto que sacó el dado ancla |
 | `ui/pantallas/partida/pantalla_coincide_con_la_validacion_test.dart` | La pantalla ilumina exactamente lo que la validación acepta y rechaza |
 | `ui/pantallas/partida/barra_de_progreso_test.dart` | La barra de progreso cuenta las casillas llenas: 6 de 49 al empezar, 7 de 49 tras una jugada |
+| `ui/pantallas/pantalla_eleccion_de_mapa_test.dart` | La elección muestra los 4 mapas con su nombre y su miniatura de 49 casillas; las miniaturas son los mapas de verdad, con sus iniciales; tocar "Nivel 3" abre su preparación (3 casos) |
+| `ui/pantallas/eleccion/flecha_atras_vuelve_a_elegir_test.dart` | Desde la preparación, la flecha de atrás vuelve a elegir el mapa |
+| `ui/pantallas/partida/jugar_otra_vez_mismo_mapa_test.dart` | Al terminar el Nivel 4, "Jugar otra vez" prepara el Nivel 4 |
+| `ui/pantallas/partida/explicacion_zona_naranja_test.dart` | Un 2 en la fila naranja "4-6", vacía, se explica como "Zona naranja — Solo del 4 al 6.", sin "Ya tiene" |
+| `ui/pantallas/partida/salir_pide_confirmacion_test.dart` | A mitad de partida, la flecha de atrás pregunta: "Seguir jugando" se queda y "Salir" vuelve a elegir el mapa |
+| `ui/pantallas/partida/salir_al_terminar_sin_preguntar_test.dart` | Con la partida terminada, la flecha de atrás sale sin preguntar |
 | `ui/pantallas/partida/fin_de_partida_y_jugar_otra_vez_test.dart` | Con el tablero lleno sale "¡Tablero completo!", y "Jugar otra vez" vuelve a la preparación |
-| `main/arranca_en_preparacion_test.dart` | La app arranca en la pantalla de preparación |
+| `main/arranca_en_eleccion_de_mapa_test.dart` | La app arranca en la pantalla para elegir el mapa (hasta el 2026-10-24, `arranca_en_preparacion_test`) |
 | `ui/widgets/tablero/se_adapta_al_ancho_test.dart` | Las fichas miden 48 si caben y se achican si no: 42 con 336 px, 36 con 296 px |
 
 ### Tamaños de pantalla
@@ -150,9 +156,10 @@ Cada uno se repite en 5 tamaños, de `tamanosDePantalla` (en
 
 | Archivo | Qué prueba |
 |---|---|
+| `ui/pantallas/tamanos/eleccion_sin_desbordes_test.dart` | La elección de mapa se abre sin desbordarse y las 4 tarjetas caben a lo ancho |
 | `ui/pantallas/tamanos/preparacion_sin_desbordes_test.dart` | La preparación se abre sin desbordarse |
 | `ui/pantallas/tamanos/partida_sin_desbordes_test.dart` | La partida no se desborda ni en su estado más alto: con dados, dado ancla y explicación |
-| `ui/pantallas/tamanos/tablero_entero_a_lo_ancho_test.dart` | Las 49 casillas caben a lo ancho de la pantalla |
+| `ui/pantallas/tamanos/tablero_entero_a_lo_ancho_test.dart` | Las 49 casillas caben a lo ancho de la pantalla, en los 4 mapas (20 casos) |
 | `ui/pantallas/tamanos/turno_jugable_en_cada_tamano_test.dart` | Se puede jugar un turno entero, haciendo scroll si los botones quedan abajo |
 
 Se comprobó que detectan el problema de verdad: con el tablero fijo de 48 px, los 8 casos
@@ -257,10 +264,11 @@ Como no hay azar, cada mapa juega siempre la misma partida, con 43 números anot
 ### El mismo camino, tocando la pantalla
 
 `test/ui/camino_feliz/partida_entera_por_la_pantalla_test.dart` es el happy path como
-**widget test**: juega la misma partida, pero tocando la app como una persona, sin
+**widget test**, uno por mapa: juega la partida tocando la app como una persona, sin
 mandarle nada a los blocs.
 
-1. Abre la app entera (`BrilliantApp`, con `abrirApp()`), con los mismos dados sin azar.
+1. Abre la app entera (`BrilliantApp`, con `abrirApp()`), con los mismos dados sin azar,
+   y toca la tarjeta del mapa.
 2. En la preparación toca cada casilla con aro y su número (los de la Partida 1), y
    comprueba que cada número aparece en el tablero y que Inicio se habilita.
 3. Toca **Inicio** y juega turno por turno. Toca **Tirar dados**. Si aparece **Pasar
@@ -270,16 +278,25 @@ mandarle nada a los blocs.
    más.
 4. Al final ve "¡Tablero completo!", "49 de 49 casillas" y en cuántos turnos se jugó,
    los 6 iniciales en su lugar, y ninguna zona rompiendo su regla.
-5. Toca **Jugar otra vez** y vuelve a una preparación vacía.
+5. Toca **Jugar otra vez** y vuelve a una preparación vacía **del mismo mapa**.
 
-Dura **56 turnos** (43 anotados y 13 pasados), no 73 como el unit test, porque elige otra
-casilla: la primera encendida en el orden en que se lee el tablero, mientras que el
-jugador del unit test toma la primera de `tablero.celdas`, que va zona por zona. Son dos
-partidas distintas, y las dos llenan el tablero. Corre en unos 9 segundos.
+Por la pantalla, cada mapa dura distinto que en el unit test:
 
-Para que los dados lleguen fijos desde el arranque, `BrilliantApp` y
-`PantallaPreparacion` reciben un `tirarDado` opcional que pasan a la partida, igual que
-`PantallaPartida`. En la app no se pasa, y los dados salen al azar.
+| Mapa | Por la pantalla | En el unit test |
+|---|---|---|
+| Nivel 1 | 56 turnos (13 pasados) | 73 |
+| Nivel 2 | 65 turnos (22 pasados) | 60 |
+| Nivel 3 | 66 turnos (23 pasados) | 67 |
+| Nivel 4 | 55 turnos (12 pasados) | 58 |
+
+Es porque eligen otra casilla: este toma la primera encendida en el orden en que se lee
+el tablero, y el jugador del unit test la primera de `tablero.celdas`, que va zona por
+zona. Son partidas distintas, y todas llenan el tablero. Cada mapa corre en unos 9
+segundos, así que la suite entera tarda unos 50.
+
+Para que los dados lleguen fijos desde el arranque, `BrilliantApp`,
+`PantallaEleccionDeMapa` y `PantallaPreparacion` reciben un `tirarDado` opcional que
+pasan a la partida, igual que `PantallaPartida`. En la app no se pasa, y los dados salen al azar.
 
 > [!tip] Se comprobó que detecta errores de la pantalla
 > Si la pantalla encendiera también las casillas que rompen la regla de su zona, el test

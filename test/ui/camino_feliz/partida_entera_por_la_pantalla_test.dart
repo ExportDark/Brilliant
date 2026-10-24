@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brilliant/modelo/mapa.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
 import 'package:brilliant/ui/widgets/dado_widget.dart';
 import 'package:brilliant/ui/widgets/tablero_widget.dart';
@@ -7,8 +8,9 @@ import 'package:brilliant/ui/widgets/tablero_widget.dart';
 import '../../juego/ayudantes.dart';
 import '../pantallas/ayudantes_pantallas.dart';
 
-/// Los números iniciales de la Partida 1 del manual.
-const _reparto = {'C1': 4, 'F2': 1, 'B4': 2, 'E4': 5, 'C6': 3, 'E7': 6};
+/// Los números que se reparten, en el orden de las casillas iniciales de
+/// cada mapa: los de la Partida 1 del manual.
+const _numeros = [4, 1, 2, 5, 3, 6];
 
 /// Un tope para que un ciclo infinito de pasar turno falle en vez de colgarse.
 const _maximoTurnos = 300;
@@ -59,67 +61,89 @@ Future<bool> _jugarUnTurno(WidgetTester tester, int turno) async {
 }
 
 void main() {
-  testWidgets('Camino feliz por la pantalla: se reparte, se juega la partida entera tocando y '
-      'se vuelve a empezar', (tester) async {
-    await abrirApp(tester, tirarDado: dadosConTodasLasCombinaciones());
+  for (final mapa in mapas) {
+    testWidgets('Camino feliz por la pantalla, ${mapa.nombre}: se elige el mapa, se reparte, se '
+        'juega la partida entera tocando y se vuelve a empezar', (tester) async {
+      final reparto = {
+        for (final (indice, casilla) in mapa.casillasIniciales.indexed) casilla: _numeros[indice],
+      };
+      await abrirApp(tester, tirarDado: dadosConTodasLasCombinaciones());
 
-    // 1. Preparación: se toca cada casilla con aro y después su número.
-    expect(find.text('Prepara tu tablero'), findsOneWidget);
-    expect(habilitado(tester, _botonInicio), isFalse);
-    for (final MapEntry(key: casilla, value: numero) in _reparto.entries) {
-      await tocar(tester, casillaTocable(casilla));
-      await tocar(tester, _ficha(numero));
-      expect(celdaEn(tester, casilla).celda.valor, numero);
-    }
-    expect(find.text('¡Listo! Toca Inicio para empezar.'), findsOneWidget);
-    expect(habilitado(tester, _botonInicio), isTrue);
+      // 1. Se elige el mapa.
+      expect(find.text('Elige un mapa'), findsOneWidget);
+      await tocar(tester, tarjetaDe(mapa));
 
-    // 2. Inicio lleva a la partida, con los 6 números en su lugar.
-    await tocar(tester, _botonInicio);
-    expect(find.text('Turno 1'), findsOneWidget);
-    expect(find.text('6 de 49 casillas'), findsOneWidget);
-    for (final MapEntry(key: casilla, value: numero) in _reparto.entries) {
-      expect(celdaEn(tester, casilla).celda.valor, numero);
-    }
-
-    // 3. La partida entera, turno por turno, con dados sin azar que recorren
-    // las 36 combinaciones.
-    var colocadas = 0;
-    var pasados = 0;
-    while (!tester.any(_finDePartida)) {
-      final turno = colocadas + pasados + 1;
-      if (turno > _maximoTurnos) fail('la partida no terminó en $_maximoTurnos turnos');
-      expect(find.text('Turno $turno'), findsOneWidget);
-
-      if (await _jugarUnTurno(tester, turno)) {
-        colocadas++;
-        expect(find.text('${6 + colocadas} de 49 casillas'), findsOneWidget);
-      } else {
-        pasados++;
+      // 2. Preparación: se toca cada casilla con aro y después su número.
+      expect(find.text(mapa.nombre), findsOneWidget);
+      expect(find.text('Prepara tu tablero'), findsOneWidget);
+      expect(habilitado(tester, _botonInicio), isFalse);
+      for (final MapEntry(key: casilla, value: numero) in reparto.entries) {
+        await tocar(tester, casillaTocable(casilla));
+        await tocar(tester, _ficha(numero));
+        expect(celdaEn(tester, casilla).celda.valor, numero);
       }
-    }
+      expect(find.text('¡Listo! Toca Inicio para empezar.'), findsOneWidget);
+      expect(habilitado(tester, _botonInicio), isTrue);
 
-    // 4. El final: el tablero lleno, los iniciales en su lugar y ninguna zona
-    // rompiendo su regla.
-    expect(colocadas, 43);
-    expect(find.text('Partida terminada'), findsOneWidget);
-    expect(find.text('¡Tablero completo!'), findsOneWidget);
-    expect(find.text('49 de 49 casillas'), findsOneWidget);
-    expect(find.text('Lo jugaste en ${colocadas + pasados} turnos.'), findsOneWidget);
-    expect(botonTirar, findsNothing);
-    expect(celdasDibujadasDonde(tester, (CeldaWidget celda) => celda.celda.valor == null), isEmpty);
-    for (final MapEntry(key: casilla, value: numero) in _reparto.entries) {
-      expect(celdaEn(tester, casilla).celda.valor, numero);
-    }
-    expectZonasCumplenSusReglas(
-      tester.widget<TableroWidget>(find.byType(TableroWidget)).tablero,
-      contexto: 'camino feliz por la pantalla',
-    );
+      // 3. Inicio lleva a la partida del mismo mapa, con los 6 números en su lugar.
+      await tocar(tester, _botonInicio);
+      expect(find.text(mapa.nombre), findsOneWidget);
+      expect(find.text('Turno 1'), findsOneWidget);
+      expect(find.text('6 de 49 casillas'), findsOneWidget);
+      for (final MapEntry(key: casilla, value: numero) in reparto.entries) {
+        expect(celdaEn(tester, casilla).celda.valor, numero);
+      }
 
-    // 5. "Jugar otra vez" vuelve a una preparación vacía.
-    await tocar(tester, find.widgetWithText(FilledButton, 'Jugar otra vez'));
-    expect(find.text('Prepara tu tablero'), findsOneWidget);
-    expect(celdasDibujadasDonde(tester, (CeldaWidget celda) => celda.celda.valor != null), isEmpty);
-    expect(habilitado(tester, _botonInicio), isFalse);
-  });
+      // 4. La partida entera, turno por turno, con dados sin azar que recorren
+      // las 36 combinaciones.
+      var colocadas = 0;
+      var pasados = 0;
+      while (!tester.any(_finDePartida)) {
+        final turno = colocadas + pasados + 1;
+        if (turno > _maximoTurnos) fail('la partida no terminó en $_maximoTurnos turnos');
+        expect(find.text('Turno $turno'), findsOneWidget);
+
+        if (await _jugarUnTurno(tester, turno)) {
+          colocadas++;
+          expect(find.text('${6 + colocadas} de 49 casillas'), findsOneWidget);
+        } else {
+          pasados++;
+        }
+      }
+
+      // 5. El final: el tablero lleno, los iniciales en su lugar y ninguna zona
+      // rompiendo su regla.
+      expect(colocadas, 43);
+      expect(find.text('Partida terminada'), findsOneWidget);
+      expect(find.text('¡Tablero completo!'), findsOneWidget);
+      expect(find.text('49 de 49 casillas'), findsOneWidget);
+      expect(find.text('Lo jugaste en ${colocadas + pasados} turnos.'), findsOneWidget);
+      expect(botonTirar, findsNothing);
+      expect(
+        celdasDibujadasDonde(tester, (CeldaWidget celda) => celda.celda.valor == null),
+        isEmpty,
+      );
+      for (final MapEntry(key: casilla, value: numero) in reparto.entries) {
+        expect(celdaEn(tester, casilla).celda.valor, numero);
+      }
+      expectZonasCumplenSusReglas(
+        tester.widget<TableroWidget>(find.byType(TableroWidget)).tablero,
+        contexto: 'camino feliz por la pantalla, ${mapa.nombre}',
+      );
+
+      // 6. "Jugar otra vez" vuelve a una preparación vacía del mismo mapa.
+      await tocar(tester, find.widgetWithText(FilledButton, 'Jugar otra vez'));
+      expect(find.text(mapa.nombre), findsOneWidget);
+      expect(find.text('Prepara tu tablero'), findsOneWidget);
+      expect(
+        celdasDibujadasDonde(tester, (CeldaWidget celda) => celda.celda.valor != null),
+        isEmpty,
+      );
+      expect(
+        celdasDibujadasDonde(tester, (CeldaWidget celda) => celda.celda.esInicial),
+        mapa.casillasIniciales.toSet(),
+      );
+      expect(habilitado(tester, _botonInicio), isFalse);
+    });
+  }
 }
