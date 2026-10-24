@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/modelo/celda.dart';
-import 'package:brilliant/modelo/color5.dart';
+import 'package:brilliant/modelo/color_zona.dart';
 import 'package:brilliant/modelo/posicion.dart';
 
 void main() {
   group('Celda', () {
     test('una celda sin valor está vacía', () {
-      const celda = Celda(posicion: Posicion(fila: 0, columna: 0), color: Color5.verde);
+      const celda = Celda(posicion: Posicion(fila: 0, columna: 0), color: ColorZona.verde);
 
       expect(celda.estaVacia, isTrue);
       expect(celda.valor, isNull);
@@ -15,7 +15,7 @@ void main() {
     test('una celda con valor no está vacía', () {
       const celda = Celda(
         posicion: Posicion(fila: 0, columna: 0),
-        color: Color5.verde,
+        color: ColorZona.verde,
         valor: 4,
       );
 
@@ -24,7 +24,7 @@ void main() {
     });
 
     test('esInicial es false por defecto', () {
-      const celda = Celda(posicion: Posicion(fila: 0, columna: 0), color: Color5.rojo);
+      const celda = Celda(posicion: Posicion(fila: 0, columna: 0), color: ColorZona.rojo);
 
       expect(celda.esInicial, isFalse);
     });
@@ -32,7 +32,7 @@ void main() {
     test('conValor devuelve una nueva celda con el valor puesto, sin mutar la original', () {
       const original = Celda(
         posicion: Posicion(fila: 2, columna: 3),
-        color: Color5.azul,
+        color: ColorZona.azul,
         esInicial: true,
       );
 
@@ -47,33 +47,33 @@ void main() {
 
     test('rechaza valores fuera del rango 1-6', () {
       expect(
-        () => Celda(posicion: const Posicion(fila: 0, columna: 0), color: Color5.morado, valor: 0),
+        () => Celda(posicion: const Posicion(fila: 0, columna: 0), color: ColorZona.morado, valor: 0),
         throwsA(isA<AssertionError>()),
       );
       expect(
-        () => Celda(posicion: const Posicion(fila: 0, columna: 0), color: Color5.morado, valor: 7),
+        () => Celda(posicion: const Posicion(fila: 0, columna: 0), color: ColorZona.morado, valor: 7),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('dos celdas con los mismos campos son iguales', () {
-      const a = Celda(posicion: Posicion(fila: 1, columna: 1), color: Color5.amarillo, valor: 2);
-      const b = Celda(posicion: Posicion(fila: 1, columna: 1), color: Color5.amarillo, valor: 2);
+      const a = Celda(posicion: Posicion(fila: 1, columna: 1), color: ColorZona.amarillo, valor: 2);
+      const b = Celda(posicion: Posicion(fila: 1, columna: 1), color: ColorZona.amarillo, valor: 2);
 
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
     });
 
     test('celdas con distinto valor no son iguales', () {
-      const a = Celda(posicion: Posicion(fila: 1, columna: 1), color: Color5.amarillo, valor: 2);
-      const b = Celda(posicion: Posicion(fila: 1, columna: 1), color: Color5.amarillo, valor: 3);
+      const a = Celda(posicion: Posicion(fila: 1, columna: 1), color: ColorZona.amarillo, valor: 2);
+      const b = Celda(posicion: Posicion(fila: 1, columna: 1), color: ColorZona.amarillo, valor: 3);
 
       expect(a, isNot(equals(b)));
     });
 
     test('celdas con distinta posición no son iguales', () {
-      const a = Celda(posicion: Posicion(fila: 1, columna: 1), color: Color5.amarillo, valor: 2);
-      const b = Celda(posicion: Posicion(fila: 1, columna: 2), color: Color5.amarillo, valor: 2);
+      const a = Celda(posicion: Posicion(fila: 1, columna: 1), color: ColorZona.amarillo, valor: 2);
+      const b = Celda(posicion: Posicion(fila: 1, columna: 2), color: ColorZona.amarillo, valor: 2);
 
       expect(a, isNot(equals(b)));
     });

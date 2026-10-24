@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/modelo/celda.dart';
-import 'package:brilliant/modelo/color5.dart';
+import 'package:brilliant/modelo/color_zona.dart';
 import 'package:brilliant/modelo/posicion.dart';
 import 'package:brilliant/ui/tema.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
 
-const _celda = Celda(posicion: Posicion(fila: 1, columna: 0), color: Color5.verde);
+const _celda = Celda(posicion: Posicion(fila: 1, columna: 0), color: ColorZona.verde);
 
 /// La decoración con la que se dibuja [widget], ya terminada la transición
 /// suave de color.
@@ -109,7 +109,7 @@ void main() {
 
 /// Una casilla azul con un 4 anotado, con o sin el número resaltado.
 Future<void> _mostrarConNumero(WidgetTester tester, {required bool numeroResaltado}) {
-  const conCuatro = Celda(posicion: Posicion(fila: 0, columna: 2), color: Color5.azul, valor: 4);
+  const conCuatro = Celda(posicion: Posicion(fila: 0, columna: 2), color: ColorZona.azul, valor: 4);
   return tester.pumpWidget(
     MaterialApp(
       home: Center(child: CeldaWidget(celda: conCuatro, numeroResaltado: numeroResaltado)),

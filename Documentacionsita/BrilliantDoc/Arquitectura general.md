@@ -74,7 +74,7 @@ se resuelva agregando código en su capa, sin tocar lo que ya funciona y ya est�
 
 ```
 lib/
-  modelo/     Posicion, Celda, Color5, TipoRegion, Region, extraerValores, Tablero
+  modelo/     Posicion, Celda, ColorZona, TipoRegion, Region, extraerValores, Tablero
   reglas/     ReglaColor + funciones puras + una clase por color
   juego/      PreparacionBloc y PartidaBloc, cada uno con su estado y sus eventos,
               y evaluarJugada / hayJugada (validación de jugadas)

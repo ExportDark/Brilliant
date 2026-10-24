@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/modelo/celda.dart';
-import 'package:brilliant/modelo/color5.dart';
+import 'package:brilliant/modelo/color_zona.dart';
 import 'package:brilliant/modelo/posicion.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
 
@@ -21,9 +21,9 @@ void main() {
 
     final inicial = await _borde(
       tester,
-      const Celda(posicion: posicion, color: Color5.azul, esInicial: true),
+      const Celda(posicion: posicion, color: ColorZona.azul, esInicial: true),
     );
-    final comun = await _borde(tester, const Celda(posicion: posicion, color: Color5.azul));
+    final comun = await _borde(tester, const Celda(posicion: posicion, color: ColorZona.azul));
 
     // El aro es de 2 px, en un tono más oscuro del mismo azul; no es negro.
     expect(inicial, isNotNull);

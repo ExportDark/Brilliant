@@ -11,5 +11,5 @@ class ReglaAzul implements ReglaColor {
   }
 
   @override
-  String get descripcion => 'Todos iguales: las 4 casillas llevan el mismo número';
+  String get descripcion => 'Todos iguales: todas las casillas llevan el mismo número';
 }

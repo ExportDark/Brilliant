@@ -3,7 +3,9 @@ import 'posicion.dart';
 import 'tipo_region.dart';
 
 /// Una región física del tablero: un grupo concreto de celdas que comparte
-/// un [TipoRegion] (color + regla + cantidad de celdas esperada).
+/// un [TipoRegion] (color + regla). Cuántas celdas tiene lo decide el mapa
+/// que la declara: un mismo color tiene zonas de distinto tamaño según el
+/// mapa.
 class Region {
   final int identificador;
   final TipoRegion tipo;
@@ -13,11 +15,7 @@ class Region {
     required this.identificador,
     required this.tipo,
     required this.casillas,
-  }) : assert(
-         casillas.length == tipo.cantidadCeldas,
-         'La región #$identificador (${tipo.color}) debería tener '
-         '${tipo.cantidadCeldas} celdas, pero tiene ${casillas.length}.',
-       );
+  });
 
   /// Verdadero cuando todas las casillas de la región ya tienen un valor.
   /// Calculado siempre a partir de [casillas], nunca guardado aparte.

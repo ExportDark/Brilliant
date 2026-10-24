@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 253 tests, todos pasando (2026-10-19).
+las pruebas y qué se aprendió de ellas. 254 tests, todos pasando (2026-10-24).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -21,7 +21,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | Carpeta | Tests | Qué prueba |
 |---|---|---|
 | `test/modelo/` | 52 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion` y `Tablero` (layout del manual, anotar y vaciar casillas) |
-| `test/reglas/` | 34 | Las funciones puras de cada restricción, las 5 clases de color y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
+| `test/reglas/` | 35 | Las funciones puras de cada restricción, las 5 clases de color y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 89 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, las partidas completas simuladas y el camino feliz |
 | `test/ui/` | 77 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la pantalla de preparación y la de partida, las dos pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla |
 | `test/main/` | 1 | Que la app arranque en la pantalla de preparación |
@@ -63,6 +63,7 @@ Todas las rutas son dentro de `test/`.
 | `modelo/celda/sin_valor_conserva_datos_test.dart` | `Celda.sinValor` vacía y conserva posición, color y si es inicial |
 | `modelo/posicion/vecinas_dentro_del_tablero_test.dart` | En el tablero, las esquinas tienen 2 vecinas, los bordes 3 y el interior 4 |
 | `reglas/descripcion/cada_regla_se_describe_test.dart` | Cada color se describe con el nombre de su regla del manual |
+| `reglas/descripcion/no_dicen_cuantas_casillas_test.dart` | Ninguna descripción dice cuántas casillas tiene la zona, porque cambia según el mapa |
 
 ### Preparación
 

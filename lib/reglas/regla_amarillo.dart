@@ -1,8 +1,8 @@
 import 'regla_color.dart';
 import 'regla_numeros_distintos.dart';
 
-/// Zona amarilla: sus 5 celdas están dispersas por el tablero pero cuentan
-/// como una única región lógica — no se puede repetir ningún valor entre
+/// Zona amarilla: sus celdas pueden estar dispersas por el tablero, pero
+/// cuentan como una única región lógica — no se puede repetir ningún valor entre
 /// ninguna de ellas, igual que la zona roja.
 class ReglaAmarillo implements ReglaColor {
   const ReglaAmarillo();
@@ -14,5 +14,5 @@ class ReglaAmarillo implements ReglaColor {
 
   @override
   String get descripcion =>
-      'Todos diferentes: ningún número se repite entre las 5 casillas amarillas';
+      'Todos diferentes: ningún número se repite entre las casillas amarillas';
 }

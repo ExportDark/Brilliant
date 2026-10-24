@@ -9,7 +9,7 @@ Ver también: [[Modelo de dominio]] · [[Arquitectura general]] · [[Tablero y r
 
 ## `TipoRegion`: color + regla juntos, sin dispatcher
 
-**Por qué no era obvio:** el plan original tenía `Color5` como enum suelto, y para saber
+**Por qué no era obvio:** el plan original tenía `Color5` (hoy `ColorZona`) como enum suelto, y para saber
 qué regla aplicaba a una zona hacía falta un dispatcher (`reglas_por_color.dart`, un
 `switch` color → regla).
 
@@ -24,19 +24,22 @@ de ejecución**. Esta fue una propuesta del usuario, mejor que el diseño origin
 
 ---
 
-## `cantidadCeldas`: cuántas casillas debe tener cada región de ese tipo
+## El tamaño de cada zona lo pone el mapa (antes `cantidadCeldas`)
 
-Para este mapa: **amarillo 5, azul 4, verde 6, rojo 6, morado 6**.
+Hasta el 2026-10-24, `TipoRegion` tenía un tercer campo, `cantidadCeldas`: cuántas
+casillas debía tener cada zona de ese color (amarillo 5, azul 4, verde, rojo y morado 6),
+y un `assert` de `Region` lo verificaba al construirla. Servía para atrapar un error de
+dedo al transcribir el mapa.
 
-**Punto clave:** esto es propio del mapa, **no una ley universal del color**. Otro mapa
-podría declarar otros tamaños para el mismo color. Por eso las 5 constantes
-(`tipoAmarillo`, `tipoVerde`, …) con sus `cantidadCeldas` son las *del mapa actual*, no
-valores reutilizables sin más por cualquier mapa futuro.
+Ya se sabía que era propio de ese mapa y no una ley del color, y los otros mapas
+oficiales lo confirmaron: una misma zona azul tiene 4 casillas en un mapa y 5 o 6 en
+otro. Se quitó el campo, y el tamaño sale de las casillas que declara cada mapa.
 
-**Para qué sirve:** validación defensiva. Al construir cada `Region`, un `assert`
-verifica `casillas.length == tipo.cantidadCeldas` — así un error de tipeo al transcribir
-el layout 7×7 a mano (ej. olvidar una casilla morada) falla de inmediato en vez de pasar
-desapercibido.
+La protección contra errores de dedo no se perdió:
+
+- `Tablero` sigue validando que el mapa cubra las 49 casillas, cada una una sola vez.
+- Los tests de cada mapa comparan el color de las 49 casillas y el tamaño de cada zona
+  con tablas escritas a mano.
 
 ---
 

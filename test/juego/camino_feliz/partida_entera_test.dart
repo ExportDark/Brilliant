@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/juego/partida_bloc.dart';
 import 'package:brilliant/juego/preparacion_bloc.dart';
 import 'package:brilliant/juego/preparacion_event.dart';
-import 'package:brilliant/modelo/color5.dart';
+import 'package:brilliant/modelo/color_zona.dart';
 import 'package:brilliant/modelo/extraer_valores.dart';
 import 'package:brilliant/modelo/tablero.dart';
 
@@ -21,15 +21,15 @@ void _expectReglasDelManual(Tablero tablero) {
     final zona = 'la zona #${region.identificador} (${region.tipo.color.name}) con $valores';
 
     switch (region.tipo.color) {
-      case Color5.rojo:
+      case ColorZona.rojo:
         expect(distintos, {1, 2, 3, 4, 5, 6}, reason: '$zona: tiene que ser una corrida del 1 al 6');
-      case Color5.amarillo:
+      case ColorZona.amarillo:
         expect(distintos, hasLength(valores.length), reason: '$zona: no puede repetir');
-      case Color5.azul:
+      case ColorZona.azul:
         expect(distintos, hasLength(1), reason: '$zona: todos iguales');
-      case Color5.morado:
+      case ColorZona.morado:
         expect(distintos.length, lessThanOrEqualTo(2), reason: '$zona: dos números como máximo');
-      case Color5.verde:
+      case ColorZona.verde:
         break;
     }
   }

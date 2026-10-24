@@ -7,6 +7,19 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-24 — El modelo, listo para más de un mapa
+
+Primer paso para jugar los 4 mapas oficiales. Es un refactor: el juego no cambia.
+
+- **`Color5` pasa a llamarse `ColorZona`**, porque los otros mapas suman colores (gris y
+  naranja).
+- **`TipoRegion` ya no fija el tamaño de la zona** (`cantidadCeldas`), porque una misma
+  zona azul tiene 4 casillas en un mapa y 5 o 6 en otro. El tamaño lo pone cada mapa.
+  Ver [[Modelado de regiones]].
+- **Las descripciones de las reglas no dicen cuántas casillas tiene la zona**: "Todos
+  iguales: todas las casillas llevan el mismo número". Un test nuevo lo cuida.
+- 254 tests.
+
 ## 2026-10-19 — Camino feliz por la pantalla
 
 - **El happy path como widget test**: abre la app entera, reparte los 6 números tocando

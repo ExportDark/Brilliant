@@ -70,7 +70,7 @@ La regla de color es la misma pregunta de siempre,
 qué** no puede ponerlo ahí. La pantalla arma mensajes como estos, **sin coordenadas**:
 
 - *"Esa casilla no está junto a ningún 4: el 2 va arriba, abajo o a un lado de un 4."*
-- *"Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*, con
+- *"Zona azul — Todos iguales: todas las casillas llevan el mismo número. Ya tiene: 4"*, con
   la `descripcion` de cada regla.
 
 Entre "un" y el número va un espacio que no se corta (` `), para que el número nunca

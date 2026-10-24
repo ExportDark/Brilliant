@@ -4,50 +4,23 @@ import '../reglas/regla_color.dart';
 import '../reglas/regla_morado.dart';
 import '../reglas/regla_rojo.dart';
 import '../reglas/regla_verde.dart';
-import 'color5.dart';
+import 'color_zona.dart';
 
-/// Une un color con su regla de colocación y con cuántas celdas debe tener
-/// cada región de ese tipo EN ESTE MAPA (otro mapa podría declarar otros
-/// tamaños para el mismo color — no es una ley universal del color).
+/// Une un color con su regla de colocación. Cuántas celdas tiene cada zona
+/// no es parte del tipo: lo decide cada mapa al declarar sus zonas.
 class TipoRegion {
-  final Color5 color;
+  final ColorZona color;
   final ReglaColor regla;
-  final int cantidadCeldas;
 
-  const TipoRegion({
-    required this.color,
-    required this.regla,
-    required this.cantidadCeldas,
-  });
+  const TipoRegion({required this.color, required this.regla});
 }
 
-/// Tipos de región de este mapa (el layout 7x7 documentado en docs/REGLAS.md).
-const tipoAmarillo = TipoRegion(
-  color: Color5.amarillo,
-  regla: ReglaAmarillo(),
-  cantidadCeldas: 5,
-);
+const tipoAmarillo = TipoRegion(color: ColorZona.amarillo, regla: ReglaAmarillo());
 
-const tipoVerde = TipoRegion(
-  color: Color5.verde,
-  regla: ReglaVerde(),
-  cantidadCeldas: 6,
-);
+const tipoVerde = TipoRegion(color: ColorZona.verde, regla: ReglaVerde());
 
-const tipoMorado = TipoRegion(
-  color: Color5.morado,
-  regla: ReglaMorado(),
-  cantidadCeldas: 6,
-);
+const tipoMorado = TipoRegion(color: ColorZona.morado, regla: ReglaMorado());
 
-const tipoAzul = TipoRegion(
-  color: Color5.azul,
-  regla: ReglaAzul(),
-  cantidadCeldas: 4,
-);
+const tipoAzul = TipoRegion(color: ColorZona.azul, regla: ReglaAzul());
 
-const tipoRojo = TipoRegion(
-  color: Color5.rojo,
-  regla: ReglaRojo(),
-  cantidadCeldas: 6,
-);
+const tipoRojo = TipoRegion(color: ColorZona.rojo, regla: ReglaRojo());

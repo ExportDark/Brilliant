@@ -27,7 +27,7 @@ Repositorio: https://github.com/ExportDark/Brilliant
 
 - [[Decisiones de extracción del manual]] — cómo se sacó el tablero del PDF
 - [[Sistema de coordenadas]] — fila/columna, y la notación del manual
-- [[Modelado de regiones]] — `TipoRegion`, identificador, `completada`, `cantidadCeldas`
+- [[Modelado de regiones]] — `TipoRegion`, identificador, `completada`, el tamaño de cada zona
 
 ## El proyecto
 

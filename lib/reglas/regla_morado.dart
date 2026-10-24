@@ -1,7 +1,7 @@
 import 'regla_color.dart';
 import 'regla_maximo_valores_distintos.dart';
 
-/// Zona morada: dentro de toda la zona (6 celdas) solo puede haber, como
+/// Zona morada: dentro de toda la zona solo puede haber, como
 /// máximo, dos números distintos repetidos entre sí.
 class ReglaMorado implements ReglaColor {
   static const _maximoValoresDistintos = 2;

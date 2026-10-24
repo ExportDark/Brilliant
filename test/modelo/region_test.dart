@@ -40,15 +40,16 @@ void main() {
       expect(region.completada, isTrue);
     });
 
-    test('rechaza construirse con una cantidad de celdas distinta a la del tipo', () {
-      expect(
-        () => Region(
-          identificador: 1,
-          tipo: tipoAzul,
-          casillas: [_celdaAzul(0), _celdaAzul(1), _celdaAzul(2)],
-        ),
-        throwsA(isA<AssertionError>()),
+    test('acepta zonas de cualquier tamaño: el tamaño lo pone cada mapa', () {
+      // Un mismo color tiene zonas de tamaños distintos según el mapa: una
+      // azul de 3 casillas es tan válida como una de 4 o de 6.
+      final region = Region(
+        identificador: 1,
+        tipo: tipoAzul,
+        casillas: [_celdaAzul(0), _celdaAzul(1), _celdaAzul(2)],
       );
+
+      expect(region.casillas, hasLength(3));
     });
   });
 }

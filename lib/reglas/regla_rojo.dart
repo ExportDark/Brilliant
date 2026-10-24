@@ -1,8 +1,8 @@
 import 'regla_color.dart';
 import 'regla_numeros_distintos.dart';
 
-/// Zona roja: sus 6 celdas deben terminar con 6 valores todos distintos
-/// entre sí (una "corrida" del 1 al 6).
+/// Zona roja: ningún número se repite entre sus celdas. Con 6 celdas, eso
+/// es una "corrida" del 1 al 6.
 class ReglaRojo implements ReglaColor {
   const ReglaRojo();
 
@@ -12,5 +12,5 @@ class ReglaRojo implements ReglaColor {
   }
 
   @override
-  String get descripcion => 'Todos diferentes: las 6 casillas llevan números distintos';
+  String get descripcion => 'Todos diferentes: ningún número se repite en la zona';
 }

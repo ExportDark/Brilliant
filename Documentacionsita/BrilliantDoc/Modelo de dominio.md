@@ -4,9 +4,11 @@ Las entidades de `lib/modelo/`, de la más simple a la que las agrupa a todas.
 
 Ver también: [[Arquitectura general]] · [[Modelado de regiones]] · [[Tablero y regiones]]
 
-## `Color5` (`color5.dart`)
+## `ColorZona` (`color_zona.dart`)
 
-Enum con los 5 colores de zona: `amarillo`, `verde`, `morado`, `azul`, `rojo`.
+Enum con los colores de zona: `amarillo`, `verde`, `morado`, `azul`, `rojo`. Hasta el
+2026-10-24 se llamaba `Color5`; se renombró porque los otros mapas oficiales suman
+colores. Ver [[Modelado de regiones]].
 
 ## `Posicion` (`posicion.dart`)
 
@@ -33,7 +35,7 @@ quien las use las descarta (`tablero.celdaEn` devuelve `null` para esas).
 Entidad **inmutable** que representa una casilla:
 
 - `posicion`: su `Posicion` fija en la grilla
-- `color`: el `Color5` de su región (determina qué regla aplica)
+- `color`: el `ColorZona` de su región (determina qué regla aplica)
 - `valor`: el número 1-6 anotado, o `null` si sigue vacía
 - `esInicial`: si es una de las 6 casillas que se llenan en la preparación
 
@@ -43,18 +45,16 @@ del rango 1-6.
 
 ## `TipoRegion` (`tipo_region.dart`)
 
-`{color, regla, cantidadCeldas}` — une cada color con su `ReglaColor` ya instanciada y
-con cuántas casillas debe tener cada región de ese tipo **en este mapa**.
+`{color, regla}` — une cada color con su `ReglaColor` ya instanciada. Cuántas casillas
+tiene cada zona no es parte del tipo: lo decide el mapa al declarar sus zonas.
 
-Hay 5 constantes ya armadas para el mapa actual:
-
-| Constante | Color | Regla | cantidadCeldas |
-|---|---|---|---|
-| `tipoAmarillo` | amarillo | `ReglaAmarillo` | 5 |
-| `tipoVerde` | verde | `ReglaVerde` | 6 |
-| `tipoMorado` | morado | `ReglaMorado` | 6 |
-| `tipoAzul` | azul | `ReglaAzul` | 4 |
-| `tipoRojo` | rojo | `ReglaRojo` | 6 |
+| Constante | Color | Regla |
+|---|---|---|
+| `tipoAmarillo` | amarillo | `ReglaAmarillo` |
+| `tipoVerde` | verde | `ReglaVerde` |
+| `tipoMorado` | morado | `ReglaMorado` |
+| `tipoAzul` | azul | `ReglaAzul` |
+| `tipoRojo` | rojo | `ReglaRojo` |
 
 ## `Region` (`region.dart`)
 
@@ -62,7 +62,7 @@ Hay 5 constantes ya armadas para el mapa actual:
 
 - `completada` es un **getter calculado** (`casillas.every((c) => !c.estaVacia)`), nunca
   un campo guardado
-- Al construirse valida que `casillas.length == tipo.cantidadCeldas`
+- Puede tener cualquier cantidad de casillas: el tamaño lo pone el mapa
 
 Ver [[Modelado de regiones]] para el razonamiento detrás de cada decisión.
 
@@ -95,7 +95,6 @@ de dedo es plausible):
 - ninguna casilla declarada en dos regiones
 - ninguna casilla de la grilla sin cubrir
 - ninguna casilla declarada fuera de la grilla
-- cada región con la cantidad de casillas de su tipo (vía `Region`)
 
 Cualquiera de estos falla al instante diciendo **qué casilla** en notación del manual.
 

@@ -77,7 +77,7 @@ vez de `"fila 5, columna 2"`.
 Entidad inmutable que representa una casilla del tablero:
 
 - `posicion`: su `Posicion` fija en la grilla.
-- `color`: el `Color5` de su zona (determina qué regla aplica).
+- `color`: el `ColorZona` de su zona (determina qué regla aplica).
 - `valor`: el número 1-6 anotado, o `null` si sigue vacía.
 - `esInicial`: si es una de las 6 casillas fijas que se llenan en la preparación
   de la partida (antes de tirar dados).
@@ -101,29 +101,27 @@ tinta oscura sobre un círculo blanco.
 - `regla_numeros_distintos.dart`: función pura `puedeAgregarManteniendoDistintos` —
   el valor solo es válido si no se repite ningún número en la zona. La usan tanto el
   rojo como el amarillo (misma regla "todos diferentes", ver manual del juego).
-- `regla_rojo.dart`: `ReglaRojo` — la zona roja (6 celdas) debe terminar con 6 valores
-  todos distintos entre sí (una corrida del 1 al 6).
-- `regla_amarillo.dart`: `ReglaAmarillo` — sus 5 celdas están dispersas por el tablero
-  pero se tratan como una única región lógica: no se puede repetir ningún valor entre
+- `regla_rojo.dart`: `ReglaRojo` — ningún número se repite en la zona roja (con 6
+  celdas, una corrida del 1 al 6).
+- `regla_amarillo.dart`: `ReglaAmarillo` — sus celdas pueden estar dispersas por el
+  tablero pero se tratan como una única región lógica: no se puede repetir ningún valor entre
   ninguna de ellas (misma regla que rojo, reutilizando `puedeAgregarManteniendoDistintos`).
 - `regla_cualquiera.dart` / `regla_verde.dart`: `ReglaVerde` — sin restricción, cualquier
   valor es válido en cualquier celda libre de la zona.
 - `regla_valor_unico.dart` / `regla_azul.dart`: `ReglaAzul` — todas las celdas de la zona
   deben terminar con el mismo valor.
 - `regla_maximo_valores_distintos.dart` / `regla_morado.dart`: `ReglaMorado` — como
-  máximo 2 valores distintos en toda la zona (6 celdas).
+  máximo 2 valores distintos en toda la zona.
 
 ## Módulo: TipoRegion, Region, extraerValores (`lib/modelo/`)
 
-- `tipo_region.dart`: `TipoRegion{color, regla, cantidadCeldas}` — une cada color con
-  su regla ya instanciada. `cantidadCeldas` es propia de este mapa (amarillo 5, azul 4,
-  verde/morado/rojo 6), no una ley universal del color. 5 constantes ya armadas
-  (`tipoAmarillo`, `tipoVerde`, `tipoMorado`, `tipoAzul`, `tipoRojo`) que `Tablero`
-  reutilizará directo, sin ningún dispatcher/switch.
+- `tipo_region.dart`: `TipoRegion{color, regla}` — une cada color con su regla ya
+  instanciada. Constantes ya armadas (`tipoAmarillo`, `tipoVerde`, `tipoMorado`,
+  `tipoAzul`, `tipoRojo`) que `Tablero` usa directo, sin ningún dispatcher/switch. Cuántas
+  casillas tiene cada zona no es parte del tipo: lo decide el mapa.
 - `region.dart`: `Region{identificador, tipo, casillas}` — una zona física concreta del
-  tablero. Valida al construirse que `casillas.length == tipo.cantidadCeldas` (falla
-  rápido si el layout se transcribe mal). `completada` es un getter calculado a partir
-  de `casillas`, nunca un campo guardado.
+  tablero, de cualquier tamaño. `completada` es un getter calculado a partir de
+  `casillas`, nunca un campo guardado.
 - `extraer_valores.dart`: `extraerValores(Region) -> List<int>` — los valores ya
   anotados en la región, para alimentar `region.tipo.regla.puedeAgregar(...)`.
 
@@ -291,7 +289,7 @@ casillas").
    otra casilla vacía explica debajo del tablero por qué no se puede, sin coordenadas,
    por ejemplo:
    - *"Esa casilla no está junto a ningún 4: el 2 va arriba, abajo o a un lado de un 4."*
-   - *"Zona azul — Todos iguales: las 4 casillas llevan el mismo número. Ya tiene: 4"*
+   - *"Zona azul — Todos iguales: todas las casillas llevan el mismo número. Ya tiene: 4"*
 5. Si no hay jugada con ningún dado como ancla, aparece **Pasar turno** en lugar de
    Tirar dados. Cuando ninguna tirada posible tiene jugada, aparece una tarjeta con
    "¡Tablero completo!", en cuántos turnos se jugó y el botón **Jugar otra vez**, que

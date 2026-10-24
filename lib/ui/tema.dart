@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../modelo/color5.dart';
+import '../modelo/color_zona.dart';
 
 /// Los colores de la app: un fondo crema, un acento lavanda oscuro y tonos
 /// suaves para todo lo demás.
@@ -28,11 +28,11 @@ abstract final class Paleta {
 /// El color de cada zona del tablero, en tonos suaves pero fáciles de
 /// distinguir entre sí.
 const coloresDeZona = {
-  Color5.rojo: Color(0xFFF28B82),
-  Color5.morado: Color(0xFFB79CED),
-  Color5.azul: Color(0xFF7FB7F0),
-  Color5.verde: Color(0xFF8FCB9B),
-  Color5.amarillo: Color(0xFFF6D365),
+  ColorZona.rojo: Color(0xFFF28B82),
+  ColorZona.morado: Color(0xFFB79CED),
+  ColorZona.azul: Color(0xFF7FB7F0),
+  ColorZona.verde: Color(0xFF8FCB9B),
+  ColorZona.amarillo: Color(0xFFF6D365),
 };
 
 /// El color de texto que se lee bien sobre [fondo]: oscuro sobre colores

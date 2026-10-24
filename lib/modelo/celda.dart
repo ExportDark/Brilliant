@@ -1,11 +1,11 @@
-import 'color5.dart';
+import 'color_zona.dart';
 import 'posicion.dart';
 
 /// Una celda del tablero: posición fija, color de zona fijo, y un valor
 /// (1-6) que se anota durante la partida, o `null` si sigue vacía.
 class Celda {
   final Posicion posicion;
-  final Color5 color;
+  final ColorZona color;
   final int? valor;
   final bool esInicial;
 

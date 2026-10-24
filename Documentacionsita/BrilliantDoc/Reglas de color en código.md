@@ -29,9 +29,13 @@ abstract class ReglaColor {
 ```
 
 Dado lo que ya está anotado en la región, `puedeAgregar` decide si un nuevo valor se puede
-agregar. `descripcion` es la regla dicha en una frase (por ejemplo, *"Todos iguales: las 4
-casillas llevan el mismo número"*), y es lo que la pantalla de partida le muestra al
+agregar. `descripcion` es la regla dicha en una frase (por ejemplo, *"Todos iguales: todas
+las casillas llevan el mismo número"*), y es lo que la pantalla de partida le muestra al
 jugador cuando una casilla no acepta su número. Ver [[Turnos y jugadas]].
+
+Las descripciones **no dicen cuántas casillas tiene la zona**, porque eso cambia según el
+mapa. Hasta el 2026-10-24 decían "las 4 casillas" o "las 6 casillas"; un test
+(`no_dicen_cuantas_casillas_test`) cuida que no vuelva a pasar.
 
 ## Las funciones puras
 

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:brilliant/modelo/color5.dart';
+import 'package:brilliant/modelo/color_zona.dart';
 import 'package:brilliant/modelo/posicion.dart';
 import 'package:brilliant/modelo/tablero.dart';
 
@@ -17,27 +17,27 @@ void main() {
     });
 
     test('cada color tiene la cantidad de casillas del manual', () {
-      final casillasPorColor = <Color5, int>{};
+      final casillasPorColor = <ColorZona, int>{};
       for (final celda in tablero.celdas) {
         casillasPorColor.update(celda.color, (n) => n + 1, ifAbsent: () => 1);
       }
 
-      expect(casillasPorColor[Color5.amarillo], 5);
-      expect(casillasPorColor[Color5.verde], 12);
-      expect(casillasPorColor[Color5.azul], 8);
-      expect(casillasPorColor[Color5.morado], 12);
-      expect(casillasPorColor[Color5.rojo], 12);
+      expect(casillasPorColor[ColorZona.amarillo], 5);
+      expect(casillasPorColor[ColorZona.verde], 12);
+      expect(casillasPorColor[ColorZona.azul], 8);
+      expect(casillasPorColor[ColorZona.morado], 12);
+      expect(casillasPorColor[ColorZona.rojo], 12);
     });
 
     test('el amarillo es una sola región y los demás colores tienen dos', () {
-      int regionesDe(Color5 color) =>
+      int regionesDe(ColorZona color) =>
           tablero.regiones.where((region) => region.tipo.color == color).length;
 
-      expect(regionesDe(Color5.amarillo), 1);
-      expect(regionesDe(Color5.verde), 2);
-      expect(regionesDe(Color5.azul), 2);
-      expect(regionesDe(Color5.morado), 2);
-      expect(regionesDe(Color5.rojo), 2);
+      expect(regionesDe(ColorZona.amarillo), 1);
+      expect(regionesDe(ColorZona.verde), 2);
+      expect(regionesDe(ColorZona.azul), 2);
+      expect(regionesDe(ColorZona.morado), 2);
+      expect(regionesDe(ColorZona.rojo), 2);
     });
 
     test('marca exactamente las 6 casillas iniciales del manual', () {
@@ -50,19 +50,19 @@ void main() {
     });
 
     test('el color de cada casilla coincide con la tabla del manual', () {
-      Color5 colorEn(String notacion) =>
+      ColorZona colorEn(String notacion) =>
           tablero.celdaEn(Posicion.desdeNotacion(notacion))!.color;
 
-      expect(colorEn('A1'), Color5.amarillo);
-      expect(colorEn('C1'), Color5.azul);
-      expect(colorEn('D1'), Color5.morado);
-      expect(colorEn('B3'), Color5.rojo);
-      expect(colorEn('D4'), Color5.amarillo);
-      expect(colorEn('E4'), Color5.verde);
-      expect(colorEn('G5'), Color5.azul);
-      expect(colorEn('C6'), Color5.morado);
-      expect(colorEn('E7'), Color5.rojo);
-      expect(colorEn('G7'), Color5.amarillo);
+      expect(colorEn('A1'), ColorZona.amarillo);
+      expect(colorEn('C1'), ColorZona.azul);
+      expect(colorEn('D1'), ColorZona.morado);
+      expect(colorEn('B3'), ColorZona.rojo);
+      expect(colorEn('D4'), ColorZona.amarillo);
+      expect(colorEn('E4'), ColorZona.verde);
+      expect(colorEn('G5'), ColorZona.azul);
+      expect(colorEn('C6'), ColorZona.morado);
+      expect(colorEn('E7'), ColorZona.rojo);
+      expect(colorEn('G7'), ColorZona.amarillo);
     });
 
     test('todas las casillas empiezan vacías y ninguna región está completada', () {
@@ -73,7 +73,7 @@ void main() {
     test('regionEn devuelve la región que contiene esa casilla', () {
       final region = tablero.regionEn(Posicion.desdeNotacion('C1'))!;
 
-      expect(region.tipo.color, Color5.azul);
+      expect(region.tipo.color, ColorZona.azul);
       expect(
         region.casillas.map((celda) => celda.posicion.notacion),
         containsAll(['C1', 'C2', 'D2', 'D3']),

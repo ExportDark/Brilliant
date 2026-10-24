@@ -5,7 +5,7 @@ import '../../juego/partida_bloc.dart';
 import '../../juego/partida_event.dart';
 import '../../juego/partida_state.dart';
 import '../../juego/validacion_jugada.dart';
-import '../../modelo/color5.dart';
+import '../../modelo/color_zona.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
@@ -328,13 +328,13 @@ class _TextoConIcono extends StatelessWidget {
 /// de abajo ("junto a un" / "4.").
 const _espacioFijo = '\u00A0';
 
-String _nombreZona(Color5 color) {
+String _nombreZona(ColorZona color) {
   return switch (color) {
-    Color5.amarillo => 'amarilla',
-    Color5.verde => 'verde',
-    Color5.morado => 'morada',
-    Color5.azul => 'azul',
-    Color5.rojo => 'roja',
+    ColorZona.amarillo => 'amarilla',
+    ColorZona.verde => 'verde',
+    ColorZona.morado => 'morada',
+    ColorZona.azul => 'azul',
+    ColorZona.rojo => 'roja',
   };
 }
 
