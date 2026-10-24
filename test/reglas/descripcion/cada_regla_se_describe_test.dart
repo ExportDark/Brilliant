@@ -9,5 +9,8 @@ void main() {
     expect(tipoVerde.regla.descripcion, startsWith('Cualquiera'));
     expect(tipoAzul.regla.descripcion, startsWith('Todos iguales'));
     expect(tipoMorado.regla.descripcion, startsWith('Solo dos números diferentes'));
+    expect(tipoGris.regla.descripcion, startsWith('Todos iguales'));
+    expect(tipoNaranjaBajo.regla.descripcion, 'Solo del 1 al 3');
+    expect(tipoNaranjaAlto.regla.descripcion, 'Solo del 4 al 6');
   });
 }

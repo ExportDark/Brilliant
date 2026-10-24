@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../juego/preparacion_bloc.dart';
 import '../../juego/preparacion_event.dart';
 import '../../juego/preparacion_state.dart';
+import '../../modelo/mapa.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
@@ -28,7 +29,7 @@ class PantallaPreparacion extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PreparacionBloc(
-        casillasIniciales.map(Posicion.desdeNotacion).toList(),
+        nivel1.casillasIniciales.map(Posicion.desdeNotacion).toList(),
       ),
       child: _VistaPreparacion(tirarDado: tirarDado),
     );

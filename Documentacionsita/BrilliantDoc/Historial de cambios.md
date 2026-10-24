@@ -7,6 +7,27 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-24 — Los 4 mapas oficiales, en el modelo
+
+- **Los 4 mapas** de las tarjetas ("Level 1" a "Level 4") en `lib/modelo/mapa.dart`, y
+  `Tablero.desdeMapa(mapa)` para armar cualquiera. Se transcribieron de una foto, midiendo
+  el color de cada casilla; el Level 1 coincidió casilla por casilla con el mapa que ya
+  había, que es el `nivel1`. Ver [[Mapas]].
+- **Dos colores nuevos:** el gris ("=", todos iguales, como el azul) y el naranja ("1-3"
+  o "4-6", solo números de ese rango). Reglas nuevas: `ReglaGris`, `ReglaNaranja` y la
+  función pura `puedeAgregarEnRango`. Ver [[Reglas de color en código]].
+- **Casillas iniciales por mapa.** Las tarjetas no las marcan: los niveles 2 y 3 usan
+  las del Nivel 1, y el Nivel 4 usa C2, F2, B4, D4, B6, G6, para que cada una caiga en
+  una zona distinta y ninguna en una naranja. La constante global `casillasIniciales`
+  pasó a ser de cada mapa.
+- **Las partidas simuladas y el camino feliz corren en los 4 mapas.** Todos llenan las 49
+  casillas. Tests nuevos de cada mapa: colores contra una tabla escrita a mano, zonas y
+  tamaños, iniciales, y que el Nivel 1 sea el mapa de siempre. Se comprobó que fallan
+  si una zona se transcribe con otro color o si la regla naranja acepta cualquier
+  número. Ver [[Pruebas]].
+- Todavía no se puede elegir el mapa en la app: la preparación sigue usando el Nivel 1.
+- 326 tests.
+
 ## 2026-10-24 — El modelo, listo para más de un mapa
 
 Primer paso para jugar los 4 mapas oficiales. Es un refactor: el juego no cambia.

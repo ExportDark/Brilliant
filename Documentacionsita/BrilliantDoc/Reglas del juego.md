@@ -1,7 +1,7 @@
 # Reglas del juego
 
 Brilliant es un **roll & write** (tira los dados y anota): cada jugador tiene su propio
-tablero de 7×7 dividido en zonas de color, todos comparten los mismos resultados de
+tablero de 7×7 dividido en zonas de color (hay 4 mapas para elegir, ver [[Mapas]]), todos comparten los mismos resultados de
 dados en cada turno, pero cada quien decide dónde anotarlos en su propia hoja.
 
 Ver también: [[Tablero y regiones]] · [[Puntuación]]
@@ -29,11 +29,16 @@ de esa zona específica:
 
 | Color | Regla | Qué significa |
 |---|---|---|
-| Amarillo | Todos diferentes | Las 5 casillas amarillas (dispersas por el tablero) cuentan como **una sola región**: no puede repetirse ningún valor entre ellas |
+| Amarillo | Todos diferentes | Las casillas amarillas (dispersas por el tablero) cuentan como **una sola región**: no puede repetirse ningún valor entre ellas |
 | Verde | Cualquiera | Sin restricción de valor: cualquier número de los dados en cualquier celda libre |
-| Morado | Solo dos números diferentes | En toda la zona (6 celdas) puede haber como máximo **dos** valores distintos |
-| Azul | Todos iguales | Las 4 celdas de la zona deben terminar con el **mismo** número |
-| Rojo | Todos diferentes | Las 6 celdas deben terminar con 6 números todos distintos (una "corrida" del 1 al 6) |
+| Morado | Solo dos números diferentes | En toda la zona puede haber como máximo **dos** valores distintos |
+| Azul | Todos iguales | Las celdas de la zona deben terminar con el **mismo** número |
+| Rojo | Todos diferentes | Ningún número se repite en la zona; con 6 celdas, es una "corrida" del 1 al 6 |
+| Gris | Todos iguales | Como el azul. Solo en los niveles 2 y 3 |
+| Naranja | 1-3 o 4-6 | Solo números de ese rango, aunque la zona esté vacía. Solo en el Nivel 4 |
+
+Cuántas casillas tiene cada zona depende del mapa. Las del Nivel 1 están en
+[[Tablero y regiones]], y las de los otros en [[Mapas]].
 
 > [!note] Sobre el amarillo
 > El manual original describe el amarillo como "5 zonas de una sola casilla", lo que

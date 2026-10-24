@@ -335,6 +335,8 @@ String _nombreZona(ColorZona color) {
     ColorZona.morado => 'morada',
     ColorZona.azul => 'azul',
     ColorZona.rojo => 'roja',
+    ColorZona.gris => 'gris',
+    ColorZona.naranja => 'naranja',
   };
 }
 

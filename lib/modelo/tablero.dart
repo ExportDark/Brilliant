@@ -1,18 +1,11 @@
 import 'celda.dart';
+import 'mapa.dart';
 import 'posicion.dart';
 import 'region.dart';
 import 'tipo_region.dart';
 
-/// Las 6 casillas que se llenan en la preparación, antes de tirar los dados,
-/// con los números del 1 al 6 sin repetir.
-const casillasIniciales = {'C1', 'F2', 'B4', 'E4', 'C6', 'E7'};
-
 /// El tablero del juego: la grilla completa, dividida en regiones de color.
-///
-/// Cada región se declara con la lista de casillas que la forman, en la
-/// notación del manual — así el layout se lee igual que en el documento y no
-/// hay que deducir por adyacencia a cuál de las dos regiones de un mismo
-/// color pertenece cada casilla.
+/// Se arma a partir de uno de los [mapas] oficiales.
 class Tablero {
   static const filas = 7;
   static const columnas = 7;
@@ -22,21 +15,19 @@ class Tablero {
 
   Tablero._(this.regiones, this._regionPorPosicion);
 
-  /// El mapa original de 7x7 documentado en el manual.
-  factory Tablero.mapaOriginal() {
+  /// El tablero vacío de [mapa], con sus casillas iniciales marcadas. Las
+  /// regiones se numeran desde 1 en el orden en que el mapa declara sus zonas.
+  factory Tablero.desdeMapa(Mapa mapa) {
+    final iniciales = mapa.casillasIniciales.toSet();
     final regiones = [
-      _construirRegion(1, tipoAmarillo, ['A1', 'G1', 'D4', 'A7', 'G7']),
-      _construirRegion(2, tipoVerde, ['B1', 'A2', 'B2', 'A3', 'A4', 'A5']),
-      _construirRegion(3, tipoVerde, ['G2', 'G3', 'F3', 'E4', 'F4', 'G4']),
-      _construirRegion(4, tipoAzul, ['C1', 'C2', 'D2', 'D3']),
-      _construirRegion(5, tipoAzul, ['G5', 'G6', 'F6', 'F7']),
-      _construirRegion(6, tipoMorado, ['D1', 'E1', 'F1', 'E2', 'F2', 'E3']),
-      _construirRegion(7, tipoMorado, ['C4', 'C5', 'D5', 'C6', 'C7', 'B7']),
-      _construirRegion(8, tipoRojo, ['B3', 'C3', 'B4', 'B5', 'B6', 'A6']),
-      _construirRegion(9, tipoRojo, ['E5', 'F5', 'E6', 'D6', 'D7', 'E7']),
+      for (final (indice, zona) in mapa.zonas.indexed)
+        _construirRegion(indice + 1, zona.tipo, zona.casillas, iniciales),
     ];
     return Tablero._(regiones, _indexarPorPosicion(regiones));
   }
+
+  /// El mapa del manual de la imitación: el [nivel1].
+  factory Tablero.mapaOriginal() => Tablero.desdeMapa(nivel1);
 
   Iterable<Celda> get celdas => regiones.expand((region) => region.casillas);
 
@@ -89,13 +80,14 @@ class Tablero {
     int identificador,
     TipoRegion tipo,
     List<String> notaciones,
+    Set<String> iniciales,
   ) {
     final casillas = [
       for (final notacion in notaciones)
         Celda(
           posicion: Posicion.desdeNotacion(notacion),
           color: tipo.color,
-          esInicial: casillasIniciales.contains(notacion),
+          esInicial: iniciales.contains(notacion),
         ),
     ];
     return Region(identificador: identificador, tipo: tipo, casillas: casillas);

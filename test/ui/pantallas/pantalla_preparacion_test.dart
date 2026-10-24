@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brilliant/modelo/mapa.dart';
 import 'package:brilliant/modelo/posicion.dart';
-import 'package:brilliant/modelo/tablero.dart';
 import 'package:brilliant/ui/pantallas/pantalla_partida.dart';
 import 'package:brilliant/ui/pantallas/pantalla_preparacion.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
 
 /// Un reparto válido: un número distinto en cada casilla inicial.
 final _repartoCompleto = {
-  for (final (indice, casilla) in casillasIniciales.indexed) casilla: indice + 1,
+  for (final (indice, casilla) in nivel1.casillasIniciales.indexed) casilla: indice + 1,
 };
 
 Future<void> _abrir(WidgetTester tester) async {
@@ -126,7 +126,7 @@ void main() {
 
       expect(_habilitado(tester, _inicio), isTrue);
       expect(_textoEnTablero(tester, 'C1'), '4');
-      final numeros = {for (final casilla in casillasIniciales) _textoEnTablero(tester, casilla)};
+      final numeros = {for (final casilla in nivel1.casillasIniciales) _textoEnTablero(tester, casilla)};
       expect(numeros, {'1', '2', '3', '4', '5', '6'});
     });
 
@@ -137,7 +137,7 @@ void main() {
       await _tocar(tester, find.widgetWithText(TextButton, 'Reiniciar'));
 
       expect(_habilitado(tester, _inicio), isFalse);
-      for (final casilla in casillasIniciales) {
+      for (final casilla in nivel1.casillasIniciales) {
         expect(_textoEnTablero(tester, casilla), '');
       }
     });

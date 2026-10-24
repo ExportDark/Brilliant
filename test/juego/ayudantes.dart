@@ -6,6 +6,7 @@ import 'package:brilliant/juego/partida_bloc.dart';
 import 'package:brilliant/juego/partida_event.dart';
 import 'package:brilliant/juego/validacion_jugada.dart';
 import 'package:brilliant/modelo/extraer_valores.dart';
+import 'package:brilliant/modelo/mapa.dart';
 import 'package:brilliant/modelo/posicion.dart';
 import 'package:brilliant/modelo/tablero.dart';
 
@@ -16,6 +17,19 @@ Posicion pos(String notacion) => Posicion.desdeNotacion(notacion);
 Tablero tableroPartida1({Map<String, int> ademas = const {}}) {
   final valores = {'C1': 4, 'F2': 1, 'B4': 2, 'E4': 5, 'C6': 3, 'E7': 6, ...ademas};
   return Tablero.mapaOriginal().conValores({
+    for (final MapEntry(key: notacion, value: valor) in valores.entries) pos(notacion): valor,
+  });
+}
+
+/// El tablero de [mapa] con los números de la Partida 1 (4, 1, 2, 5, 3, 6)
+/// repartidos en sus casillas iniciales, en orden, más lo que traiga [ademas].
+Tablero tableroPreparado(Mapa mapa, {Map<String, int> ademas = const {}}) {
+  final valores = {
+    for (final (indice, casilla) in mapa.casillasIniciales.indexed)
+      casilla: const [4, 1, 2, 5, 3, 6][indice],
+    ...ademas,
+  };
+  return Tablero.desdeMapa(mapa).conValores({
     for (final MapEntry(key: notacion, value: valor) in valores.entries) pos(notacion): valor,
   });
 }

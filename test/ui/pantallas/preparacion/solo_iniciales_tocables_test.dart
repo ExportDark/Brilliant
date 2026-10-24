@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:brilliant/modelo/tablero.dart';
+import 'package:brilliant/modelo/mapa.dart';
 
 import '../ayudantes_pantallas.dart';
 
@@ -16,6 +16,6 @@ void main() {
           value.substring('casilla-'.length),
     };
 
-    expect(tocables, casillasIniciales);
+    expect(tocables, nivel1.casillasIniciales.toSet());
   });
 }

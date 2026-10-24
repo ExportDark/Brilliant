@@ -15,9 +15,9 @@ Construcción incremental, módulo por módulo:
 
 - [x] Entidad `Celda` y su widget de visualización (`lib/modelo/celda.dart`,
       `lib/ui/widgets/celda_widget.dart`)
-- [x] Reglas de color: rojo, amarillo, verde, azul, morado
+- [x] Reglas de color: rojo, amarillo, verde, azul, morado, gris y naranja
 - [x] `TipoRegion`, `Region`, `extraerValores`
-- [x] `Tablero` completo (7×7, 9 regiones)
+- [x] `Tablero` completo (7×7), armado desde cualquiera de los 4 mapas oficiales
 - [x] `TableroWidget`: las 7×7 fichas con los números anotados
 - [x] Preparación de la partida (`PreparacionBloc`): repartir los valores iniciales
 - [x] Pantalla de preparación: repartir los 6 números en el tablero y botón **Inicio**
@@ -33,7 +33,7 @@ Construcción incremental, módulo por módulo:
 
 ```
 lib/
-  modelo/   entidades de dominio (Posicion, Celda, Region, Tablero, ...)
+  modelo/   entidades de dominio (Posicion, Celda, Region, Mapa, Tablero, ...)
   reglas/   reglas de colocación por color
   juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
   ui/
@@ -112,6 +112,9 @@ tinta oscura sobre un círculo blanco.
   deben terminar con el mismo valor.
 - `regla_maximo_valores_distintos.dart` / `regla_morado.dart`: `ReglaMorado` — como
   máximo 2 valores distintos en toda la zona.
+- `regla_gris.dart`: `ReglaGris` — como el azul, todas las celdas con el mismo valor.
+- `regla_rango.dart` / `regla_naranja.dart`: `ReglaNaranja(minimo, maximo)` — solo
+  números de un rango ("1-3" o "4-6"), aunque la zona esté vacía.
 
 ## Módulo: TipoRegion, Region, extraerValores (`lib/modelo/`)
 
@@ -125,20 +128,26 @@ tinta oscura sobre un círculo blanco.
 - `extraer_valores.dart`: `extraerValores(Region) -> List<int>` — los valores ya
   anotados en la región, para alimentar `region.tipo.regla.puedeAgregar(...)`.
 
+## Módulo: Mapa (`lib/modelo/mapa.dart`)
+
+Los 4 mapas oficiales, `nivel1` a `nivel4` (en la lista `mapas`). Cada `Mapa` declara
+sus zonas, cada una con su tipo y la **lista de sus casillas en notación** (`['C1',
+'C2', 'D2', 'D3']`), y sus 6 casillas iniciales. Las zonas no se declaran como una
+grilla de colores: así el layout se lee igual que la tarjeta y no hay que deducir por
+adyacencia a cuál de las zonas de un color pertenece cada casilla.
+
+El `nivel1` es el mapa del manual (9 regiones). Los otros salieron de una foto de las
+tarjetas y suman dos colores: el gris y el naranja.
+
 ## Módulo: Tablero (`lib/modelo/tablero.dart`)
 
-`Tablero.mapaOriginal()` arma el mapa 7×7 del manual: 9 regiones (1 amarilla de 5
-casillas dispersas + 2 de cada otro color) y las 6 casillas iniciales marcadas.
-
-Cada región se declara con la **lista de sus casillas en notación** (`['C1', 'C2',
-'D2', 'D3']`), no como una grilla de colores: así el layout se lee igual que el manual
-y no hay que deducir por adyacencia a cuál de las dos regiones de un color pertenece
-cada casilla.
+`Tablero.desdeMapa(mapa)` arma el tablero 7×7 de un mapa, con sus casillas iniciales
+marcadas. `Tablero.mapaOriginal()` es un atajo de `Tablero.desdeMapa(nivel1)`.
 
 Como el layout se transcribe a mano, el tablero se valida solo al construirse: ninguna
-casilla declarada dos veces, ninguna casilla de la grilla sin cubrir, ninguna casilla
-fuera de la grilla, y (vía `Region`) cada región con la cantidad de casillas de su
-tipo. Cualquier error de transcripción revienta al instante diciendo qué casilla.
+casilla declarada dos veces, ninguna casilla de la grilla sin cubrir y ninguna casilla
+fuera de la grilla. Cualquier error de transcripción revienta al instante diciendo qué
+casilla.
 
 Consultas: `regiones`, `celdas`, `celdaEn(posicion)` y `regionEn(posicion)`.
 

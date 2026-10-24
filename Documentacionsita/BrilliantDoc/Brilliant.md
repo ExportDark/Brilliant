@@ -10,13 +10,14 @@ Repositorio: https://github.com/ExportDark/Brilliant
 ## El juego
 
 - [[Reglas del juego]] — objetivo, reglas por color, desarrollo de un turno
-- [[Tablero y regiones]] — el mapa 7×7, las 9 regiones y las casillas iniciales
+- [[Tablero y regiones]] — el Nivel 1: el mapa 7×7, las 9 regiones y las casillas iniciales
+- [[Mapas]] — los 4 mapas oficiales, sus zonas, las reglas por símbolo y cómo se sacaron de la foto
 - [[Puntuación]] — la propuesta de puntaje del manual, y por qué hay que repensarla
 
 ## El código
 
 - [[Arquitectura general]] — las 4 capas y qué pregunta responde cada una
-- [[Modelo de dominio]] — `Posicion`, `Celda`, `TipoRegion`, `Region`, `Tablero`
+- [[Modelo de dominio]] — `Posicion`, `Celda`, `TipoRegion`, `Region`, `Mapa`, `Tablero`
 - [[Reglas de color en código]] — el contrato `ReglaColor` y las funciones puras
 - [[Preparación de la partida]] — repartir los valores iniciales antes de jugar
 - [[Turnos y jugadas]] — los dados, la regla del ancla y la validación de cada jugada

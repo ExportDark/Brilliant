@@ -1,9 +1,10 @@
 # Tablero y regiones
 
-El tablero es una grilla **fija** de 7×7 (49 casillas), dividida en **9 regiones** de
-color. El layout es siempre el mismo en este mapa.
+El tablero es una grilla de 7×7 (49 casillas), dividida en regiones de color. Hay 4
+mapas oficiales: esta nota describe el **Nivel 1**, el del manual de la imitación, con
+**9 regiones**. Los otros tres están en [[Mapas]].
 
-Ver también: [[Reglas del juego]] · [[Sistema de coordenadas]] · [[Modelo de dominio]]
+Ver también: [[Mapas]] · [[Reglas del juego]] · [[Sistema de coordenadas]] · [[Modelo de dominio]]
 
 ## El mapa
 
@@ -45,8 +46,9 @@ por el tablero pero forman una sola región lógica. Ver [[Modelado de regiones]
 
 ## Casillas iniciales
 
-Seis casillas — **C1, F2, B4, E4, C6, E7** — son siempre las mismas, sin importar el
-color de fondo que les toque. No se llenan con los dados: en la preparación, antes de
+En el Nivel 1 son seis casillas — **C1, F2, B4, E4, C6, E7** —, sin importar el color
+de fondo que les toque. Los niveles 2 y 3 usan las mismas, y el Nivel 4 otras (ver
+[[Mapas]]). No se llenan con los dados: en la preparación, antes de
 tirar, el jugador coloca en ellas los números del 1 al 6, uno en cada casilla, sin
 repetir (una permutación completa del 1 al 6).
 
@@ -66,7 +68,8 @@ Por eso la preparación es una decisión estratégica del jugador, no un reparto
 
 ## Cómo está en el código
 
-`Tablero.mapaOriginal()` (`lib/modelo/tablero.dart`) declara estas 9 regiones con la
-lista de casillas en notación, tal cual aparecen en la tabla de arriba, y valida al
-construirse que el layout cubra la grilla exactamente una vez.
+`nivel1` (`lib/modelo/mapa.dart`) declara estas 9 regiones con la lista de casillas en
+notación, tal cual aparecen en la tabla de arriba. `Tablero.desdeMapa(nivel1)` las arma
+y valida que el layout cubra la grilla exactamente una vez. `Tablero.mapaOriginal()` es
+un atajo de lo mismo.
 Ver [[Modelo de dominio]].

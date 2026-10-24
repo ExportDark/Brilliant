@@ -5,13 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/juego/preparacion_bloc.dart';
 import 'package:brilliant/juego/preparacion_event.dart';
 import 'package:brilliant/juego/preparacion_state.dart';
+import 'package:brilliant/modelo/mapa.dart';
 import 'package:brilliant/modelo/posicion.dart';
-import 'package:brilliant/modelo/tablero.dart';
 
 Posicion _pos(String notacion) => Posicion.desdeNotacion(notacion);
 
 /// Las casillas iniciales del mapa, que es lo que la pantalla le pasaría al bloc.
-final _casillas = casillasIniciales.map(_pos).toList();
+final _casillas = nivel1.casillasIniciales.map(_pos).toList();
 
 /// Un reparto válido: un número distinto en cada casilla.
 final _repartoCompleto = {

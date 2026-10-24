@@ -5,14 +5,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/juego/preparacion_bloc.dart';
 import 'package:brilliant/juego/preparacion_event.dart';
 import 'package:brilliant/juego/preparacion_state.dart';
-import 'package:brilliant/modelo/tablero.dart';
+import 'package:brilliant/modelo/mapa.dart';
 
 import '../ayudantes.dart';
 
 void main() {
   blocTest<PreparacionBloc, PreparacionState>(
     'PreparacionBloc: si falta una sola casilla, Aleatorio pone justo el número que falta',
-    build: () => PreparacionBloc(casillasIniciales.map(pos).toList(), azar: Random(1)),
+    build: () => PreparacionBloc(nivel1.casillasIniciales.map(pos).toList(), azar: Random(1)),
     act: (bloc) => bloc
       ..add(ValorAsignado(pos('C1'), 1))
       ..add(ValorAsignado(pos('F2'), 2))

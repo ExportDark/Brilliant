@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 254 tests, todos pasando (2026-10-24).
+las pruebas y qué se aprendió de ellas. 326 tests, todos pasando (2026-10-24).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -20,9 +20,9 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 
 | Carpeta | Tests | Qué prueba |
 |---|---|---|
-| `test/modelo/` | 52 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion` y `Tablero` (layout del manual, anotar y vaciar casillas) |
-| `test/reglas/` | 35 | Las funciones puras de cada restricción, las 5 clases de color y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
-| `test/juego/` | 89 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, las partidas completas simuladas y el camino feliz |
+| `test/modelo/` | 78 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
+| `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
+| `test/juego/` | 124 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
 | `test/ui/` | 77 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la pantalla de preparación y la de partida, las dos pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla |
 | `test/main/` | 1 | Que la app arranque en la pantalla de preparación |
 
@@ -64,6 +64,22 @@ Todas las rutas son dentro de `test/`.
 | `modelo/posicion/vecinas_dentro_del_tablero_test.dart` | En el tablero, las esquinas tienen 2 vecinas, los bordes 3 y el interior 4 |
 | `reglas/descripcion/cada_regla_se_describe_test.dart` | Cada color se describe con el nombre de su regla del manual |
 | `reglas/descripcion/no_dicen_cuantas_casillas_test.dart` | Ninguna descripción dice cuántas casillas tiene la zona, porque cambia según el mapa |
+
+### Mapas
+
+Los de `mapa_test.dart` se repiten en los 4 mapas. Ver [[Mapas]].
+
+| Archivo | Qué prueba |
+|---|---|
+| `modelo/mapa_test.dart` | Los 4 niveles en orden; cada mapa se arma, tiene 49 casillas vacías, y cada color tiene las zonas y los tamaños de su tarjeta |
+| `modelo/mapa/colores_coinciden_con_la_foto_test.dart` | El color de las 49 casillas de cada mapa coincide con una tabla escrita a mano en el test, leída de la foto |
+| `modelo/mapa/iniciales_en_zonas_distintas_test.dart` | Cada mapa tiene sus 6 iniciales, cada una en una zona distinta y ninguna naranja |
+| `modelo/mapa/nivel_1_es_el_mapa_de_siempre_test.dart` | El Nivel 1 arma exactamente el mismo tablero que tenía el juego antes de los mapas |
+| `juego/validacion/naranja_fuera_de_rango_test.dart` | En el Nivel 4, la fila "4-6" rechaza un 2 aunque esté vacía, y acepta un 5 |
+| `juego/validacion/gris_lejano_bloquea_test.dart` | En el Nivel 3, un número en D4 bloquea otro distinto en D1: la zona gris está dispersa |
+
+Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.dart`,
+`reglas/regla_naranja_test.dart` y `reglas/regla_gris_test.dart`.
 
 ### Preparación
 
@@ -107,7 +123,7 @@ Todas las rutas son dentro de `test/`.
 | Archivo | Qué prueba |
 |---|---|
 | `ui/widgets/celda/aro_solo_en_iniciales_test.dart` | Solo las casillas iniciales llevan el aro tenue de 2 px, y no es negro |
-| `ui/widgets/celda/numero_legible_sobre_cada_color_test.dart` | `tintaSobre`: el número va oscuro sobre los 5 colores suaves y blanco sobre un fondo oscuro |
+| `ui/widgets/celda/numero_legible_sobre_cada_color_test.dart` | `tintaSobre`: el número va oscuro sobre los 7 colores suaves y blanco sobre un fondo oscuro |
 | `ui/widgets/tablero/sin_coordenadas_test.dart` | El tablero no muestra las letras A–G ni los números 1–7 |
 | `ui/widgets/dado/puntos_segun_el_valor_test.dart` | Del 1 al 6, el dado tiene tantos puntos como su valor y se anuncia como "Dado: N" (6 casos) |
 | `ui/pantallas/preparacion/seleccion_salta_a_la_siguiente_test.dart` | Al poner un número, la selección salta a la siguiente casilla vacía |
@@ -177,22 +193,23 @@ comprueba que saque caras del 1 al 6 y que salgan todas.
 
 ## Partidas completas simuladas
 
-`test/juego/partida_completa_test.dart` juega **10 partidas enteras** con el
-`PartidaBloc`, cada una con una semilla fija (1 a 10), así que si alguna falla se puede
-repetir exactamente igual. En cada partida:
+`test/juego/partida_completa_test.dart` juega **10 partidas enteras en cada uno de los 4
+mapas** con el `PartidaBloc`, cada una con una semilla fija (1 a 10), así que si alguna
+falla se puede repetir exactamente igual. En cada partida:
 
 1. La preparación es una permutación al azar del 1 al 6.
 2. Un jugador automático tira, elige como ancla el dado que tenga jugada, anota en la
    primera casilla válida, y pasa el turno cuando no hay jugada.
 3. Al final se comprueba que la partida **terminó** (antes de 2000 turnos, para detectar
-   un ciclo infinito de pasar turno), que **cada jugada fue aceptada** y que **ninguna de
-   las 9 zonas rompe su regla de color**.
+   un ciclo infinito de pasar turno), que **cada jugada fue aceptada** y que **ninguna
+   zona rompe su regla de color**.
 
-Las 10 corren en alrededor de un segundo.
+Las 40 corren en unos 3 segundos. Con el Nivel 1, las semillas dan exactamente las mismas
+partidas que antes de que hubiera mapas.
 
 > [!info] Lo que mostraron: la partida siempre llena el tablero
-> Las 10 partidas terminaron con **49 de 49 casillas**, en 58 a 104 turnos. No es
-> casualidad: con las reglas actuales ninguna zona se queda sin salida (a la roja siempre
+> Las 10 partidas del Nivel 1 terminaron con **49 de 49 casillas**, en 58 a 104 turnos, y
+> lo mismo pasa en los otros tres mapas (ver [[Mapas]]). No es casualidad: con las reglas actuales ninguna zona se queda sin salida (a la roja siempre
 > le falta un número de la corrida, la morada ya eligió sus dos números, la azul repite
 > el suyo) y toda casilla vacía tarde o temprano queda junto a una llena. Por eso contar
 > casillas llenas no distinguiría a nadie. Ver [[Puntuación]].
@@ -200,24 +217,33 @@ Las 10 corren en alrededor de un segundo.
 ## Camino feliz: una partida entera
 
 `test/juego/camino_feliz/partida_entera_test.dart` es el **happy path** del juego: una
-partida en la que todo sale bien, de punta a punta, sin pantalla. Es el único unit test
-que encadena los dos blocs:
+partida en la que todo sale bien, de punta a punta, sin pantalla, **en cada uno de los 4
+mapas**. Es el único unit test que encadena los dos blocs:
 
-1. **Preparación.** `PreparacionBloc` reparte los números de la Partida 1 (C1=4, F2=1,
-   B4=2, E4=5, C6=3, E7=6) y se confirma.
+1. **Preparación.** `PreparacionBloc` reparte los números de la Partida 1 (4, 1, 2, 5,
+   3, 6) en las casillas iniciales del mapa, en orden, y se confirma.
 2. **Paso a la partida.** El tablero se arma igual que al oprimir Inicio:
-   `Tablero.mapaOriginal().conValores(preparacion.state.valores)`.
+   `Tablero.desdeMapa(mapa).conValores(preparacion.state.valores)`.
 3. **Partida.** `PartidaBloc` con dados **sin azar** que recorren las 36 combinaciones de
    dos dados en orden, (1,1), (1,2), …, (6,6), y vuelven a empezar
    (`dadosConTodasLasCombinaciones()`). Como el dado ancla puede ser cualquiera de los
    dos, toda jugada que haga falta sale a más tardar en 36 turnos, así que la partida
    siempre avanza. El jugador automático es `jugarHastaElFinal()`.
 4. **Final.** Termina con **las 49 casillas llenas**, los 6 iniciales en su lugar, y
-   cada zona cumpliendo las reglas del manual: las rojas con del 1 al 6, la amarilla sin
-   repetir, cada azul con un solo número y cada morada con dos como máximo.
+   cada zona cumpliendo las reglas de las tarjetas:
+   - las rojas y la amarilla, sin repetir;
+   - cada azul y cada gris, con un solo número;
+   - cada morada, con dos números como máximo;
+   - cada naranja, solo con números de su rango.
 
-Como no hay azar, la partida es siempre la misma: **73 turnos**, con 43 números anotados
-y 30 turnos pasados.
+Como no hay azar, cada mapa juega siempre la misma partida, con 43 números anotados:
+
+| Mapa | Turnos | Pasados |
+|---|---|---|
+| Nivel 1 | 73 | 30 |
+| Nivel 2 | 60 | 17 |
+| Nivel 3 | 67 | 24 |
+| Nivel 4 | 58 | 15 |
 
 > [!tip] Las reglas del final se revisan a mano
 > El final no usa las clases de reglas del código para juzgarse: revisa cada color con su
@@ -225,7 +251,8 @@ y 30 turnos pasados.
 > regla de "todos diferentes" dejara pasar repetidos, este test falla ("la zona #1
 > (amarillo) con [1, 2, 3, 1, 2]: no puede repetir"); una verificación que usara la
 > misma regla rota no lo notaría. Si la preparación entregara mal los números, también
-> falla.
+> falla. Y si la regla naranja aceptara cualquier número, falla el Nivel 4 ("la zona #7
+> (naranja) con [5, 6, 6, 1, 1, 5, 6]: solo números de {4, 5, 6}").
 
 ### El mismo camino, tocando la pantalla
 

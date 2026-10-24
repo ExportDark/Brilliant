@@ -6,9 +6,9 @@ Ver también: [[Arquitectura general]] · [[Modelado de regiones]] · [[Tablero 
 
 ## `ColorZona` (`color_zona.dart`)
 
-Enum con los colores de zona: `amarillo`, `verde`, `morado`, `azul`, `rojo`. Hasta el
-2026-10-24 se llamaba `Color5`; se renombró porque los otros mapas oficiales suman
-colores. Ver [[Modelado de regiones]].
+Enum con los colores de zona: `amarillo`, `verde`, `morado`, `azul`, `rojo`, `gris` y
+`naranja`. El gris y el naranja solo aparecen en algunos mapas. Hasta el 2026-10-24 se
+llamaba `Color5`, y se renombró al sumar esos dos. Ver [[Mapas]].
 
 ## `Posicion` (`posicion.dart`)
 
@@ -37,7 +37,8 @@ Entidad **inmutable** que representa una casilla:
 - `posicion`: su `Posicion` fija en la grilla
 - `color`: el `ColorZona` de su región (determina qué regla aplica)
 - `valor`: el número 1-6 anotado, o `null` si sigue vacía
-- `esInicial`: si es una de las 6 casillas que se llenan en la preparación
+- `esInicial`: si es una de las 6 casillas que se llenan en la preparación (las decide
+  el mapa)
 
 `conValor(nuevoValor)` devuelve una **copia** con el valor anotado, sin mutar la
 original. `estaVacia` dice si todavía no tiene valor. Un `assert` rechaza valores fuera
@@ -55,6 +56,9 @@ tiene cada zona no es parte del tipo: lo decide el mapa al declarar sus zonas.
 | `tipoMorado` | morado | `ReglaMorado` |
 | `tipoAzul` | azul | `ReglaAzul` |
 | `tipoRojo` | rojo | `ReglaRojo` |
+| `tipoGris` | gris | `ReglaGris` |
+| `tipoNaranjaBajo` | naranja | `ReglaNaranja(1, 3)` |
+| `tipoNaranjaAlto` | naranja | `ReglaNaranja(4, 6)` |
 
 ## `Region` (`region.dart`)
 
@@ -75,14 +79,24 @@ Si algo necesita saber la posición o la casilla exacta, accede directo a
 `region.casillas` sin pasar por esta función — cada `Celda` ya trae su posición y su
 valor.
 
+## `Mapa` (`mapa.dart`)
+
+`{nivel, casillasIniciales, zonas}` — uno de los 4 mapas oficiales: sus zonas, cada una
+con su tipo y sus casillas, y sus 6 casillas iniciales en el orden en que se van
+seleccionando en la preparación. `nombre` da "Nivel 2".
+
+Están las constantes `nivel1` a `nivel4` y la lista `mapas`. Ver [[Mapas]].
+
 ## `Tablero` (`tablero.dart`)
 
-`Tablero.mapaOriginal()` arma el mapa 7×7 del manual con sus 9 regiones.
+`Tablero.desdeMapa(mapa)` arma el tablero 7×7 de un mapa. Las regiones se numeran desde
+1 en el orden en que el mapa declara sus zonas. `Tablero.mapaOriginal()` es un atajo de
+`Tablero.desdeMapa(nivel1)`, que usan muchos tests.
 
-Cada región se declara con la **lista de sus casillas en notación**:
+Cada zona se declara con la **lista de sus casillas en notación**:
 
 ```dart
-_construirRegion(4, tipoAzul, ['C1', 'C2', 'D2', 'D3']),
+(tipo: tipoAzul, casillas: ['C1', 'C2', 'D2', 'D3']),
 ```
 
 y no como una grilla de colores, porque una grilla sola no dice a cuál de las dos

@@ -45,16 +45,23 @@ mapa. Hasta el 2026-10-24 decían "las 4 casillas" o "las 6 casillas"; un test
 | `regla_cualquiera.dart` | `puedeAgregarCualquiera` | Nada: siempre `true` |
 | `regla_valor_unico.dart` | `puedeAgregarValorUnico` | Que todos los valores sean iguales |
 | `regla_maximo_valores_distintos.dart` | `puedeAgregarConMaximoValoresDistintos` | Que no se superen N valores distintos (parametrizable) |
+| `regla_rango.dart` | `puedeAgregarEnRango` | Que el número esté entre un mínimo y un máximo. No mira lo que ya tiene la zona |
 
 ## Las clases por color
 
 | Clase | Delega en | Regla del juego |
 |---|---|---|
-| `ReglaRojo` | `puedeAgregarManteniendoDistintos` | Corrida del 1 al 6 en las 6 casillas |
-| `ReglaAmarillo` | `puedeAgregarManteniendoDistintos` | Sin repetir entre las 5 casillas dispersas |
+| `ReglaRojo` | `puedeAgregarManteniendoDistintos` | Sin repetir en la zona |
+| `ReglaAmarillo` | `puedeAgregarManteniendoDistintos` | Sin repetir entre las casillas dispersas |
 | `ReglaVerde` | `puedeAgregarCualquiera` | Sin restricción |
 | `ReglaAzul` | `puedeAgregarValorUnico` | Todas las casillas con el mismo valor |
 | `ReglaMorado` | `puedeAgregarConMaximoValoresDistintos` (máx. 2) | Máximo 2 valores distintos |
+| `ReglaGris` | `puedeAgregarValorUnico` | Todas las casillas con el mismo valor, como el azul |
+| `ReglaNaranja(minimo, maximo)` | `puedeAgregarEnRango` | Solo números del rango. Se describe como "Solo del 4 al 6" |
+
+El naranja es el único color con dos reglas: cada zona naranja trae su rango. Por eso
+hay dos tipos, `tipoNaranjaBajo` (1-3) y `tipoNaranjaAlto` (4-6), con la misma clase y
+distinto rango. Ver [[Mapas]].
 
 ## Cómo se usan
 

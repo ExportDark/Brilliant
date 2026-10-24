@@ -33,6 +33,9 @@ const coloresDeZona = {
   ColorZona.azul: Color(0xFF7FB7F0),
   ColorZona.verde: Color(0xFF8FCB9B),
   ColorZona.amarillo: Color(0xFFF6D365),
+  ColorZona.gris: Color(0xFFC9C2B8),
+  // Entre el coral y la mantequilla, para no confundirse con ninguno.
+  ColorZona.naranja: Color(0xFFF5A65B),
 };
 
 /// El color de texto que se lee bien sobre [fondo]: oscuro sobre colores

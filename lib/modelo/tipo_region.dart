@@ -1,7 +1,9 @@
 import '../reglas/regla_amarillo.dart';
 import '../reglas/regla_azul.dart';
 import '../reglas/regla_color.dart';
+import '../reglas/regla_gris.dart';
 import '../reglas/regla_morado.dart';
+import '../reglas/regla_naranja.dart';
 import '../reglas/regla_rojo.dart';
 import '../reglas/regla_verde.dart';
 import 'color_zona.dart';
@@ -24,3 +26,17 @@ const tipoMorado = TipoRegion(color: ColorZona.morado, regla: ReglaMorado());
 const tipoAzul = TipoRegion(color: ColorZona.azul, regla: ReglaAzul());
 
 const tipoRojo = TipoRegion(color: ColorZona.rojo, regla: ReglaRojo());
+
+const tipoGris = TipoRegion(color: ColorZona.gris, regla: ReglaGris());
+
+/// La zona naranja "1-3".
+const tipoNaranjaBajo = TipoRegion(
+  color: ColorZona.naranja,
+  regla: ReglaNaranja(minimo: 1, maximo: 3),
+);
+
+/// La zona naranja "4-6".
+const tipoNaranjaAlto = TipoRegion(
+  color: ColorZona.naranja,
+  regla: ReglaNaranja(minimo: 4, maximo: 6),
+);

@@ -59,10 +59,14 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       puntos (`DadoWidget`), casillas encendidas con aro blanco y brillo, barra de
       progreso y una tarjeta de fin de partida con "Jugar otra vez". Ver
       [[Interfaz del tablero]]
+- [x] **Los 4 mapas oficiales en el modelo** (2026-10-24) — `nivel1` a `nivel4`, con el
+      gris y el naranja, sus casillas iniciales, y las partidas simuladas y el camino
+      feliz corriendo en los cuatro. Ver [[Mapas]]
+- [ ] **Elegir el mapa en la app** — una pantalla "Elige un mapa" al abrir
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 254 tests, todos pasando.
+cerrarla es el puntaje. 326 tests, todos pasando.
 
 ## Qué falta
 
