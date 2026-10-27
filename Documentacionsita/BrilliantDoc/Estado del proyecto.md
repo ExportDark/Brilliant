@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-24 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-10-26 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
@@ -60,15 +60,16 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       progreso y una tarjeta de fin de partida con "Jugar otra vez". Ver
       [[Interfaz del tablero]]
 - [x] **Los 4 mapas oficiales en el modelo** (2026-10-24) — `nivel1` a `nivel4`, con el
-      gris y el naranja, sus casillas iniciales, y las partidas simuladas y el camino
-      feliz corriendo en los cuatro. Ver [[Mapas]]
+      gris y el naranja, sus casillas iniciales (las de la estrellita, desde el
+      2026-10-26), y las partidas simuladas y el camino feliz corriendo en los cuatro.
+      Ver [[Mapas]]
 - [x] **Elegir el mapa en la app** (2026-10-24) — la app abre en "Elige un mapa", con
       los 4 niveles en miniatura. "Jugar otra vez" repite el mismo mapa, y salir a mitad
       de partida pide confirmación. Ver [[Mapas]]
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 357 tests, todos pasando.
+cerrarla es el puntaje. 369 tests, todos pasando.
 
 ## Qué falta
 

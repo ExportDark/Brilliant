@@ -13,12 +13,17 @@ import 'ayudantes.dart';
 const _semillas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 /// El tablero de [mapa] recién preparado: una permutación al azar del 1 al 6
-/// en sus casillas iniciales.
+/// en sus casillas iniciales, en la que cada número cabe en su casilla (en el
+/// Nivel 4, dos iniciales están en zonas naranjas).
 Tablero _preparado(Mapa mapa, Random azar) {
-  final numeros = [1, 2, 3, 4, 5, 6]..shuffle(azar);
-  return Tablero.desdeMapa(mapa).conValores({
-    for (final (indice, notacion) in mapa.casillasIniciales.indexed)
-      Posicion.desdeNotacion(notacion): numeros[indice],
+  final vacio = Tablero.desdeMapa(mapa);
+  final casillas = mapa.casillasIniciales.map(Posicion.desdeNotacion).toList();
+  final numeros = [1, 2, 3, 4, 5, 6];
+  do {
+    numeros.shuffle(azar);
+  } while (!casillas.indexed.every((par) => vacio.aceptaComoInicial(par.$2, numeros[par.$1])));
+  return vacio.conValores({
+    for (final (indice, casilla) in casillas.indexed) casilla: numeros[indice],
   });
 }
 

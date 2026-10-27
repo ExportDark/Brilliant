@@ -112,7 +112,9 @@ de dedo es plausible):
 
 Cualquiera de estos falla al instante diciendo **qué casilla** en notación del manual.
 
-Consultas: `regiones`, `celdas`, `celdaEn(posicion)`, `regionEn(posicion)`.
+Consultas: `regiones`, `celdas`, `celdaEn(posicion)`, `regionEn(posicion)` y
+`aceptaComoInicial(posicion, valor)`, que dice si un número cabe en una casilla inicial
+(solo las de las zonas naranjas del Nivel 4 rechazan alguno).
 
 Para anotar: `conValor(posicion, valor)`, `conValores({posicion: valor, ...})` y
 `sinValor(posicion)`. Devuelven un tablero **nuevo** sin mutar el original. `conValores`

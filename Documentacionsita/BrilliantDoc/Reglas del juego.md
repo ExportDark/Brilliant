@@ -48,8 +48,9 @@ Cuántas casillas tiene cada zona depende del mapa. Las del Nivel 1 están en
 ## Desarrollo de un turno
 
 1. **Preparación** (una sola vez, antes de la primera tirada): cada jugador anota los
-   números del 1 al 6, sin repetir, uno en cada una de sus 6 casillas iniciales.
-   Ver [[Tablero y regiones]].
+   números del 1 al 6, sin repetir, uno en cada una de sus 6 casillas iniciales, las que
+   en la tarjeta llevan una estrellita, cada una en una zona distinta. Si una cae en una
+   zona naranja, el número tiene que ser de su rango. Ver [[Mapas]].
 2. Se tiran los dos dados. El resultado se anuncia para todos por igual.
 3. Cada jugador elige, en privado y de forma simultánea, **UNO** de los dos dados como
    **dado ancla** (no la suma, el valor de un dado). El ancla es solo ese dado: dice qué

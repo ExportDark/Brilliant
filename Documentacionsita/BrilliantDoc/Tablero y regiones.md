@@ -46,9 +46,9 @@ por el tablero pero forman una sola región lógica. Ver [[Modelado de regiones]
 
 ## Casillas iniciales
 
-En el Nivel 1 son seis casillas — **C1, F2, B4, E4, C6, E7** —, sin importar el color
-de fondo que les toque. Los niveles 2 y 3 usan las mismas, y el Nivel 4 otras (ver
-[[Mapas]]). No se llenan con los dados: en la preparación, antes de
+En el Nivel 1 son seis casillas — **C1, F2, B4, E4, C6, E7** —, las que en la tarjeta
+llevan una estrellita, sin importar el color de fondo que les toque. Cada mapa tiene
+las suyas (ver [[Mapas]]). No se llenan con los dados: en la preparación, antes de
 tirar, el jugador coloca en ellas los números del 1 al 6, uno en cada casilla, sin
 repetir (una permutación completa del 1 al 6).
 

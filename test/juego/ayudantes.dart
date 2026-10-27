@@ -21,12 +21,19 @@ Tablero tableroPartida1({Map<String, int> ademas = const {}}) {
   });
 }
 
-/// El tablero de [mapa] con los números de la Partida 1 (4, 1, 2, 5, 3, 6)
-/// repartidos en sus casillas iniciales, en orden, más lo que traiga [ademas].
+/// Los números que se reparten en las casillas iniciales de [mapa], en orden:
+/// los de la Partida 1 del manual (4, 1, 2, 5, 3, 6). En el Nivel 4 se
+/// cambian de lugar el 3 y el 6, porque su última inicial, B7, está en la
+/// zona naranja "1-3" (y la primera, E1, en la "4-6", donde el 4 sí cabe).
+List<int> repartoDePrueba(Mapa mapa) =>
+    mapa == nivel4 ? const [4, 1, 2, 5, 6, 3] : const [4, 1, 2, 5, 3, 6];
+
+/// El tablero de [mapa] con el [repartoDePrueba] en sus casillas iniciales,
+/// más lo que traiga [ademas].
 Tablero tableroPreparado(Mapa mapa, {Map<String, int> ademas = const {}}) {
+  final numeros = repartoDePrueba(mapa);
   final valores = {
-    for (final (indice, casilla) in mapa.casillasIniciales.indexed)
-      casilla: const [4, 1, 2, 5, 3, 6][indice],
+    for (final (indice, casilla) in mapa.casillasIniciales.indexed) casilla: numeros[indice],
     ...ademas,
   };
   return Tablero.desdeMapa(mapa).conValores({

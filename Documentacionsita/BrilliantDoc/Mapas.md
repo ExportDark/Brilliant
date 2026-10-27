@@ -98,23 +98,38 @@ Una zona naranja puede rechazar un número aunque esté vacía: un 2 no cabe en 
 
 ## Las casillas iniciales
 
-Las tarjetas no marcan casillas iniciales, así que se eligieron (2026-10-24):
+En las tarjetas del juego, las casillas iniciales llevan una **estrellita**: ahí se anotan
+los números del 1 al 6 antes de la primera tirada, uno en cada zona.
 
 | Mapa | Casillas iniciales |
 |---|---|
-| Niveles 1, 2 y 3 | C1, F2, B4, E4, C6, E7 |
-| Nivel 4 | C2, F2, B4, D4, B6, G6 |
+| Nivel 1 | C1, F2, B4, E4, C6, E7 |
+| Nivel 2 | E1, A3, C4, F5, B6, E7 |
+| Nivel 3 | C2, F2, D4, B5, G5, C7 |
+| Nivel 4 | E1, C3, F3, A4, E6, B7 |
 
-El criterio es que **cada inicial caiga en una zona distinta y ninguna en una naranja**.
-Así ningún reparto del 1 al 6 rompe una regla desde el arranque. Por ejemplo, dos
-iniciales en una misma zona azul tendrían que llevar el mismo número, y los 6 números son
-distintos.
+En la foto original las estrellas no se distinguían, y el 2026-10-24 se eligieron otras a
+criterio propio. El 2026-10-26 el usuario marcó las estrellas de cada tarjeta en la foto
+con una estrella negra, y se detectaron por píxel: 6 por nivel, cada una en el centro de
+su casilla. Las del Nivel 1 coincidieron con las que ya tenía el juego, lo que confirmó la
+lectura.
 
-- **Niveles 2 y 3:** las del Nivel 1 ya cumplen el criterio.
-- **Nivel 4:** en las del Nivel 1, C1 cae en la naranja "4-6", E7 en la naranja "1-3", y
-  E4 y C6 en la misma zona azul. Se eligieron otras, repartidas como en el Nivel 1: dos
-  arriba (C2, F2), dos al medio (B4, D4) y dos abajo (B6, G6). Las 6 caen en las 6 zonas
-  que no son naranjas.
+En cada mapa caen en 6 zonas distintas. En el Nivel 4, **dos caen en las zonas
+naranjas**: E1 en la fila "4-6" y B7 en la "1-3". Ahí no cabe cualquier número:
+
+- en E1 solo se puede poner un 4, un 5 o un 6, y en B7 un 1, un 2 o un 3;
+- la preparación apaga las fichas que no caben en la casilla seleccionada, y el bloc
+  ignora un número que no cabe;
+- **Aleatorio** solo reparte números que caben. Si lo ya puesto no deja completar (por
+  ejemplo, ya se usaron el 4, el 5 y el 6 y E1 sigue vacía), revuelve todo desde cero.
+
+Lo decide `Tablero.aceptaComoInicial(posicion, valor)`: si la regla de la zona, vacía,
+acepta ese número. Como cada inicial está en una zona distinta, solo una zona naranja
+puede rechazar algo. Ver [[Preparación de la partida]].
+
+Las reglas del juego también permiten, en partidas avanzadas, elegir libremente dónde van
+los números iniciales, siempre en zonas distintas. Eso no está implementado: la app usa
+siempre las de la estrellita.
 
 ## Cómo se transcribió la foto
 
@@ -143,8 +158,8 @@ Las zonas se separaron contando los símbolos a los costados de cada tarjeta: ha
 zona (9 en el Nivel 1, 10 en el 2, 8 en el 3 y en el 4). Cuando un color tiene dos zonas,
 se separan por lado del tablero.
 
-Los destellos blancos que se ven en la foto son reflejos, no marcas: en el Level 1 solo
-aparecen en 2 de las 6 casillas iniciales.
+Las estrellitas de las casillas iniciales no se distinguen en la foto original: son
+chicas y se confunden con los reflejos. Ver "Las casillas iniciales", arriba.
 
 ## Cómo juegan
 
@@ -155,9 +170,9 @@ siempre lo mismo:
 | Mapa | Camino feliz | Partidas al azar |
 |---|---|---|
 | Nivel 1 | 73 turnos | 58 a 104 turnos |
-| Nivel 2 | 60 turnos | 62 a 205 turnos |
-| Nivel 3 | 67 turnos | 59 a 133 turnos |
-| Nivel 4 | 58 turnos | 50 a 115 turnos |
+| Nivel 2 | 73 turnos | 58 a 99 turnos |
+| Nivel 3 | 51 turnos | 54 a 101 turnos |
+| Nivel 4 | 52 turnos | 50 a 79 turnos |
 
 Ver [[Pruebas]].
 

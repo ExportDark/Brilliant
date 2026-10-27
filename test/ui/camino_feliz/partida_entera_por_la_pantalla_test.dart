@@ -8,10 +8,6 @@ import 'package:brilliant/ui/widgets/tablero_widget.dart';
 import '../../juego/ayudantes.dart';
 import '../pantallas/ayudantes_pantallas.dart';
 
-/// Los números que se reparten, en el orden de las casillas iniciales de
-/// cada mapa: los de la Partida 1 del manual.
-const _numeros = [4, 1, 2, 5, 3, 6];
-
 /// Un tope para que un ciclo infinito de pasar turno falle en vez de colgarse.
 const _maximoTurnos = 300;
 
@@ -64,8 +60,9 @@ void main() {
   for (final mapa in mapas) {
     testWidgets('Camino feliz por la pantalla, ${mapa.nombre}: se elige el mapa, se reparte, se '
         'juega la partida entera tocando y se vuelve a empezar', (tester) async {
+      final numeros = repartoDePrueba(mapa);
       final reparto = {
-        for (final (indice, casilla) in mapa.casillasIniciales.indexed) casilla: _numeros[indice],
+        for (final (indice, casilla) in mapa.casillasIniciales.indexed) casilla: numeros[indice],
       };
       await abrirApp(tester, tirarDado: dadosConTodasLasCombinaciones());
 

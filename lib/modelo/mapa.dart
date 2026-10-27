@@ -12,9 +12,9 @@ typedef ZonaDelMapa = ({TipoRegion tipo, List<String> casillas});
 class Mapa {
   final int nivel;
 
-  /// Las 6 casillas que se llenan en la preparación, en el orden en que se
-  /// van seleccionando. Cada una cae en una zona distinta, así que ningún
-  /// reparto del 1 al 6 rompe una regla desde el arranque.
+  /// Las 6 casillas que se llenan en la preparación, las que en la tarjeta
+  /// llevan una estrellita, en el orden en que se van seleccionando. Cada una
+  /// cae en una zona distinta.
   final List<String> casillasIniciales;
 
   final List<ZonaDelMapa> zonas;
@@ -48,7 +48,7 @@ const nivel1 = Mapa(
 /// casillas, arriba y abajo al centro.
 const nivel2 = Mapa(
   nivel: 2,
-  casillasIniciales: ['C1', 'F2', 'B4', 'E4', 'C6', 'E7'],
+  casillasIniciales: ['E1', 'A3', 'C4', 'F5', 'B6', 'E7'],
   zonas: [
     (tipo: tipoAmarillo, casillas: ['B2', 'F2', 'D4', 'B6', 'F6']),
     (tipo: tipoVerde, casillas: ['E1', 'F1', 'G1', 'G2', 'G3']),
@@ -67,7 +67,7 @@ const nivel2 = Mapa(
 /// dispersas.
 const nivel3 = Mapa(
   nivel: 3,
-  casillasIniciales: ['C1', 'F2', 'B4', 'E4', 'C6', 'E7'],
+  casillasIniciales: ['C2', 'F2', 'D4', 'B5', 'G5', 'C7'],
   zonas: [
     (tipo: tipoAmarillo, casillas: ['A1', 'B1', 'B2', 'F1', 'G1', 'F2']),
     (tipo: tipoVerde, casillas: ['A5', 'G5', 'A6', 'B6', 'C6', 'D6', 'E6', 'F6', 'G6']),
@@ -81,11 +81,11 @@ const nivel3 = Mapa(
 );
 
 /// El "Level 4": la fila de arriba es una zona naranja "4-6" y la de abajo
-/// una "1-3". Por eso sus casillas iniciales no son las de los otros mapas:
-/// C1 y E7 caerían en las naranjas, y E4 y C6 en la misma zona azul.
+/// una "1-3". Dos de sus casillas iniciales caen en ellas: E1 solo acepta
+/// del 4 al 6, y B7 del 1 al 3 (ver [Tablero.aceptaComoInicial]).
 const nivel4 = Mapa(
   nivel: 4,
-  casillasIniciales: ['C2', 'F2', 'B4', 'D4', 'B6', 'G6'],
+  casillasIniciales: ['E1', 'C3', 'F3', 'A4', 'E6', 'B7'],
   zonas: [
     (tipo: tipoAmarillo, casillas: ['A2', 'G2', 'A4', 'G4', 'A6', 'G6']),
     (tipo: tipoVerde, casillas: ['D2', 'B4', 'F4', 'D6']),

@@ -7,6 +7,30 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-10-26 — Las casillas iniciales reales de cada mapa
+
+- **Las iniciales son las de la estrellita** de cada tarjeta, como dicen las reglas del
+  juego. El usuario las marcó en la foto y se detectaron por píxel. Las del Nivel 1 ya
+  estaban bien; las de los niveles 2 a 4 se habían elegido a criterio propio y eran
+  otras. Ver [[Mapas]].
+
+  | Mapa | Antes | Ahora |
+  |---|---|---|
+  | Nivel 2 | C1, F2, B4, E4, C6, E7 | E1, A3, C4, F5, B6, E7 |
+  | Nivel 3 | C1, F2, B4, E4, C6, E7 | C2, F2, D4, B5, G5, C7 |
+  | Nivel 4 | C2, F2, B4, D4, B6, G6 | E1, C3, F3, A4, E6, B7 |
+
+- **En el Nivel 4, dos iniciales caen en las zonas naranjas**: E1 en la "4-6" y B7 en
+  la "1-3". La preparación ahora respeta esos rangos: apaga las fichas que no caben, el
+  bloc ignora un número que no cabe, y Aleatorio solo reparte números que caben. Lo
+  decide `Tablero.aceptaComoInicial`, y el bloc lo recibe como una función `admite`,
+  sin conocer el tablero. Ver [[Preparación de la partida]].
+- Tests de cada mapa: las iniciales contra la tarjeta, qué casillas se pueden tocar en
+  la preparación, y los rangos del Nivel 4 en el tablero, el bloc y la pantalla. Se
+  comprobó que fallan si la pantalla no le pasa el rango al bloc o si Aleatorio no lo
+  revisa. Todos los mapas siguen llenando las 49 casillas. Ver [[Pruebas]].
+- 369 tests.
+
 ## 2026-10-24 — Elegir el mapa en la app
 
 - **La app abre en "Elige un mapa"** (`PantallaEleccionDeMapa`): los 4 niveles en

@@ -32,6 +32,9 @@ class PantallaPreparacion extends StatelessWidget {
     return BlocProvider(
       create: (_) => PreparacionBloc(
         mapa.casillasIniciales.map(Posicion.desdeNotacion).toList(),
+        // En el Nivel 4, las iniciales de las zonas naranjas solo aceptan
+        // los números de su rango.
+        admite: Tablero.desdeMapa(mapa).aceptaComoInicial,
       ),
       child: _VistaPreparacion(mapa: mapa, tirarDado: tirarDado),
     );
@@ -99,11 +102,13 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
     return null;
   }
 
-  /// Un número se puede elegir si nadie lo usa todavía, o si es el que ya
-  /// tiene la casilla seleccionada.
+  /// Un número se puede elegir si cabe en la casilla seleccionada (en una
+  /// zona naranja, solo los de su rango) y si nadie lo usa todavía, o si es
+  /// el que ya tiene esa casilla.
   bool _puedeElegir(PreparacionState state, int valor) {
     final casilla = _seleccionada;
     if (casilla == null) return false;
+    if (!_bloc.admite(casilla, valor)) return false;
     return state.disponibles.contains(valor) || state.valorDe(casilla) == valor;
   }
 

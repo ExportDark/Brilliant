@@ -7,8 +7,9 @@ Ver también: [[Tablero y regiones]] · [[Reglas del juego]] · [[Arquitectura g
 ## En qué consiste
 
 Antes de tirar el primer dado, el jugador anota los números del **1 al 6** en las **6
-casillas iniciales** del mapa que eligió (en el Nivel 1: C1, F2, B4, E4, C6, E7; las de
-los otros mapas están en [[Mapas]]), **sin repetir ninguno**. Cada
+casillas iniciales** del mapa que eligió, las que en la tarjeta llevan una estrellita
+(en el Nivel 1: C1, F2, B4, E4, C6, E7; las de los otros mapas están en [[Mapas]]),
+**sin repetir ninguno**. Cada
 casilla se queda con un número distinto.
 
 No es un trámite: cuatro de esas casillas caen dentro de regiones que tienen regla, y el
@@ -71,6 +72,11 @@ información que puedan contradecirse:
 3. **`PreparacionConfirmada` no hace nada mientras falte alguna casilla.** Solo con las 6
    puestas marca `confirmada`, y recién ahí la partida puede arrancar.
 4. Una vez confirmada, el reparto queda fijo y se ignoran nuevos cambios.
+5. **Un número que no cabe en su casilla se rechaza.** Pasa solo en el Nivel 4, donde la
+   inicial E1 está en la zona naranja "4-6" y B7 en la "1-3". El bloc no conoce el
+   tablero: recibe en el constructor una función `admite(casilla, valor)`, que la
+   pantalla arma con `Tablero.aceptaComoInicial`. Sin ella, todo número cabe. Ver
+   [[Mapas]].
 
 Como nunca se admite un número repetido, tener las 6 casillas llenas implica
 necesariamente que los valores son una permutación completa del 1 al 6 — la regla de
@@ -96,7 +102,9 @@ De arriba abajo:
   [[Interfaz del tablero]].
 - **Los números del 1 al 6**, como fichas redondas, siempre en una fila: en un celular
   angosto se achican para caber. Los ya usados en otra casilla salen apagados y no se
-  pueden tocar, así que el jugador nunca llega a intentar un repetido.
+  pueden tocar, así que el jugador nunca llega a intentar un repetido. También se
+  apagan los que no caben en la casilla seleccionada: en el Nivel 4, con E1
+  seleccionada solo quedan el 4, el 5 y el 6.
 - Tres **acciones secundarias**, discretas, con ícono y texto:
   - **Aleatorio**, que manda `RepartoAleatorio`: el azar completa lo que falta.
   - **Quitar**, que vacía la casilla seleccionada.
@@ -125,9 +133,15 @@ número de C1, que define toda la región azul) y dejar el resto al azar. Con la
 llenas no queda nada que completar, así que revuelve todo de nuevo: oprimir el botón
 varias veces sigue dando repartos distintos.
 
+En el Nivel 4, además, cada número tiene que caber en su casilla: se revuelve hasta dar
+con un reparto así (como mucho 100 veces). Si lo ya puesto no deja completarlo, por
+ejemplo porque el 4, el 5 y el 6 ya se usaron y E1 sigue vacía, se revuelve todo desde
+cero. En los otros mapas todo número cabe, y el reparto sale al primer intento, igual
+que antes.
+
 El bloc recibe un `Random` opcional en el constructor. En los tests se pasa con semilla
 fija, y lo que se comprueba es que el resultado sea una permutación completa del 1 al 6
-que conserve lo que ya estaba puesto.
+que conserve lo que ya estaba puesto, y que en el Nivel 4 respete los rangos.
 
 ## Decisión: el gate vive en el bloc, no en la pantalla
 

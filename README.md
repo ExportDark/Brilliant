@@ -184,7 +184,8 @@ caber, por ejemplo a 42 px en un celular de 360 px.
 ## Módulo: preparación de la partida (`lib/juego/`)
 
 Antes de tirar el primer dado, el jugador reparte los números del **1 al 6** entre las
-**6 casillas iniciales** del tablero (C1, F2, B4, E4, C6, E7), sin repetir ninguno. Es
+**6 casillas iniciales** del mapa, las de la estrellita (en el Nivel 1: C1, F2, B4, E4,
+C6, E7), sin repetir ninguno. Es
 una decisión estratégica: cuatro de esas casillas caen dentro de regiones con regla y
 condicionan lo que se podrá anotar ahí durante la partida.
 
@@ -208,10 +209,15 @@ Reglas que hace cumplir:
 3. `PreparacionConfirmada` no hace nada mientras falte alguna casilla. Solo con las 6
    puestas marca `confirmada`.
 4. Una vez confirmada, el reparto queda fijo.
+5. Un número que no cabe en su casilla se rechaza. Solo pasa en el Nivel 4, donde dos
+   iniciales caen en zonas naranjas (E1 en la "4-6", B7 en la "1-3"). El bloc recibe
+   una función `admite(casilla, valor)`, que la pantalla arma con
+   `Tablero.aceptaComoInicial`.
 
 `RepartoAleatorio` reparte al azar los números que faltan entre las casillas vacías,
-respetando lo que el jugador ya puso. Si las 6 ya están llenas, revuelve todo de nuevo. El
-bloc recibe un `Random` opcional en el constructor para que los tests usen una semilla fija.
+respetando lo que el jugador ya puso y que cada número quepa en su casilla. Si las 6 ya
+están llenas, o si lo ya puesto no deja completar, revuelve todo de nuevo. El bloc recibe
+un `Random` opcional en el constructor para que los tests usen una semilla fija.
 
 Los eventos inválidos se ignoran sin emitir estado, de modo que en los tests el rechazo
 se observa como una ausencia de emisión.
@@ -270,8 +276,8 @@ dice el nivel, y la flecha de atrás vuelve a elegir mapa.
   - el `TableroWidget` con lo repartido hasta ahora (`tablero.conValores(state.valores)`),
     con la casilla seleccionada encendida. No hay resumen aparte: lo repartido se ve en
     el tablero;
-  - los números del 1 al 6 como fichas redondas en una fila, donde los ya usados salen
-    apagados;
+  - los números del 1 al 6 como fichas redondas en una fila, donde salen apagados los ya
+    usados y los que no caben en la casilla seleccionada;
   - **Aleatorio** (completa al azar lo que falta), **Quitar** y **Reiniciar**, como
     acciones discretas;
   - el botón **Inicio**, habilitado solo cuando `state.completa`.

@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 357 tests, todos pasando (2026-10-24).
+las pruebas y qué se aprendió de ellas. 369 tests, todos pasando (2026-10-26).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -20,10 +20,10 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 
 | Carpeta | Tests | Qué prueba |
 |---|---|---|
-| `test/modelo/` | 78 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
+| `test/modelo/` | 80 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
 | `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
-| `test/juego/` | 124 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
-| `test/ui/` | 108 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla en los 4 mapas |
+| `test/juego/` | 128 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
+| `test/ui/` | 114 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla en los 4 mapas |
 | `test/main/` | 1 | Que la app arranque en la pantalla para elegir el mapa |
 
 ## Cómo están organizadas
@@ -39,7 +39,8 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 - **Ayudantes compartidos**, en archivos que no terminan en `_test.dart` (así `flutter test`
   no los corre solos):
   - `test/juego/ayudantes.dart`: `pos('C1')`, `tableroPartida1()` (los valores iniciales de
-    la Partida 1: C1=4, F2=1, B4=2, E4=5, C6=3, E7=6), `llenoMenos('E5')`,
+    la Partida 1: C1=4, F2=1, B4=2, E4=5, C6=3, E7=6), `repartoDePrueba(mapa)` y
+    `tableroPreparado(mapa)` (lo mismo en cualquier mapa), `llenoMenos('E5')`,
     `soloCabeElSeisEnE5()`, `dadoConCaras([4, 3])`, `partidaBloc()`, `evaluarEn()`, y
     `posiblesEn()` / `bloqueadasEn()` / `casillasDonde()`, que dan en notación las casillas
     que se iluminan. Para partidas enteras: `enviar()`, `jugarHastaElFinal()` (el jugador
@@ -73,10 +74,11 @@ Los de `mapa_test.dart` se repiten en los 4 mapas. Ver [[Mapas]].
 |---|---|
 | `modelo/mapa_test.dart` | Los 4 niveles en orden; cada mapa se arma, tiene 49 casillas vacías, y cada color tiene las zonas y los tamaños de su tarjeta |
 | `modelo/mapa/colores_coinciden_con_la_foto_test.dart` | El color de las 49 casillas de cada mapa coincide con una tabla escrita a mano en el test, leída de la foto |
-| `modelo/mapa/iniciales_en_zonas_distintas_test.dart` | Cada mapa tiene sus 6 iniciales, cada una en una zona distinta y ninguna naranja |
+| `modelo/mapa/iniciales_en_zonas_distintas_test.dart` | Las 6 iniciales de cada mapa son las de la estrellita de su tarjeta, cada una en una zona distinta |
+| `modelo/tablero/acepta_como_inicial_test.dart` | `aceptaComoInicial`: en el Nivel 4, E1 solo acepta del 4 al 6 y B7 del 1 al 3; las demás iniciales, y las de los otros mapas, cualquier número |
 | `modelo/mapa/nivel_1_es_el_mapa_de_siempre_test.dart` | El Nivel 1 arma exactamente el mismo tablero que tenía el juego antes de los mapas |
-| `juego/validacion/naranja_fuera_de_rango_test.dart` | En el Nivel 4, la fila "4-6" rechaza un 2 aunque esté vacía, y acepta un 5 |
-| `juego/validacion/gris_lejano_bloquea_test.dart` | En el Nivel 3, un número en D4 bloquea otro distinto en D1: la zona gris está dispersa |
+| `juego/validacion/naranja_fuera_de_rango_test.dart` | En el Nivel 4, la fila "4-6" (con el 4 de E1) rechaza un 2 en D1 y acepta un 5 |
+| `juego/validacion/gris_lejano_bloquea_test.dart` | En el Nivel 3, el número de la inicial D4 bloquea otro distinto en G2: la zona gris está dispersa |
 
 Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.dart`,
 `reglas/regla_naranja_test.dart` y `reglas/regla_gris_test.dart`.
@@ -87,6 +89,9 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 |---|---|
 | `juego/preparacion/aleatorio_con_una_vacia_test.dart` | Si falta una sola casilla, Aleatorio pone justo el número que falta |
 | `juego/preparacion/aleatorio_reproducible_test.dart` | Con la misma semilla, Aleatorio reparte exactamente igual |
+| `juego/preparacion/naranja_solo_admite_su_rango_test.dart` | En el Nivel 4, E1 no acepta un 2 pero sí un 5, y B7 acepta un 2 (2 casos) |
+| `juego/preparacion/aleatorio_respeta_los_rangos_test.dart` | En el Nivel 4, con 20 semillas, Aleatorio pone del 4 al 6 en E1 y del 1 al 3 en B7 |
+| `juego/preparacion/aleatorio_sin_salida_revuelve_todo_test.dart` | Si el 4, el 5 y el 6 ya están usados con E1 vacía, Aleatorio revuelve todo y respeta los rangos |
 | `juego/preparacion/asignar_tras_confirmar_test.dart` | Una vez confirmada, no acepta ni siquiera reasignar el mismo número |
 
 ### Partida (el bloc y su estado)
@@ -128,7 +133,9 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/widgets/dado/puntos_segun_el_valor_test.dart` | Del 1 al 6, el dado tiene tantos puntos como su valor y se anuncia como "Dado: N" (6 casos) |
 | `ui/pantallas/preparacion/seleccion_salta_a_la_siguiente_test.dart` | Al poner un número, la selección salta a la siguiente casilla vacía |
 | `ui/pantallas/preparacion/tocar_casilla_inicial_la_selecciona_test.dart` | Tocar una casilla inicial la selecciona |
-| `ui/pantallas/preparacion/solo_iniciales_tocables_test.dart` | Solo se pueden tocar las 6 casillas iniciales |
+| `ui/pantallas/preparacion/solo_iniciales_tocables_test.dart` | En cada mapa, solo se pueden tocar sus 6 casillas iniciales (4 casos) |
+| `ui/pantallas/preparacion/fichas_segun_el_rango_test.dart` | En el Nivel 4, con E1 seleccionada solo se pueden tocar el 4, el 5 y el 6; con B7, del 1 al 3; con C3, todas |
+| `ui/pantallas/preparacion/aleatorio_en_el_nivel_4_test.dart` | En el Nivel 4, Aleatorio en la pantalla respeta los rangos naranjas |
 | `ui/pantallas/preparacion/aleatorio_e_inicio_test.dart` | Aleatorio y luego Inicio arranca la partida con los 6 números |
 | `ui/pantallas/partida/indicaciones_test.dart` | La indicación acompaña cada paso del turno |
 | `ui/pantallas/partida/pasar_turno_reemplaza_tirar_test.dart` | Sin jugada, "Pasar turno" ocupa el lugar de "Tirar dados" |
@@ -141,7 +148,8 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/pantallas/pantalla_eleccion_de_mapa_test.dart` | La elección muestra los 4 mapas con su nombre y su miniatura de 49 casillas; las miniaturas son los mapas de verdad, con sus iniciales; tocar "Nivel 3" abre su preparación (3 casos) |
 | `ui/pantallas/eleccion/flecha_atras_vuelve_a_elegir_test.dart` | Desde la preparación, la flecha de atrás vuelve a elegir el mapa |
 | `ui/pantallas/partida/jugar_otra_vez_mismo_mapa_test.dart` | Al terminar el Nivel 4, "Jugar otra vez" prepara el Nivel 4 |
-| `ui/pantallas/partida/explicacion_zona_naranja_test.dart` | Un 2 en la fila naranja "4-6", vacía, se explica como "Zona naranja — Solo del 4 al 6.", sin "Ya tiene" |
+| `ui/pantallas/partida/explicacion_zona_naranja_test.dart` | Un 2 en D1, en la fila naranja "4-6", se explica como "Zona naranja — Solo del 4 al 6. Ya tiene: 4" |
+| `ui/pantallas/partida/explicacion_zona_vacia_sin_ya_tiene_test.dart` | En un tablero armado a mano con la zona naranja vacía, el mensaje no dice "Ya tiene" |
 | `ui/pantallas/partida/salir_pide_confirmacion_test.dart` | A mitad de partida, la flecha de atrás pregunta: "Seguir jugando" se queda y "Salir" vuelve a elegir el mapa |
 | `ui/pantallas/partida/salir_al_terminar_sin_preguntar_test.dart` | Con la partida terminada, la flecha de atrás sale sin preguntar |
 | `ui/pantallas/partida/fin_de_partida_y_jugar_otra_vez_test.dart` | Con el tablero lleno sale "¡Tablero completo!", y "Jugar otra vez" vuelve a la preparación |
@@ -204,7 +212,8 @@ comprueba que saque caras del 1 al 6 y que salgan todas.
 mapas** con el `PartidaBloc`, cada una con una semilla fija (1 a 10), así que si alguna
 falla se puede repetir exactamente igual. En cada partida:
 
-1. La preparación es una permutación al azar del 1 al 6.
+1. La preparación es una permutación al azar del 1 al 6 en la que cada número cabe en su
+   casilla (en el Nivel 4, E1 lleva del 4 al 6 y B7 del 1 al 3).
 2. Un jugador automático tira, elige como ancla el dado que tenga jugada, anota en la
    primera casilla válida, y pasa el turno cuando no hay jugada.
 3. Al final se comprueba que la partida **terminó** (antes de 2000 turnos, para detectar
@@ -227,8 +236,10 @@ partidas que antes de que hubiera mapas.
 partida en la que todo sale bien, de punta a punta, sin pantalla, **en cada uno de los 4
 mapas**. Es el único unit test que encadena los dos blocs:
 
-1. **Preparación.** `PreparacionBloc` reparte los números de la Partida 1 (4, 1, 2, 5,
-   3, 6) en las casillas iniciales del mapa, en orden, y se confirma.
+1. **Preparación.** `PreparacionBloc` reparte el `repartoDePrueba` del mapa en sus
+   casillas iniciales, en orden, y se confirma: los números de la Partida 1 (4, 1, 2,
+   5, 3, 6), salvo en el Nivel 4, donde se cambian de lugar el 3 y el 6 para que B7, en
+   la zona "1-3", lleve un 3.
 2. **Paso a la partida.** El tablero se arma igual que al oprimir Inicio:
    `Tablero.desdeMapa(mapa).conValores(preparacion.state.valores)`.
 3. **Partida.** `PartidaBloc` con dados **sin azar** que recorren las 36 combinaciones de
@@ -248,9 +259,9 @@ Como no hay azar, cada mapa juega siempre la misma partida, con 43 números anot
 | Mapa | Turnos | Pasados |
 |---|---|---|
 | Nivel 1 | 73 | 30 |
-| Nivel 2 | 60 | 17 |
-| Nivel 3 | 67 | 24 |
-| Nivel 4 | 58 | 15 |
+| Nivel 2 | 73 | 30 |
+| Nivel 3 | 51 | 8 |
+| Nivel 4 | 52 | 9 |
 
 > [!tip] Las reglas del final se revisan a mano
 > El final no usa las clases de reglas del código para juzgarse: revisa cada color con su
@@ -269,7 +280,7 @@ mandarle nada a los blocs.
 
 1. Abre la app entera (`BrilliantApp`, con `abrirApp()`), con los mismos dados sin azar,
    y toca la tarjeta del mapa.
-2. En la preparación toca cada casilla con aro y su número (los de la Partida 1), y
+2. En la preparación toca cada casilla con aro y su número (el `repartoDePrueba`), y
    comprueba que cada número aparece en el tablero y que Inicio se habilita.
 3. Toca **Inicio** y juega turno por turno. Toca **Tirar dados**. Si aparece **Pasar
    turno**, lo toca. Si no, toca el primer dado como ancla y, si no se enciende ninguna
@@ -285,9 +296,9 @@ Por la pantalla, cada mapa dura distinto que en el unit test:
 | Mapa | Por la pantalla | En el unit test |
 |---|---|---|
 | Nivel 1 | 56 turnos (13 pasados) | 73 |
-| Nivel 2 | 65 turnos (22 pasados) | 60 |
-| Nivel 3 | 66 turnos (23 pasados) | 67 |
-| Nivel 4 | 55 turnos (12 pasados) | 58 |
+| Nivel 2 | 55 turnos (12 pasados) | 73 |
+| Nivel 3 | 49 turnos (6 pasados) | 51 |
+| Nivel 4 | 55 turnos (12 pasados) | 52 |
 
 Es porque eligen otra casilla: este toma la primera encendida en el orden en que se lee
 el tablero, y el jugador del unit test la primera de `tablero.celdas`, que va zona por

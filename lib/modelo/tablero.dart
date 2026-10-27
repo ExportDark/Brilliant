@@ -33,6 +33,14 @@ class Tablero {
 
   Region? regionEn(Posicion posicion) => _regionPorPosicion[posicion];
 
+  /// Si [valor] cabe en [posicion] al empezar la partida, con su zona todavía
+  /// vacía. Es lo que se le pregunta a cada casilla inicial: como cada una
+  /// está en una zona distinta, solo una zona naranja ("1-3" o "4-6") puede
+  /// rechazar un número.
+  bool aceptaComoInicial(Posicion posicion, int valor) {
+    return regionEn(posicion)?.tipo.regla.puedeAgregar(const [], valor) ?? false;
+  }
+
   Celda? celdaEn(Posicion posicion) {
     final region = _regionPorPosicion[posicion];
     if (region == null) return null;

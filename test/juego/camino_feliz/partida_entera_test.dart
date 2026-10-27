@@ -10,10 +10,6 @@ import 'package:brilliant/modelo/tipo_region.dart';
 
 import '../ayudantes.dart';
 
-/// Los números que se reparten, en el orden de las casillas iniciales de
-/// cada mapa: los de la Partida 1 del manual.
-const _numeros = [4, 1, 2, 5, 3, 6];
-
 /// Revisa el tablero lleno con las reglas de las tarjetas escritas a mano,
 /// sin usar las clases de reglas del código: así, si una regla del código
 /// fallara, este test no la usaría para juzgarse a sí mismo.
@@ -45,12 +41,16 @@ void main() {
   for (final mapa in mapas) {
     test('Camino feliz, ${mapa.nombre}: una partida bien jugada, de la preparación al final, '
         'llena el tablero sin romper ninguna regla', () async {
+      final numeros = repartoDePrueba(mapa);
       final reparto = {
-        for (final (indice, casilla) in mapa.casillasIniciales.indexed) casilla: _numeros[indice],
+        for (final (indice, casilla) in mapa.casillasIniciales.indexed) casilla: numeros[indice],
       };
 
       // 1. Preparación: se reparten los 6 números y se confirma.
-      final preparacion = PreparacionBloc(mapa.casillasIniciales.map(pos).toList());
+      final preparacion = PreparacionBloc(
+        mapa.casillasIniciales.map(pos).toList(),
+        admite: Tablero.desdeMapa(mapa).aceptaComoInicial,
+      );
       addTearDown(preparacion.close);
       for (final MapEntry(key: casilla, value: numero) in reparto.entries) {
         preparacion.add(ValorAsignado(pos(casilla), numero));

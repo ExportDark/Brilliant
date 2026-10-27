@@ -20,11 +20,23 @@ import 'preparacion_state.dart';
 /// Los eventos inválidos se ignoran sin emitir estado.
 ///
 /// [azar] decide el [RepartoAleatorio]; los tests lo pasan con semilla fija.
+/// [admite] dice si una casilla acepta un número al empezar: en el Nivel 4,
+/// una inicial cae en la zona naranja "4-6" y otra en la "1-3". Sin él,
+/// cualquier número cabe en cualquier casilla.
 class PreparacionBloc extends Bloc<PreparacionEvent, PreparacionState> {
-  final Random _azar;
+  /// Cuántas veces se revuelve, como mucho, buscando un reparto al azar en
+  /// el que cada número quepa en su casilla.
+  static const _intentosDeReparto = 100;
 
-  PreparacionBloc(List<Posicion> casillas, {Random? azar})
-      : _azar = azar ?? Random(),
+  final Random _azar;
+  final bool Function(Posicion casilla, int valor) _admite;
+
+  PreparacionBloc(
+    List<Posicion> casillas, {
+    Random? azar,
+    bool Function(Posicion casilla, int valor)? admite,
+  })  : _azar = azar ?? Random(),
+        _admite = admite ?? _cualquiera,
         super(PreparacionState(casillas: List.unmodifiable(casillas))) {
     on<ValorAsignado>(_alAsignarValor);
     on<ValorQuitado>(_alQuitarValor);
@@ -33,10 +45,17 @@ class PreparacionBloc extends Bloc<PreparacionEvent, PreparacionState> {
     on<PreparacionReiniciada>(_alReiniciar);
   }
 
+  static bool _cualquiera(Posicion casilla, int valor) => true;
+
+  /// Si [casilla] acepta [valor] al empezar. La pantalla lo usa para apagar
+  /// los números que no caben en la casilla seleccionada.
+  bool admite(Posicion casilla, int valor) => _admite(casilla, valor);
+
   void _alAsignarValor(ValorAsignado event, Emitter<PreparacionState> emit) {
     if (state.confirmada) return;
     if (!state.casillas.contains(event.casilla)) return;
     if (!valoresPosibles.contains(event.valor)) return;
+    if (!_admite(event.casilla, event.valor)) return;
 
     final usadoEnOtraCasilla = state.valores.entries.any(
       (asignacion) =>
@@ -58,16 +77,38 @@ class PreparacionBloc extends Bloc<PreparacionEvent, PreparacionState> {
     if (state.confirmada) return;
 
     // Con todas llenas no queda nada que completar: se revuelve desde cero.
-    final valores = state.completa ? <Posicion, int>{} : {...state.valores};
-    final vacias = state.casillas.where((casilla) => !valores.containsKey(casilla));
-    final numeros = valoresPosibles.difference(valores.values.toSet()).toList()
-      ..shuffle(_azar);
+    final puestos = state.completa ? <Posicion, int>{} : state.valores;
+    final vacias = [
+      for (final casilla in state.casillas)
+        if (!puestos.containsKey(casilla)) casilla,
+    ];
+    final faltantes = valoresPosibles.difference(puestos.values.toSet()).toList();
 
-    for (final (indice, casilla) in vacias.indexed) {
-      valores[casilla] = numeros[indice];
-    }
+    // Si lo ya puesto no deja completar el reparto (por ejemplo, ya se usaron
+    // el 4, el 5 y el 6, y la inicial de la zona "4-6" sigue vacía), se
+    // revuelve todo desde cero.
+    final repartido = _repartirAlAzar(vacias, faltantes);
+    final valores = repartido != null
+        ? {...puestos, ...repartido}
+        : _repartirAlAzar(state.casillas, valoresPosibles.toList());
+    if (valores == null) return;
 
     emit(state.copiaCon(valores: valores));
+  }
+
+  /// Reparte [numeros] entre [casillas] al azar, uno en cada una, de modo que
+  /// cada número quepa en su casilla. Devuelve `null` si no lo encuentra.
+  Map<Posicion, int>? _repartirAlAzar(List<Posicion> casillas, List<int> numeros) {
+    for (var intento = 0; intento < _intentosDeReparto; intento++) {
+      numeros.shuffle(_azar);
+      final reparto = {
+        for (final (indice, casilla) in casillas.indexed) casilla: numeros[indice],
+      };
+      if (reparto.entries.every((asignacion) => _admite(asignacion.key, asignacion.value))) {
+        return reparto;
+      }
+    }
+    return null;
   }
 
   void _alConfirmar(PreparacionConfirmada event, Emitter<PreparacionState> emit) {
