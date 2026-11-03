@@ -24,6 +24,7 @@ Repositorio: https://github.com/ExportDark/Brilliant
 - [[Interfaz del tablero]] — el tema suave, cómo se iluminan las casillas y los dados
 - [[Pruebas]] — qué cubren los tests, cómo están organizados y las partidas simuladas
 - [[Servidor de cuentas]] — el programa aparte donde se registran los jugadores, y su seguridad
+- [[Cuentas en la app]] — crear la cuenta, iniciar y cerrar sesión, y borrarla
 
 ## Decisiones de diseño
 

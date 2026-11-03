@@ -69,12 +69,13 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Servidor de cuentas** (2026-11-02) — un programa aparte en `servidor/`, con
       Django, djoser y knox: crear la cuenta, iniciar y cerrar sesión, y borrarla, por
       HTTPS con una autoridad local. 29 tests. Ver [[Servidor de cuentas]]
-- [ ] **Las cuentas en la app** — las pantallas para crear la cuenta, iniciar sesión y
-      borrarla
+- [x] **Las cuentas en la app** (2026-11-02) — "Iniciar sesión", "Crear cuenta" y
+      "Mi cuenta" (cerrar sesión y borrar la cuenta, con la contraseña). Sin sesión no
+      se juega, y la sesión se recuerda. Ver [[Cuentas en la app]]
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 369 tests, todos pasando.
+cerrarla es el puntaje. 419 tests de la app y 29 del servidor, todos pasando.
 
 ## Qué falta
 

@@ -1,0 +1,2 @@
+# Los .bat de Windows necesitan saltos de línea CRLF para que goto funcione.
+*.bat text eol=crlf

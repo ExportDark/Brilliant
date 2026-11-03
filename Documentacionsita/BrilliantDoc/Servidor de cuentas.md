@@ -4,7 +4,7 @@ Un programa aparte de la app, en `servidor/`: guarda las cuentas de los jugadore
 sesiones. La app se registra ahí, inicia sesión, y puede cerrar la sesión y borrar la
 cuenta. Cómo se usa está en `servidor/README.md`; esta nota cuenta las decisiones.
 
-Ver también: [[Arquitectura general]] · [[Cómo trabajar en el proyecto]] · [[Pruebas]]
+Ver también: [[Cuentas en la app]] · [[Arquitectura general]] · [[Cómo trabajar en el proyecto]] · [[Pruebas]]
 
 ## Qué se pidió
 

@@ -86,5 +86,10 @@ test/         misma estructura que lib/, un test por archivo de lógica
 servidor/     el servidor de cuentas: un programa aparte, en Python (Django)
 ```
 
+Las cuentas del lado de la app viven en su propia capa, `lib/cuenta/`: el cliente HTTP
+del servidor, el almacén cifrado de la sesión y el `SesionBloc`. No saben nada del juego,
+y el juego no sabe nada de ellas: solo la raíz de la app decide si se juega o se inicia
+sesión. Ver [[Cuentas en la app]].
+
 El servidor no comparte código con la app: se hablan por HTTPS, con una API JSON. Ver
 [[Servidor de cuentas]].

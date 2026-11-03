@@ -30,9 +30,9 @@ Deja tres archivos en `build/app/outputs/flutter-apk/`:
 
 | Archivo | Tamaño | Para qué |
 |---|---|---|
-| `app-arm64-v8a-release.apk` | 15,2 MB | **El del teléfono**: cualquier Android de los últimos años |
-| `app-armeabi-v7a-release.apk` | 12,6 MB | Teléfonos muy viejos, de 32 bits |
-| `app-x86_64-release.apk` | 16,6 MB | Emuladores en la PC |
+| `app-arm64-v8a-release.apk` | 16,8 MB | **El del teléfono**: cualquier Android de los últimos años |
+| `app-armeabi-v7a-release.apk` | 14,3 MB | Teléfonos muy viejos, de 32 bits |
+| `app-x86_64-release.apk` | 18,2 MB | Emuladores en la PC |
 
 La primera compilación tardó unos 7 minutos, porque Gradle descargó e instaló solo lo que
 faltaba del SDK (NDK 28, Build-Tools 36 y CMake). Las siguientes tardan segundos.
@@ -50,6 +50,23 @@ vuelve a correr: es OneDrive bloqueando archivos de la compilación. Ver
   Sí harían falta para `flutter doctor --android-licenses` o para crear emuladores con
   `avdmanager`. Se instalan desde Android Studio: *SDK Manager → SDK Tools → Android SDK
   Command-line Tools*.
+
+### El servidor de cuentas
+
+Sin sesión no se puede jugar, y la sesión se pide al [[Servidor de cuentas]], que corre en
+la PC. El APK de siempre lo busca en `10.0.2.2`, que es como el **emulador** ve a la PC.
+**Para el celular** hay que decirle la IP de la PC al compilar:
+
+```bash
+C:\src\flutter\bin\flutter.bat build apk --release --split-per-abi --dart-define=SERVIDOR=https://192.168.100.5:8443
+```
+
+El celular tiene que estar en la misma WiFi que la PC, con el servidor levantado
+(`servidor\iniciar.bat`), y Windows tiene que dejar entrar conexiones al puerto 8443.
+Si cambia la IP de la PC, hay que volver a compilar con la nueva.
+
+El manifiesto principal pide el permiso de internet (`android.permission.INTERNET`). El
+de release no lo traía: solo el de depuración.
 
 ## Instalarlo en el teléfono
 

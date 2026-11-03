@@ -20,9 +20,13 @@ abstract final class Paleta {
   /// El color de acento: botones, el dado ancla, la barra de progreso.
   static const acento = Color(0xFF6A5FB0);
 
-  /// El recuadro que explica por qué no se puede jugar en una casilla.
+  /// El recuadro de los avisos: por qué no se puede jugar en una casilla, o
+  /// qué pasó con la cuenta.
   static const aviso = Color(0xFFFFF1D9);
   static const avisoTinta = Color(0xFF6B4D17);
+
+  /// Lo que no se puede deshacer, como borrar la cuenta.
+  static const peligro = Color(0xFFC0473F);
 }
 
 /// El color de cada zona del tablero, en tonos suaves pero fáciles de
@@ -79,6 +83,18 @@ ThemeData temaBrilliant() {
         textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
       ),
     ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      enabledBorder: _bordeDeCampo(Paleta.baseTablero, 1.5),
+      focusedBorder: _bordeDeCampo(Paleta.acento, 2),
+      errorBorder: _bordeDeCampo(Paleta.peligro, 1.5),
+      focusedErrorBorder: _bordeDeCampo(Paleta.peligro, 2),
+      errorStyle: const TextStyle(color: Paleta.peligro),
+      errorMaxLines: 4,
+      helperMaxLines: 3,
+    ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         shape: forma,
@@ -88,3 +104,9 @@ ThemeData temaBrilliant() {
     ),
   );
 }
+
+/// El borde redondeado de los campos de texto, como las fichas del tablero.
+OutlineInputBorder _bordeDeCampo(Color color, double grosor) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(color: color, width: grosor),
+    );

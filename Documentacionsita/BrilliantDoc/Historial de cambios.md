@@ -7,6 +7,35 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-02 — Cuentas en la app
+
+- **Sin sesión no se juega.** La app abre en **"Iniciar sesión"**, con un enlace a
+  **"Crear cuenta"**, y la sesión se recuerda entre una vez y otra. En "Elige un mapa",
+  el ícono de persona abre **"Mi cuenta"**: cerrar sesión y **borrar la cuenta**, con
+  un diálogo que pide la contraseña. Ver [[Cuentas en la app]].
+- **Una capa nueva, `lib/cuenta/`:**
+  - `ClienteCuentas` habla con el servidor;
+  - el token se guarda cifrado con `flutter_secure_storage`;
+  - `SesionBloc` atiende los pedidos de a uno.
+
+  En Android y Windows la app solo confía en la autoridad local del servidor.
+- **El APK pide el permiso de internet**, que el de release no traía. Para el celular se
+  compila con `--dart-define=SERVIDOR=https://<IP de la PC>:8443`. Ver [[Versión Android]].
+- El recuadro de la explicación de la partida pasó a ser `RecuadroDeAviso`, compartido
+  con las pantallas de cuenta.
+- **Tests:**
+  - unit del cliente y del bloc;
+  - widget tests de cada pantalla;
+  - el camino feliz de las cuentas;
+  - tamaños;
+  - una prueba contra el servidor de verdad que se pide con
+    `--dart-define=CON_SERVIDOR=true`.
+
+  Los tests del juego entran con una sesión guardada. Ver [[Pruebas]].
+- Se probó con el servidor de verdad, en el emulador y en Edge: crear la cuenta, reabrir
+  la app con la sesión guardada, una contraseña mala al borrar, y borrar.
+- 419 tests de la app (más 2 contra el servidor) y 29 del servidor.
+
 ## 2026-11-02 — Servidor de cuentas
 
 - **Un programa aparte, en `servidor/`**, donde se registran los jugadores: Django con

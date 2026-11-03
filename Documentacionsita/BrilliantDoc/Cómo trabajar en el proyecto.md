@@ -28,6 +28,8 @@ Versión del SDK de Dart: 3.13.2 (stable).
 ```bash
 flutter test                                    # correr todos los tests
 flutter test test/ui test/main                  # solo los widget tests
+flutter test --dart-define=CON_SERVIDOR=true test/cuenta/contra_el_servidor_test.dart
+                                                # contra el servidor de verdad (levantado)
 dart analyze                                    # análisis estático
 flutter run -d edge                             # correr en web (en Edge)
 flutter build web                               # compilar para web

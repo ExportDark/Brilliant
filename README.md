@@ -28,6 +28,8 @@ Construcción incremental, módulo por módulo:
 - [x] Interfaz suave: tema propio, fichas redondeadas, dados con puntos, sin coordenadas a
       la vista
 - [x] Los 4 mapas oficiales, y una pantalla para elegir uno al abrir la app
+- [x] Cuentas: un servidor aparte (`servidor/`) y en la app crear la cuenta, iniciar y
+      cerrar sesión, y borrarla
 - [ ] Puntuación
 
 ## Estructura
@@ -37,9 +39,12 @@ lib/
   modelo/   entidades de dominio (Posicion, Celda, Region, Mapa, Tablero, ...)
   reglas/   reglas de colocación por color
   juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
+  cuenta/   la sesión del jugador: el cliente del servidor de cuentas, el almacén
+            cifrado y el SesionBloc
   ui/
     widgets/    CeldaWidget, TableroWidget, DadoWidget
-    pantallas/  PantallaEleccionDeMapa, PantallaPreparacion, PantallaPartida
+    pantallas/  PuertaDeSesion, PantallaEntrar, PantallaCrearCuenta, PantallaMiCuenta,
+                PantallaEleccionDeMapa, PantallaPreparacion, PantallaPartida
     tema.dart   colores y estilo de la app
   main.dart
 test/       tests, misma estructura que lib/
@@ -327,6 +332,25 @@ por su cuenta. `PantallaPartida` recibe un `tirarDado` opcional, para que los te
 qué sale en los dados. `BrilliantApp`, `PantallaEleccionDeMapa` y `PantallaPreparacion`
 también lo reciben y lo pasan a la partida, así un test puede jugar la app entera con
 dados fijos.
+
+## Módulo: cuentas (`lib/cuenta/` y sus pantallas)
+
+Sin sesión no se puede jugar. La app abre en **"Iniciar sesión"** (`PantallaEntrar`), con
+un enlace a **"Crear cuenta"**. Con la sesión iniciada pasa a "Elige un mapa", cuyo ícono
+de persona abre **"Mi cuenta"**: cerrar sesión y borrar la cuenta, que pide la
+contraseña en un diálogo. La sesión se recuerda al cerrar y abrir la app.
+
+- `cliente_cuentas.dart`: `ClienteCuentas` habla con el servidor de cuentas (ver
+  `servidor/README.md`). Convierte las respuestas en `ErrorDeCuenta` (los mensajes del
+  servidor por campo), `SesionVencida` o `SinConexion`.
+- `cliente_http.dart`: en Android y Windows, un cliente HTTP que **solo confía en la
+  autoridad local** del servidor (`assets/certificados/brilliant_ca.pem`); en la web, el
+  del navegador. La dirección del servidor se elige con `--dart-define=SERVIDOR=...`.
+- `almacen_de_sesion.dart`: el usuario y el token, cifrados con `flutter_secure_storage`.
+- `sesion_bloc.dart`: `SesionBloc`, arriba de toda la app. Atiende los pedidos de a uno.
+
+`BrilliantApp` recibe el cliente y el almacén, para que los tests usen un servidor falso
+en memoria.
 
 ## Tests del camino feliz
 

@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   bloc: ^9.2.1
   flutter_bloc: ^9.1.1
+  http: ^1.6.0
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +61,11 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # El certificado público de la autoridad local del servidor de cuentas: la
+  # app solo confía en él para hablar con el servidor.
+  assets:
+    - assets/certificados/brilliant_ca.pem
 
   # To add assets to your application, add an assets section, like this:
   # assets:

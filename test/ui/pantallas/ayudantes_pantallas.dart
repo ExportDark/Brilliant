@@ -10,6 +10,7 @@ import 'package:brilliant/ui/pantallas/pantalla_partida.dart';
 import 'package:brilliant/ui/pantallas/pantalla_preparacion.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
 
+import '../../cuenta/ayudantes_cuenta.dart';
 import '../../juego/ayudantes.dart';
 
 /// Los tamaños de pantalla en los que se prueba que todo quepa, en píxeles
@@ -31,14 +32,24 @@ void _superficie(WidgetTester tester, Size tamano) {
 }
 
 /// Abre la app entera, como al lanzarla, con dados que decide [tirarDado]
-/// (sin él, al azar).
+/// (sin él, al azar). Habla con [servidor] (por defecto, uno falso nuevo).
+///
+/// Con [conSesion], la app ya tiene guardada una sesión de "ana" y arranca
+/// directo en "Elige un mapa"; sin ella, en "Iniciar sesión".
 Future<void> abrirApp(
   WidgetTester tester, {
   int Function()? tirarDado,
   Size tamano = const Size(1000, 1400),
+  ServidorFalso? servidor,
+  bool conSesion = true,
 }) async {
   _superficie(tester, tamano);
-  await tester.pumpWidget(BrilliantApp(tirarDado: tirarDado));
+  final elServidor = servidor ?? ServidorFalso();
+  final almacen = AlmacenEnMemoria(conSesion ? elServidor.sesionIniciada('ana') : null);
+  await tester.pumpWidget(
+    BrilliantApp(cuentas: elServidor.cliente(), almacen: almacen, tirarDado: tirarDado),
+  );
+  await tester.pumpAndSettle();
 }
 
 /// Abre la preparación de [mapa] (por defecto, el Nivel 1).
@@ -82,6 +93,28 @@ Future<void> tocar(WidgetTester tester, Finder objetivo) async {
 Finder tarjetaDe(Mapa mapa) => find.byKey(ValueKey('mapa-${mapa.nivel}'));
 
 final botonTirar = find.widgetWithText(FilledButton, 'Tirar dados');
+
+/// Escribe [texto] en el campo de clave [clave] (un `TextFormField` o un
+/// `CampoDeContrasena`).
+Future<void> escribir(WidgetTester tester, String clave, String texto) async {
+  await tester.enterText(find.byKey(ValueKey(clave)), texto);
+  await tester.pump();
+}
+
+final botonEntrar = find.widgetWithText(FilledButton, 'Entrar');
+
+final botonCrearCuenta = find.widgetWithText(FilledButton, 'Crear cuenta');
+
+final enlaceCrearCuenta = find.widgetWithText(TextButton, '¿No tienes cuenta? Crea una');
+
+final botonMiCuenta = find.byKey(const ValueKey('boton-mi-cuenta'));
+
+/// Inicia sesión desde "Iniciar sesión" con [usuario] y [contrasena].
+Future<void> entrarCon(WidgetTester tester, String usuario, String contrasena) async {
+  await escribir(tester, 'campo-usuario', usuario);
+  await escribir(tester, 'campo-contrasena', contrasena);
+  await tocar(tester, botonEntrar);
+}
 
 final botonPasar = find.widgetWithText(FilledButton, 'Pasar turno');
 

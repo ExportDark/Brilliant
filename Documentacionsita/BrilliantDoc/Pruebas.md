@@ -1,7 +1,8 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 369 tests, todos pasando (2026-10-26).
+las pruebas y qué se aprendió de ellas. 419 tests, todos pasando, más 2 que hablan con el servidor de verdad y solo corren si se
+piden (2026-11-02).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -23,8 +24,9 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 80 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
 | `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 128 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
-| `test/ui/` | 114 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las pantallas en 5 tamaños, del celular chico al escritorio, y el camino feliz por la pantalla en los 4 mapas |
-| `test/main/` | 1 | Que la app arranque en la pantalla para elegir el mapa |
+| `test/cuenta/` | 25 (+2) | `ClienteCuentas` (cada pedido y cada error), `SesionBloc` (abrir, entrar, crear, salir y borrar) y, si se pide, la prueba contra el servidor de verdad |
+| `test/ui/` | 138 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
 ## Cómo están organizadas
 
@@ -313,6 +315,36 @@ pasan a la partida, igual que `PantallaPartida`. En la app no se pasa, y los dad
 > Si la pantalla encendiera también las casillas que rompen la regla de su zona, el test
 > falla en el turno 4 ("en E2 tenía que quedar el 4"): toca una casilla encendida y el
 > bloc no la acepta. El unit test no lo notaría, porque no mira la pantalla.
+
+## Las cuentas
+
+Los tests de la app no hablan con el servidor de verdad: usan `ServidorFalso`
+(`test/cuenta/ayudantes_cuenta.dart`), un servidor en memoria que contesta como el de
+verdad, con las mismas rutas, los mismos códigos y los mismos mensajes en español. Los
+tests que abren la app entera (`abrirApp`) entran con una sesión de "ana" ya guardada,
+así que los del juego siguen igual.
+
+| Archivo | Qué prueba |
+|---|---|
+| `cuenta/cliente_cuentas_test.dart` | La ruta, el método, el cuerpo y el header `Authorization` de cada pedido; 400 → `ErrorDeCuenta` por campo y general; 429; 401 → `SesionVencida`; 500; sin red → `SinConexion` (11 casos) |
+| `cuenta/sesion_bloc_test.dart` | Al abrir: sin sesión, con una que sirve, con una vencida y sin conexión. Entrar bien, mal y sin conexión. Crear la cuenta, y con un usuario repetido. Cerrar sesión, también sin conexión. Borrar con la contraseña mala y con la buena. Descartar los avisos (14 casos) |
+| `cuenta/contra_el_servidor_test.dart` | Con el servidor levantado y `--dart-define=CON_SERVIDOR=true`: el recorrido completo por HTTPS, y que un cliente sin la autoridad local no se conecta (2 casos) |
+| `ui/pantallas/cuenta/entrar/…` | Los campos vacíos no se mandan; el error del servidor se muestra y se va al escribir; sin conexión avisa; entrar lleva a elegir el mapa; el enlace lleva a crear cuenta |
+| `ui/pantallas/cuenta/crear_cuenta/…` | Revisa lo básico antes de mandar; el usuario repetido va en su campo; crear la cuenta entra sola |
+| `ui/pantallas/cuenta/mi_cuenta/…` | Muestra el usuario; cerrar sesión vuelve a entrar; borrar pide la contraseña y se puede cancelar; con la mala no borra; con la buena borra y vuelve a entrar |
+| `ui/camino_feliz/cuentas_de_punta_a_punta_test.dart` | Crear la cuenta, jugar un turno, cerrar sesión, volver a entrar, reabrir la app (sigue la sesión), borrar la cuenta y que ya no se pueda entrar |
+| `ui/pantallas/tamanos/cuentas_sin_desbordes_test.dart` | Las pantallas de cuenta y el diálogo de borrar, en los 5 tamaños (10 casos) |
+
+Encontraron dos cosas:
+
+- **Que bloc atiende los eventos al mismo tiempo.** Cerrar sesión se cruzaba con la
+  revisión de la sesión guardada. Ahora el `SesionBloc` los atiende de a uno.
+- **Dos desbordes en los celulares chicos.** El texto de los botones de "Mi cuenta" se
+  desbordaba, y ahora se acorta. El diálogo de borrar no cabía de alto, y ahora se
+  desplaza.
+
+Se comprobó que detectan errores: si el cliente no mandara el token, fallan 12 tests
+entre el cliente, el bloc y las pantallas. Ver [[Cuentas en la app]].
 
 ## El servidor de cuentas
 

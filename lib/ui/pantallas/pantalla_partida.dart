@@ -12,6 +12,7 @@ import '../../modelo/tablero.dart';
 import '../tema.dart';
 import '../widgets/celda_widget.dart';
 import '../widgets/dado_widget.dart';
+import '../widgets/recuadro_de_aviso.dart';
 import '../widgets/tablero_widget.dart';
 import 'pantalla_preparacion.dart';
 
@@ -211,7 +212,7 @@ class _VistaPartidaState extends State<_VistaPartida> {
                         ),
                         if (explicacion != null) ...[
                           const SizedBox(height: 12),
-                          _Explicacion(explicacion),
+                          RecuadroDeAviso(explicacion, key: const ValueKey('explicacion')),
                         ],
                         if (state.terminada) ...[
                           const SizedBox(height: 20),
@@ -389,36 +390,4 @@ String _nombreZona(ColorZona color) {
     ColorZona.gris => 'gris',
     ColorZona.naranja => 'naranja',
   };
-}
-
-/// El recuadro suave que explica por qué la casilla tocada no acepta el
-/// número.
-class _Explicacion extends StatelessWidget {
-  final String texto;
-
-  const _Explicacion(this.texto);
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      key: const ValueKey('explicacion'),
-      constraints: const BoxConstraints(maxWidth: 420),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: Paleta.aviso,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.info_outline_rounded, color: Paleta.avisoTinta),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(texto, style: const TextStyle(color: Paleta.avisoTinta, height: 1.3)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

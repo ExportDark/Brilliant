@@ -4,9 +4,11 @@ import '../../modelo/mapa.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
 import '../widgets/tablero_widget.dart';
+import 'pantalla_mi_cuenta.dart';
 import 'pantalla_preparacion.dart';
 
-/// La pantalla con la que arranca la app: los 4 mapas oficiales en tarjetas,
+/// La pantalla con la que arranca el juego, con la sesión iniciada: los 4
+/// mapas oficiales en tarjetas,
 /// cada una con su tablero en miniatura. Al tocar una se pasa a la
 /// preparación de ese mapa; desde ahí, la flecha de atrás vuelve aquí.
 class PantallaEleccionDeMapa extends StatelessWidget {
@@ -30,7 +32,19 @@ class PantallaEleccionDeMapa extends StatelessWidget {
     final textos = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Brilliant')),
+      appBar: AppBar(
+        title: const Text('Brilliant'),
+        actions: [
+          IconButton(
+            key: const ValueKey('boton-mi-cuenta'),
+            tooltip: 'Mi cuenta',
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PantallaMiCuenta()),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
