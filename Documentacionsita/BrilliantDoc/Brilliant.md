@@ -23,6 +23,7 @@ Repositorio: https://github.com/ExportDark/Brilliant
 - [[Turnos y jugadas]] — los dados, la regla del ancla y la validación de cada jugada
 - [[Interfaz del tablero]] — el tema suave, cómo se iluminan las casillas y los dados
 - [[Pruebas]] — qué cubren los tests, cómo están organizados y las partidas simuladas
+- [[Servidor de cuentas]] — el programa aparte donde se registran los jugadores, y su seguridad
 
 ## Decisiones de diseño
 

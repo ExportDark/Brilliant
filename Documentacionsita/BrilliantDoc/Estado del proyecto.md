@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-10-26 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-11-02 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
@@ -66,6 +66,11 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Elegir el mapa en la app** (2026-10-24) — la app abre en "Elige un mapa", con
       los 4 niveles en miniatura. "Jugar otra vez" repite el mismo mapa, y salir a mitad
       de partida pide confirmación. Ver [[Mapas]]
+- [x] **Servidor de cuentas** (2026-11-02) — un programa aparte en `servidor/`, con
+      Django, djoser y knox: crear la cuenta, iniciar y cerrar sesión, y borrarla, por
+      HTTPS con una autoridad local. 29 tests. Ver [[Servidor de cuentas]]
+- [ ] **Las cuentas en la app** — las pantallas para crear la cuenta, iniciar sesión y
+      borrarla
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para

@@ -314,6 +314,12 @@ pasan a la partida, igual que `PantallaPartida`. En la app no se pasa, y los dad
 > falla en el turno 4 ("en E2 tenía que quedar el 4"): toca una casilla encendida y el
 > bloc no la acepta. El unit test no lo notaría, porque no mira la pantalla.
 
+## El servidor de cuentas
+
+El servidor tiene sus propios tests, en Python: 29 con pytest, en
+`servidor/cuentas/tests/`. No entran en la cuenta de los tests de la app. Qué prueba cada
+archivo está en [[Servidor de cuentas]].
+
 ## Verificación en la app real
 
 Además de los tests, cada cambio visual se revisa en la app compilada para web, con

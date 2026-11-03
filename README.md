@@ -43,6 +43,7 @@ lib/
     tema.dart   colores y estilo de la app
   main.dart
 test/       tests, misma estructura que lib/
+servidor/   el servidor de cuentas (Python, Django): ver servidor/README.md
 ```
 
 ## Correr el proyecto

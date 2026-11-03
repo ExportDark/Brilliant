@@ -7,6 +7,25 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-02 — Servidor de cuentas
+
+- **Un programa aparte, en `servidor/`**, donde se registran los jugadores: Django con
+  djoser (crear, ver y borrar la cuenta) y django-rest-knox (los tokens de sesión). Se
+  descartó FastAPI + fastapi-users porque solo funciona con correo, y las cuentas son
+  con nombre de usuario. Ver [[Servidor de cuentas]].
+- **Seguridad:**
+  - contraseñas con Argon2id y los validadores de Django;
+  - tokens que se guardan con hash, vencen y se revocan;
+  - borrar la cuenta pide la contraseña;
+  - nadie toca la cuenta de otro;
+  - límite de intentos;
+  - solo HTTPS, con una autoridad local cuyo certificado público lleva la app.
+- Se levanta con `servidor\iniciar.bat`. Se probó de verdad por HTTPS, por `localhost` y
+  por la IP de la red.
+- 29 tests con pytest. Se comprobó que fallan si borrar la cuenta no pide la contraseña.
+- Todavía falta la parte de la app: las pantallas de crear la cuenta, iniciar sesión y
+  borrarla.
+
 ## 2026-10-26 — Las casillas iniciales reales de cada mapa
 
 - **Las iniciales son las de la estrellita** de cada tarjeta, como dicen las reglas del

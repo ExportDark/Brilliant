@@ -43,6 +43,23 @@ escritorio con C++": sin eso, `flutter run -d windows` no compila. Para Android,
 VS Code tiene instaladas las extensiones `dart-code.dart-code` y `dart-code.flutter`, así
 que los archivos `.dart` se reconocen solos (resaltado, análisis, botón Run/Debug).
 
+## Levantar el servidor de cuentas
+
+```bat
+servidor\iniciar.bat
+```
+
+Lo deja en `https://localhost:8443`. La primera vez crea `servidor\.venv` e instala los
+paquetes (Python 3.12 ya está en la PC). Sus tests:
+
+```bat
+cd servidor
+.venv\Scripts\python.exe -m pytest
+```
+
+Para probarlo a mano se usa Python, no `curl`: el `curl` de Windows no respeta
+`--cacert` con la autoridad local. Ver [[Servidor de cuentas]].
+
 ## Probar la app en el navegador (sin Chrome)
 
 En esta máquina no hay Chrome, pero sí Edge y Node. Así se revisa la app de verdad y se
@@ -84,6 +101,10 @@ Así se verificó el layout el 2026-09-30. Ver [[Decisiones de extracción del m
 - `devtools_options.yaml`: lo crea Flutter DevTools al correr la app desde VS Code.
 - `.obsidian/workspace.json` y `.obsidian/graph.json`: Obsidian los reescribe solo al
   abrir o cerrar paneles.
+- En `servidor/`: el entorno de Python (`.venv`), la clave secreta (`.env`), la base
+  (`db.sqlite3`) y los certificados con sus claves privadas (`certificados/`). Son de
+  cada PC. Sí se sube el certificado público de la autoridad que usa la app
+  (`assets/certificados/brilliant_ca.pem`).
 - En `android/`, lo que ignora su propio `.gitignore`: `local.properties` (la ruta del
   SDK de esta PC), el wrapper de Gradle, `GeneratedPluginRegistrant.java` y cualquier
   `keystore`. Flutter los regenera solo al compilar.

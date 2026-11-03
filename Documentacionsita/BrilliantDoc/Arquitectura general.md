@@ -83,4 +83,8 @@ lib/
     widgets/    CeldaWidget, TableroWidget
     pantallas/  PantallaPreparacion y PantallaPartida, cada una con su bloc
 test/         misma estructura que lib/, un test por archivo de lógica
+servidor/     el servidor de cuentas: un programa aparte, en Python (Django)
 ```
+
+El servidor no comparte código con la app: se hablan por HTTPS, con una API JSON. Ver
+[[Servidor de cuentas]].
