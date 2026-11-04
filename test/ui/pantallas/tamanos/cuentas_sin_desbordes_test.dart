@@ -33,6 +33,11 @@ void main() {
         await tocar(tester, enlaceCrearCuenta);
         await tocar(tester, botonCrearCuenta);
         expect(tester.takeException(), isNull, reason: 'crear cuenta, con los errores a la vista');
+
+        // Los errores más largos: el de los caracteres del usuario y el de la
+        // contraseña larga.
+        await crearCuentaCon(tester, 'ana pérez', 'x' * 129);
+        expect(tester.takeException(), isNull, reason: 'crear cuenta, con los errores largos');
       });
 
       testWidgets('mi cuenta y el diálogo de borrar, en $nombre ($medidas)', (tester) async {

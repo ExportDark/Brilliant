@@ -26,6 +26,7 @@ Future<void> main() async {
     buscador: crearBuscador(),
     cambiosDeRed: Connectivity().onConnectivityChanged,
     revisarCada: const Duration(seconds: 10),
+    latidoCada: const Duration(minutes: 2),
   ));
 }
 
@@ -52,6 +53,11 @@ class BrilliantApp extends StatefulWidget {
   /// vuelve a revisar solo.
   final Duration? revisarCada;
 
+  /// Cada cuánto, con la app en primer plano, se le avisa al servidor que la
+  /// sesión sigue en uso: una cuenta tiene una sola sesión activa. Sin él, no
+  /// se avisa solo.
+  final Duration? latidoCada;
+
   /// Decide qué sale en los dados. Sin él salen al azar; los tests lo fijan.
   final int Function()? tirarDado;
 
@@ -62,6 +68,7 @@ class BrilliantApp extends StatefulWidget {
     this.buscador = const SinBuscar(),
     this.cambiosDeRed,
     this.revisarCada,
+    this.latidoCada,
     this.tirarDado,
   });
 
@@ -76,6 +83,7 @@ class _BrilliantAppState extends State<BrilliantApp> {
   late final SesionBloc _sesion;
   late final AppLifecycleListener _ciclo;
   StreamSubscription<Object?>? _red;
+  Timer? _latidos;
 
   @override
   void initState() {
@@ -90,12 +98,31 @@ class _BrilliantAppState extends State<BrilliantApp> {
 
     // Al volver a la app (por ejemplo, después de cambiar de WiFi en los
     // ajustes) y al cambiar la red, el servidor puede estar en otra parte.
-    _ciclo = AppLifecycleListener(onResume: _servidor.revisar);
+    // Al volver, además, la sesión vuelve a estar en uso.
+    _ciclo = AppLifecycleListener(
+      onResume: () {
+        _servidor.revisar();
+        _sesion.add(const SesionLatido());
+      },
+    );
     _red = widget.cambiosDeRed?.listen((_) => _servidor.revisar());
+
+    // En segundo plano no se avisa: la sesión de un celular guardado en el
+    // bolsillo deja de contar como activa, y se puede entrar en otro.
+    final cada = widget.latidoCada;
+    if (cada != null) {
+      _latidos = Timer.periodic(cada, (_) {
+        final estado = WidgetsBinding.instance.lifecycleState;
+        if (estado == null || estado == AppLifecycleState.resumed) {
+          _sesion.add(const SesionLatido());
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
+    _latidos?.cancel();
     _red?.cancel();
     _ciclo.dispose();
     _sesion.close();

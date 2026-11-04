@@ -8,6 +8,7 @@ import 'package:http/testing.dart';
 import 'package:brilliant/cuenta/almacen_de_sesion.dart';
 import 'package:brilliant/cuenta/buscador_de_servidores.dart';
 import 'package:brilliant/cuenta/cliente_cuentas.dart';
+import 'package:brilliant/cuenta/reglas_de_cuenta.dart';
 
 /// Una contraseña que el servidor acepta.
 const contrasenaDePrueba = 'gema-brillante-73';
@@ -69,13 +70,29 @@ ServidorEncontrado anunciado(String ip, {String pc = 'ORION'}) => ServidorEncont
       direccion: Uri.parse('https://$ip:8443/'),
     );
 
+/// El mensaje del servidor cuando la cuenta tiene la sesión activa en otro
+/// aparato (`servidor/cuentas/views.py`).
+const sesionEnOtroAparato =
+    'Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o espera '
+    'unos minutos si ya no la usas.';
+
 /// Un servidor de cuentas en memoria, que contesta como el de verdad: las
-/// mismas rutas, los mismos códigos y los mismos mensajes en español. Sirve
-/// para probar la app sin levantar el servidor.
+/// mismas rutas, los mismos códigos y los mismos mensajes en español, con las
+/// mismas reglas (el nombre de usuario, "Ana" y "ana" son la misma cuenta, una
+/// sola sesión activa por cuenta). Sirve para probar la app sin levantar el
+/// servidor.
 ///
 /// Solo contesta en su [direccion], como el de verdad solo está en la IP de
 /// la PC: un pedido a otra dirección no llega.
 class ServidorFalso {
+  /// Una sesión usada hace menos que esto está activa: no deja entrar con la
+  /// misma cuenta en otro aparato.
+  static const sesionActiva = Duration(minutes: 5);
+
+  /// El reloj del servidor. Los tests lo adelantan para que una sesión deje
+  /// de estar activa.
+  DateTime Function() ahora = DateTime.now;
+
   /// Dónde contesta. Cambiarla es como si la PC cambiara de red.
   var direccion = 'servidor.test';
 
@@ -88,6 +105,9 @@ class ServidorFalso {
 
   /// Token → usuario.
   final sesiones = <String, String>{};
+
+  /// Token → cuándo se usó por última vez.
+  final _ultimoUso = <String, DateTime>{};
 
   /// Los pedidos que llegaron, en orden.
   final pedidos = <http.Request>[];
@@ -112,7 +132,21 @@ class ServidorFalso {
   /// tiene ahora.
   ClienteCuentas cliente() => ClienteCuentas(clienteHttp, Uri.parse('https://$direccion:8443/'));
 
-  String _nuevoToken() => 'token-${_siguienteToken++}'.padRight(64, 'x');
+  String _nuevoToken() {
+    final token = 'token-${_siguienteToken++}'.padRight(64, 'x');
+    _ultimoUso[token] = ahora();
+    return token;
+  }
+
+  /// La cuenta de [usuario] sin distinguir mayúsculas, con su nombre como se
+  /// guardó, o `null` si no existe.
+  String? _cuentaDe(Object? usuario) {
+    if (usuario is! String) return null;
+    for (final nombre in cuentas.keys) {
+      if (nombre.toLowerCase() == usuario.trim().toLowerCase()) return nombre;
+    }
+    return null;
+  }
 
   Future<http.Response> _atender(http.Request pedido) async {
     if (apagado) throw http.ClientException('El servidor está apagado', pedido.url);
@@ -124,22 +158,33 @@ class ServidorFalso {
     final datos = pedido.body.isEmpty
         ? const <String, dynamic>{}
         : jsonDecode(pedido.body) as Map<String, dynamic>;
-    final usuarioDelToken = sesiones[pedido.headers['Authorization']?.replaceFirst('Token ', '')];
+    final token = pedido.headers['Authorization']?.replaceFirst('Token ', '');
+    final usuarioDelToken = sesiones[token];
+    // Usar el token lo renueva, como knox: la sesión sigue activa.
+    if (usuarioDelToken != null) _ultimoUso[token!] = ahora();
     final ruta = '${pedido.method} ${pedido.url.path}';
 
     switch (ruta) {
       case 'POST /auth/users/':
         return _crearCuenta(datos);
       case 'POST /auth/token/login/':
-        final usuario = datos['username'] as String?;
+        final usuario = _cuentaDe(datos['username']);
         if (usuario == null || cuentas[usuario] != datos['password']) {
           return _json(400, {
             'non_field_errors': ['No puede iniciar sesión con las credenciales proporcionadas.'],
           });
         }
-        final token = _nuevoToken();
-        sesiones[token] = usuario;
-        return _json(200, {'token': token, 'expiry': '2026-11-09T00:00:00Z'});
+        final suyas = [for (final MapEntry(:key, :value) in sesiones.entries) if (value == usuario) key];
+        if (suyas.any((suya) => ahora().difference(_ultimoUso[suya]!) < sesionActiva)) {
+          return _json(409, {
+            'non_field_errors': [sesionEnOtroAparato],
+          });
+        }
+        // Las viejas, sin usar: la entrada nueva las cierra.
+        suyas.forEach(sesiones.remove);
+        final nuevo = _nuevoToken();
+        sesiones[nuevo] = usuario;
+        return _json(200, {'token': nuevo, 'expiry': '2026-11-09T00:00:00Z'});
       case 'GET /auth/users/me/' when usuarioDelToken != null:
         return _json(200, {'username': usuarioDelToken, 'id': 1, 'email': ''});
       case 'POST /auth/token/logout/' when usuarioDelToken != null:
@@ -161,11 +206,22 @@ class ServidorFalso {
   }
 
   http.Response _crearCuenta(Map<String, dynamic> datos) {
-    final usuario = datos['username'] as String? ?? '';
+    final usuario = (datos['username'] as String? ?? '').trim();
     final contrasena = datos['password'] as String? ?? '';
-    if (cuentas.containsKey(usuario)) {
+    final problema = problemaConElUsuario(usuario);
+    if (problema != null) {
+      return _json(400, {
+        'username': [problema],
+      });
+    }
+    if (_cuentaDe(usuario) != null) {
       return _json(400, {
         'username': ['Ya existe un usuario con este nombre.'],
+      });
+    }
+    if (contrasena.runes.length > largoMaximoContrasena) {
+      return _json(400, {
+        'password': ['Asegúrese de que este campo no tenga más de 128 caracteres.'],
       });
     }
     if (contrasena.length < 8) {

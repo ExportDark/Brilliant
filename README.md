@@ -354,10 +354,15 @@ contraseña en un diálogo. La sesión se recuerda al cerrar y abrir la app.
   (`_brilliant._tcp`), con el paquete nsd. En la web no se puede buscar.
 - `almacen_de_sesion.dart`: el usuario, el token y la dirección del servidor elegida,
   cifrados con `flutter_secure_storage`.
+- `reglas_de_cuenta.dart`: las reglas del usuario (de 3 a 20 letras sin acento, números,
+  `.`, `_` y `-`) y de la contraseña (de 8 a 128, nunca recortada), las mismas del
+  servidor. "Crear cuenta" las revisa antes de mandar nada.
 - `servidor_cubit.dart`: `ServidorCubit`, dónde está el servidor y si contesta. Si no
   contesta, lo busca en la red: si contesta uno solo, se cambia a él.
 - `sesion_bloc.dart`: `SesionBloc`, arriba de toda la app. Atiende los pedidos de a uno.
-  Si un pedido no llega, le pide al `ServidorCubit` buscar el servidor y lo repite.
+  Si un pedido no llega, le pide al `ServidorCubit` buscar el servidor y lo repite. Una
+  cuenta tiene una sola sesión activa: con la app abierta, cada 2 minutos le avisa al
+  servidor que la sigue usando.
 
 **La dirección del servidor es dinámica**, porque la IP de la PC cambia con la red.
 "Iniciar sesión" muestra **si el servidor está disponible** (punto verde) o no (punto

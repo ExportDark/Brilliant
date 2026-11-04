@@ -39,10 +39,16 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
         SalidaPedida() => _alSalir(emit),
         BorradoPedido() => _alBorrar(event, emit),
         AvisosDescartados() => emit(state.sinAvisos()),
+        SesionLatido() => _alLatir(emit),
       },
       transformer: (eventos, atender) => eventos.asyncExpand(atender),
     );
   }
+
+  /// El aviso cuando la sesión de este aparato dejó de valer mientras se usaba.
+  static const sesionCerrada =
+      'Tu sesión se cerró: venció, o se entró con tu cuenta en otro aparato. Vuelve a '
+      'iniciar sesión.';
 
   /// La dirección del servidor con la que se está hablando.
   Uri get servidor => _cuentas.servidor;
@@ -112,6 +118,23 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     } on Exception {
       // La cuenta sí se creó: solo falló iniciar la sesión.
       emit(const SesionState.sinSesion(aviso: 'Tu cuenta se creó. Inicia sesión para jugar.'));
+    }
+  }
+
+  Future<void> _alLatir(Emitter<SesionState> emit) async {
+    final sesion = _sesion;
+    if (sesion == null) return;
+
+    try {
+      await _conElServidor(() => _cuentas.quienSoy(sesion.token));
+    } on SesionVencida {
+      // Venció, o se entró con la cuenta en otro aparato mientras este no la
+      // usaba: la sesión de aquí ya no vale.
+      await _olvidarSesion();
+      emit(const SesionState.sinSesion(aviso: sesionCerrada));
+    } on Exception {
+      // Sin red, o sin saber a cuál servidor hablarle: se sigue jugando, y se
+      // vuelve a avisar en el próximo latido.
     }
   }
 

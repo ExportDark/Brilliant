@@ -112,6 +112,27 @@ void main() {
       expect(error.generales, ['Solicitud fue regulada.']);
     });
 
+    test('la cuenta activa en otro aparato (409) es un ErrorDeCuenta con el mensaje', () async {
+      final (:cuentas, pedidos: _) = _contestando(409, {
+        'non_field_errors': ['Esta cuenta ya tiene la sesión iniciada en otro aparato.'],
+      });
+
+      final error = await _errorDe(() => cuentas.entrar(usuario: 'ana', contrasena: 'buena'));
+
+      expect(error.generales, ['Esta cuenta ya tiene la sesión iniciada en otro aparato.']);
+    });
+
+    test('los mensajes de knox, en "error", también se ven', () async {
+      final (:cuentas, pedidos: _) = _contestando(403, {
+        'error': 'Maximum amount of tokens allowed per user exceeded.',
+      });
+
+      final error = await _errorDe(() => cuentas.entrar(usuario: 'ana', contrasena: 'buena'));
+
+      expect(error.generales, ['Maximum amount of tokens allowed per user exceeded.']);
+      expect(error.porCampo, isEmpty);
+    });
+
     test('un 401 es SesionVencida', () async {
       final (:cuentas, pedidos: _) = _contestando(401, {'detail': 'Token inválido.'});
 

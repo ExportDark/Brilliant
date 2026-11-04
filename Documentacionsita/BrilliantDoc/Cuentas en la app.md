@@ -36,6 +36,7 @@ contraseña otra vez.
 | `direccion_del_servidor.dart` | La dirección por defecto, leer la que escribe el jugador (`192.168.137.252`, `ip:puerto` o una URL `https`) y mostrarla corta |
 | `buscador_de_servidores.dart` + `_io` / `_web` | `BuscadorDeServidores`: busca en la red los servidores que se anuncian. En Android, `BuscadorNsd`, con el paquete nsd; en la web, `SinBuscar` |
 | `almacen_de_sesion.dart` | `AlmacenSeguro` guarda el usuario, el token y la dirección del servidor elegida con `flutter_secure_storage`: cifrados, con una clave del Keystore de Android. La contraseña nunca se guarda |
+| `reglas_de_cuenta.dart` | Las reglas del nombre de usuario y de la contraseña, las mismas del servidor y con los mismos mensajes: `problemaConElUsuario` y `problemaConLaContrasena` |
 | `servidor_cubit.dart` (+ `_state`) | `ServidorCubit`: dónde está el servidor y si contesta (`revisando`, `disponible`, `noDisponible`), arriba de toda la app |
 | `sesion_bloc.dart` (+ `_event`, `_state`) | `SesionBloc`: la sesión del jugador, arriba de toda la app |
 
@@ -71,8 +72,8 @@ Tres piezas son compartidas:
   guardada, se cruzaban con el pedido anterior. Lo encontraron los tests del bloc.
 - **Los errores del servidor se muestran tal cual**, en español, debajo de su campo
   ("Ya existe un usuario con este nombre.") o en el recuadro de avisos ("No puede iniciar
-  sesión con las credenciales proporcionadas."). La app solo revisa lo básico antes de
-  mandar: que no falte nada, el largo de la contraseña y que las dos coincidan.
+  sesión con las credenciales proporcionadas."). También los de knox, que vienen en
+  `error`: antes se perdían. Ver [[#Las reglas de las cuentas]].
 - **Al escribir de nuevo, el error anterior se va**, y también al pasar de una pantalla de
   cuenta a otra (`AvisosDescartados`).
 - **Cerrar sesión sin conexión la cierra igual** en el aparato: el token se olvida, y en
@@ -80,6 +81,49 @@ Tres piezas son compartidas:
 - **Al entrar o salir, se vuelve a la raíz.** Un `BlocListener` arriba del `MaterialApp`
   cierra todo lo que haya encima (crear cuenta, mi cuenta, el diálogo de borrar) cuando
   cambia la etapa de la sesión.
+
+## Las reglas de las cuentas
+
+Las mismas del servidor (ver [[Servidor de cuentas#Las reglas de las cuentas]]). La app
+las revisa en "Crear cuenta" antes de mandar nada, con los mismos mensajes:
+
+| Qué | Regla en la app |
+|---|---|
+| Nombre de usuario | De 3 a 20 caracteres: letras sin acento, números, punto, guion y guion bajo. El campo no deja escribir más de 20 y lo explica debajo. Se recortan los espacios del borde |
+| Contraseña | De 8 a 128 caracteres. **Nunca se recorta**: los espacios del borde son parte de ella |
+| Las dos contraseñas | Tienen que coincidir |
+
+Lo que solo sabe el servidor lo dice él, en su campo o en el recuadro de avisos:
+
+- que el nombre ya existe, también con otras mayúsculas: "ANA" choca con "ana";
+- que la contraseña es común o se parece al usuario;
+- que la cuenta tiene la sesión activa en otro aparato.
+
+"Iniciar sesión" no revisa reglas: manda lo escrito, con el usuario recortado, y se entra
+escribiéndolo con cualquier mayúscula.
+
+Los largos se cuentan en caracteres (runas), como Python, y no en unidades de UTF-16:
+un emoji cuenta como uno.
+
+### Una sola sesión activa: el latido
+
+Una cuenta tiene una sola sesión **activa**: usada en los últimos 5 minutos. Para que la
+del aparato que se está usando cuente como activa:
+
+- **cada 2 minutos, con la app en primer plano**, `BrilliantApp` manda `SesionLatido`, y
+  el `SesionBloc` pregunta "quién soy" con el token;
+- **al volver a la app**, también;
+- **en segundo plano no**: un celular guardado en el bolsillo deja de contar como activo
+  y se puede entrar en otro.
+
+Si el latido recibe 401 (la sesión venció, o se entró con la cuenta en otro aparato
+mientras este no la usaba), la app vuelve a "Iniciar sesión" con el aviso "Tu sesión se
+cerró: venció, o se entró con tu cuenta en otro aparato. Vuelve a iniciar sesión.". Sin
+conexión no cierra nada: el juego sigue.
+
+Entrar con la cuenta activa en otro aparato muestra el mensaje del servidor en el recuadro
+de avisos: "Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o
+espera unos minutos si ya no la usas."
 
 ## Encontrar el servidor
 
@@ -204,6 +248,13 @@ particular.
   borrarla en la versión web.
 - **Al cambiar la PC de red** (a 192.168.137.252), en el emulador: escribir la
   dirección nueva en "Servidor" conecta.
+- **Las reglas, con el servidor de verdad** (2026-11-04):
+  - las 3 pruebas de `contra_el_servidor_test.dart` pasan;
+  - en el emulador, "ana@x" muestra "Solo puede tener letras sin acento…" sin mandar
+    nada;
+  - con la cuenta abierta desde un script de Python que hace de otro celular, entrar en
+    el emulador escribiendo el nombre en mayúsculas muestra "Esta cuenta ya tiene la
+    sesión iniciada en otro aparato…".
 - **El indicador, con el servidor de verdad**, en el emulador (2026-11-04):
   - al abrir, "Servidor disponible · 10.0.2.2";
   - al apagarle la WiFi y los datos al emulador (`adb shell svc wifi disable`), la app

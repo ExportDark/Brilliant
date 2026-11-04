@@ -151,7 +151,8 @@ class ClienteCuentas {
   }
 
   /// Los errores de DRF vienen como `{"campo": ["mensaje", ...]}`; los que no
-  /// son de un campo, en `non_field_errors` o en `detail`.
+  /// son de un campo, en `non_field_errors` o en `detail`, y los de knox, en
+  /// `error`.
   static ErrorDeCuenta _errorDe(Map<String, dynamic> datos) {
     List<String> mensajes(Object? valor) => switch (valor) {
           final List<dynamic> lista => [for (final mensaje in lista) '$mensaje'],
@@ -162,7 +163,7 @@ class ClienteCuentas {
     final porCampo = <String, List<String>>{};
     final generales = <String>[];
     for (final MapEntry(key: campo, :value) in datos.entries) {
-      if (campo == 'non_field_errors' || campo == 'detail') {
+      if (campo == 'non_field_errors' || campo == 'detail' || campo == 'error') {
         generales.addAll(mensajes(value));
       } else {
         porCampo[campo] = mensajes(value);

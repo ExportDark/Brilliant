@@ -43,3 +43,10 @@ final class BorradoPedido extends SesionEvent {
 final class AvisosDescartados extends SesionEvent {
   const AvisosDescartados();
 }
+
+/// La app sigue abierta: con sesión, se le avisa al servidor. Una cuenta tiene
+/// una sola sesión activa, y "activa" es usada hace poco: este aviso, que la
+/// app manda cada 2 minutos mientras está en primer plano, la mantiene así.
+final class SesionLatido extends SesionEvent {
+  const SesionLatido();
+}

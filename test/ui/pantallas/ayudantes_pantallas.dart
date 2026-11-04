@@ -41,7 +41,8 @@ void _superficie(WidgetTester tester, Size tamano) {
 /// usa ese, con lo que tenga guardado. Con [buscador], busca servidores en la
 /// red con ese; sin él, no busca. Con [cambiosDeRed], cada evento es como si
 /// el aparato cambiara de red; con [revisarCada], revisa solo el servidor
-/// mientras no hay.
+/// mientras no hay; con [latidoCada], avisa al servidor que la sesión sigue
+/// en uso.
 Future<void> abrirApp(
   WidgetTester tester, {
   int Function()? tirarDado,
@@ -52,6 +53,7 @@ Future<void> abrirApp(
   BuscadorDeServidores buscador = const SinBuscar(),
   Stream<Object?>? cambiosDeRed,
   Duration? revisarCada,
+  Duration? latidoCada,
 }) async {
   _superficie(tester, tamano);
   final elServidor = servidor ?? ServidorFalso();
@@ -64,6 +66,7 @@ Future<void> abrirApp(
       buscador: buscador,
       cambiosDeRed: cambiosDeRed,
       revisarCada: revisarCada,
+      latidoCada: latidoCada,
       tirarDado: tirarDado,
     ),
   );
@@ -124,6 +127,28 @@ final botonEntrar = find.widgetWithText(FilledButton, 'Entrar');
 final botonCrearCuenta = find.widgetWithText(FilledButton, 'Crear cuenta');
 
 final enlaceCrearCuenta = find.widgetWithText(TextButton, '¿No tienes cuenta? Crea una');
+
+/// En "Crear cuenta", escribe [usuario] y [contrasena] (dos veces, o la
+/// segunda [repetida]) y toca "Crear cuenta".
+Future<void> crearCuentaCon(
+  WidgetTester tester,
+  String usuario,
+  String contrasena, {
+  String? repetida,
+}) async {
+  await escribir(tester, 'campo-usuario-nuevo', usuario);
+  await escribir(tester, 'campo-contrasena-nueva', contrasena);
+  await escribir(tester, 'campo-contrasena-repetida', repetida ?? contrasena);
+  await tocar(tester, botonCrearCuenta);
+}
+
+/// El error que muestra el campo de clave [clave], o `null` si no tiene.
+String? errorDelCampo(WidgetTester tester, String clave) => tester
+    .widget<TextField>(
+      find.descendant(of: find.byKey(ValueKey(clave)), matching: find.byType(TextField)),
+    )
+    .decoration
+    ?.errorText;
 
 final botonMiCuenta = find.byKey(const ValueKey('boton-mi-cuenta'));
 

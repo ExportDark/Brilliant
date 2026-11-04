@@ -83,10 +83,15 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       "Servidor disponible" con un punto verde, o "Sin servidor" con uno rojo. Lo vuelve
       a revisar solo al abrir, al volver a la app, al cambiar la red del aparato y cada
       10 segundos mientras no hay. Ver [[Cuentas en la app#Si está disponible, a la vista]]
+- [x] **Las reglas de las cuentas** (2026-11-04) — usuario de 3 a 20 letras sin acento,
+      números, `.`, `_` y `-`; "Ana" y "ana" son la misma cuenta; contraseña de 8 a 128,
+      sin recortar; y una sola sesión activa por cuenta, con un aviso cada 2 minutos. En
+      el servidor y en la app, con los mismos mensajes. Ver
+      [[Cuentas en la app#Las reglas de las cuentas]]
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 468 tests de la app y 76 del servidor, todos pasando.
+cerrarla es el puntaje. 512 tests de la app y 76 del servidor, todos pasando.
 
 ## Qué falta
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../cuenta/reglas_de_cuenta.dart';
 import '../../cuenta/sesion_bloc.dart';
 import '../../cuenta/sesion_event.dart';
 import '../../cuenta/sesion_state.dart';
@@ -11,14 +12,13 @@ import '../widgets/recuadro_de_aviso.dart';
 /// "Crear cuenta": usuario y contraseña, escrita dos veces. Al crearla se
 /// inicia sesión sola y se pasa a elegir el mapa.
 ///
-/// Aquí se revisa solo lo básico (que no falte nada, el largo y que las dos
-/// contraseñas coincidan). El resto lo decide el servidor, y sus mensajes
-/// aparecen debajo de cada campo.
+/// Aquí se revisan las reglas de `reglas_de_cuenta.dart` (el nombre de
+/// usuario, el largo de la contraseña) y que las dos contraseñas coincidan,
+/// antes de mandar nada. El resto lo decide el servidor (que el usuario no
+/// exista, que la contraseña no sea común), y sus mensajes aparecen debajo de
+/// cada campo.
 class PantallaCrearCuenta extends StatefulWidget {
   const PantallaCrearCuenta({super.key});
-
-  /// El largo mínimo de la contraseña, el mismo que pide el servidor.
-  static const largoMinimo = 8;
 
   @override
   State<PantallaCrearCuenta> createState() => _PantallaCrearCuentaState();
@@ -93,12 +93,15 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                               autocorrect: false,
                               textInputAction: TextInputAction.next,
                               autofillHints: const [AutofillHints.newUsername],
+                              maxLength: largoMaximoUsuario,
                               onChanged: _alCambiar,
-                              validator: (texto) => (texto ?? '').trim().isEmpty
-                                  ? 'Elige un nombre de usuario'
-                                  : null,
+                              validator: (texto) => problemaConElUsuario((texto ?? '').trim()),
                               decoration: InputDecoration(
                                 labelText: 'Usuario',
+                                helperText: 'De $largoMinimoUsuario a $largoMaximoUsuario caracteres: '
+                                    'letras sin acento, números, punto, guion y guion bajo.',
+                                helperMaxLines: 2,
+                                errorMaxLines: 3,
                                 prefixIcon: const Icon(Icons.person_outline_rounded),
                                 errorText: error?.de('username'),
                               ),
@@ -108,20 +111,14 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                               key: const ValueKey('campo-contrasena-nueva'),
                               controlador: _contrasena,
                               etiqueta: 'Contraseña',
-                              ayuda: 'Al menos ${PantallaCrearCuenta.largoMinimo} caracteres. '
+                              ayuda: 'Al menos $largoMinimoContrasena caracteres. '
                                   'Que no sea común, ni solo números, ni parecida a tu usuario.',
                               error: error?.de('password'),
                               habilitado: !state.ocupado,
                               accion: TextInputAction.next,
                               pistasDeAutocompletado: const [AutofillHints.newPassword],
                               alCambiar: _alCambiar,
-                              validar: (texto) {
-                                if ((texto ?? '').isEmpty) return 'Elige una contraseña';
-                                if (texto!.length < PantallaCrearCuenta.largoMinimo) {
-                                  return 'Al menos ${PantallaCrearCuenta.largoMinimo} caracteres';
-                                }
-                                return null;
-                              },
+                              validar: (texto) => problemaConLaContrasena(texto ?? ''),
                             ),
                             const SizedBox(height: 14),
                             CampoDeContrasena(

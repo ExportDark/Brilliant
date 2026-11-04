@@ -7,6 +7,26 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-04 — Las reglas de las cuentas, en la app
+
+- **"Crear cuenta" revisa las reglas antes de mandar nada**, con los mismos mensajes que
+  el servidor: usuario de 3 a 20 letras sin acento, números, `.`, `_` y `-` (el campo no
+  deja escribir más de 20 y lo explica debajo); contraseña de 8 a 128, nunca recortada.
+  Están en `lib/cuenta/reglas_de_cuenta.dart`. Ver [[Cuentas en la app#Las reglas de las cuentas]].
+- **El latido:** con la app en primer plano, cada 2 minutos y al volver a ella, se le
+  avisa al servidor que la sesión sigue en uso, para que cuente como activa. Si el
+  servidor la cerró, la app vuelve a "Iniciar sesión" con un aviso.
+- **Entrar con la cuenta activa en otro aparato** muestra el mensaje del servidor. Los
+  mensajes de knox, que vienen en `error`, ya no se pierden.
+- `ServidorFalso` imita las reglas nuevas, con un reloj que los tests adelantan.
+- **Tests:** las reglas (26 casos), el cliente, el bloc, 10 widget tests nuevos y 1
+  contra el servidor de verdad. Se rompió a propósito cada pieza para ver que su test
+  falla.
+- **En el emulador, con el servidor de verdad:** "ana@x" avisa sin mandar nada, y con la
+  cuenta abierta desde un script que hace de otro celular, entrar escribiendo el nombre en
+  mayúsculas dice que la cuenta tiene la sesión iniciada en otro aparato.
+- 512 tests de la app (más 3 contra el servidor).
+
 ## 2026-11-04 — Las reglas de las cuentas, en el servidor
 
 - **Por qué:** al revisar todas las validaciones de las cuentas aparecieron huecos y dos

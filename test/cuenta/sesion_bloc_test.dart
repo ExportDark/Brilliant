@@ -406,4 +406,107 @@ void main() {
       },
     );
   });
+
+  group('SesionBloc y la sesión en otro aparato', () {
+    blocTest<SesionBloc, SesionState>(
+      'entrar con la cuenta activa en otro aparato muestra el error y no guarda nada',
+      build: () {
+        servidor.sesionIniciada('ana');
+        return nuevoBloc();
+      },
+      act: (bloc) => bloc
+        ..add(const SesionRevisada())
+        ..add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba)),
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'sinSesion · error');
+        expect(bloc.state.error!.generales, [sesionEnOtroAparato]);
+        expect(almacen.sesion, isNull);
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'si la del otro aparato no se usa hace más de 5 minutos, entra y la vieja ya no sirve',
+      build: () {
+        servidor.sesionIniciada('ana');
+        final despues = DateTime.now().add(const Duration(minutes: 6));
+        servidor.ahora = () => despues;
+        return nuevoBloc();
+      },
+      act: (bloc) => bloc
+        ..add(const SesionRevisada())
+        ..add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba)),
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'conSesion · ana');
+        expect(servidor.sesiones.keys, [almacen.sesion!.token], reason: 'la vieja se cerró');
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'el latido, con sesión, le pregunta al servidor con el token: así sigue activa',
+      build: () {
+        almacen.sesion = servidor.sesionIniciada('ana');
+        return nuevoBloc();
+      },
+      act: (bloc) async {
+        bloc.add(const SesionRevisada());
+        await bloc.stream.firstWhere((state) => state.etapa == EtapaDeSesion.conSesion);
+        servidor.pedidos.clear();
+        bloc.add(const SesionLatido());
+      },
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'conSesion · ana');
+        expect(servidor.pedidos.single.url.path, '/auth/users/me/');
+        expect(servidor.pedidos.single.headers['Authorization'], 'Token ${almacen.sesion!.token}');
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'si el servidor ya cerró la sesión, el latido vuelve a "Iniciar sesión" con el aviso',
+      build: () {
+        almacen.sesion = servidor.sesionIniciada('ana');
+        return nuevoBloc();
+      },
+      act: (bloc) async {
+        bloc.add(const SesionRevisada());
+        await bloc.stream.firstWhere((state) => state.etapa == EtapaDeSesion.conSesion);
+        // Se entró con la cuenta en otro aparato mientras este no la usaba.
+        servidor.sesiones.clear();
+        bloc.add(const SesionLatido());
+      },
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.sesionCerrada}');
+        expect(almacen.sesion, isNull);
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'sin conexión, el latido no cierra nada: se sigue jugando',
+      build: () {
+        almacen.sesion = servidor.sesionIniciada('ana');
+        return nuevoBloc();
+      },
+      act: (bloc) async {
+        bloc.add(const SesionRevisada());
+        await bloc.stream.firstWhere((state) => state.etapa == EtapaDeSesion.conSesion);
+        servidor.apagado = true;
+        bloc.add(const SesionLatido());
+      },
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'conSesion · ana');
+        expect(almacen.sesion, isNotNull);
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'sin sesión, el latido no hace nada',
+      build: nuevoBloc,
+      act: (bloc) => bloc
+        ..add(const SesionRevisada())
+        ..add(const SesionLatido()),
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'sinSesion');
+        expect(servidor.pedidos.where((pedido) => pedido.headers.containsKey('Authorization')), isEmpty);
+      },
+    );
+  });
 }
