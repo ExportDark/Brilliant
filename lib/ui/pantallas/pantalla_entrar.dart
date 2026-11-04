@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../cuenta/direccion_del_servidor.dart';
 import '../../cuenta/sesion_bloc.dart';
 import '../../cuenta/sesion_event.dart';
 import '../../cuenta/sesion_state.dart';
 import '../tema.dart';
 import '../widgets/campo_de_contrasena.dart';
+import '../widgets/indicador_del_servidor.dart';
 import '../widgets/logo_brilliant.dart';
 import '../widgets/recuadro_de_aviso.dart';
 import 'dialogo_del_servidor.dart';
 import 'pantalla_crear_cuenta.dart';
 
 /// "Iniciar sesión": la pantalla con la que arranca la app si no hay sesión.
-/// Sin sesión no se puede jugar; desde aquí también se crea la cuenta, y se
-/// cambia la dirección del servidor si la PC cambió de red.
+/// Sin sesión no se puede jugar; desde aquí también se crea la cuenta. Abajo
+/// se ve si el servidor está disponible, y tocándolo se elige otro.
 class PantallaEntrar extends StatefulWidget {
   const PantallaEntrar({super.key});
 
@@ -142,17 +142,9 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
                             onPressed: state.ocupado ? null : _irACrearCuenta,
                             child: const Text('¿No tienes cuenta? Crea una'),
                           ),
-                          const SizedBox(height: 16),
-                          Center(
-                            child: TextButton.icon(
-                              key: const ValueKey('boton-servidor'),
-                              onPressed: state.ocupado ? null : _cambiarServidor,
-                              icon: const Icon(Icons.dns_outlined, size: 18),
-                              label: Text(
-                                'Servidor: ${textoDeDireccion(_sesion.servidor)}',
-                                style: textos.bodyMedium?.copyWith(color: Paleta.tintaSuave),
-                              ),
-                            ),
+                          const SizedBox(height: 20),
+                          IndicadorDelServidor(
+                            alTocar: state.ocupado ? null : _cambiarServidor,
                           ),
                         ],
                       ),

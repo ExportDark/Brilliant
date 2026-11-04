@@ -78,6 +78,9 @@ El manifiesto principal pide dos permisos:
 - `android.permission.CHANGE_WIFI_MULTICAST_STATE`, para buscar el servidor en la WiFi
   (mDNS usa multicast).
 
+El paquete connectivity_plus, con el que la app nota los cambios de red, agrega solo el
+permiso `ACCESS_NETWORK_STATE` desde su propio manifiesto.
+
 > [!note] El emulador no encuentra el servidor de la PC
 > Su red pasa por un NAT que no deja pasar el multicast. En el emulador la búsqueda corre
 > pero no encuentra nada; se usa `10.0.2.2`. Buscar se prueba en un celular de verdad.

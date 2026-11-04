@@ -87,8 +87,8 @@ servidor/     el servidor de cuentas: un programa aparte, en Python (Django)
 ```
 
 Las cuentas del lado de la app viven en su propia capa, `lib/cuenta/`: el cliente HTTP
-del servidor, el almacén cifrado de la sesión, el buscador de servidores en la red y el
-`SesionBloc`. No saben nada del juego,
+del servidor, el almacén cifrado de la sesión, el buscador de servidores en la red, el
+`ServidorCubit` (dónde está el servidor y si contesta) y el `SesionBloc`. No saben nada del juego,
 y el juego no sabe nada de ellas: solo la raíz de la app decide si se juega o se inicia
 sesión. Ver [[Cuentas en la app]].
 

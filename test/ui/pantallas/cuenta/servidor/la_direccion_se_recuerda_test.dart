@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../cuenta/ayudantes_cuenta.dart';
@@ -16,6 +16,6 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await abrirApp(tester, servidor: servidor, almacen: almacen);
 
-    expect(find.text('Servidor: 192.168.137.252'), findsOneWidget);
+    expect(indicadorDelServidor(tester), 'Servidor disponible · 192.168.137.252');
   });
 }

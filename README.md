@@ -354,16 +354,20 @@ contraseña en un diálogo. La sesión se recuerda al cerrar y abrir la app.
   (`_brilliant._tcp`), con el paquete nsd. En la web no se puede buscar.
 - `almacen_de_sesion.dart`: el usuario, el token y la dirección del servidor elegida,
   cifrados con `flutter_secure_storage`.
+- `servidor_cubit.dart`: `ServidorCubit`, dónde está el servidor y si contesta. Si no
+  contesta, lo busca en la red: si contesta uno solo, se cambia a él.
 - `sesion_bloc.dart`: `SesionBloc`, arriba de toda la app. Atiende los pedidos de a uno.
-  Si el servidor no contesta, lo busca en la red: si contesta uno solo, se cambia a él y
-  repite el pedido.
+  Si un pedido no llega, le pide al `ServidorCubit` buscar el servidor y lo repite.
 
-**La dirección del servidor es dinámica**, porque la IP de la PC cambia con la red. En
-"Iniciar sesión", **"Servidor: …"** abre un diálogo con los servidores que encuentra en la
-WiFi, para tocar uno, o para escribir la IP a mano. Lo que se elige se recuerda.
+**La dirección del servidor es dinámica**, porque la IP de la PC cambia con la red.
+"Iniciar sesión" muestra **si el servidor está disponible** (punto verde) o no (punto
+rojo), y lo vuelve a revisar solo al abrir, al volver a la app, al cambiar la red del
+aparato y cada 10 segundos mientras no hay. Tocándolo se abre un diálogo con los
+servidores que encuentra en la WiFi, para tocar uno, o para escribir la IP a mano. Lo
+que se elige se recuerda.
 
-`BrilliantApp` recibe el cliente, el almacén y el buscador, para que los tests usen un
-servidor falso en memoria y un buscador falso.
+`BrilliantApp` recibe el cliente, el almacén, el buscador y los avisos de cambio de red,
+para que los tests usen un servidor falso en memoria, un buscador falso y una red falsa.
 
 ## Tests del camino feliz
 

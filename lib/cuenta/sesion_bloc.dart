@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 
 import 'almacen_de_sesion.dart';
-import 'buscador_de_servidores.dart';
 import 'cliente_cuentas.dart';
 import 'direccion_del_servidor.dart';
+import 'servidor_cubit.dart';
 import 'sesion_event.dart';
 import 'sesion_state.dart';
 
@@ -15,25 +15,19 @@ import 'sesion_state.dart';
 /// escribir otra vez la contraseña. El token no sale del bloc: las pantallas
 /// solo ven el usuario.
 ///
-/// También guarda la dirección del servidor, por si la PC cambia de red. Si
-/// el servidor no contesta, lo busca en la red con el [BuscadorDeServidores]:
-/// si encuentra uno solo, se cambia a él y vuelve a intentar, sin que el
-/// jugador tenga que escribir la IP nueva.
+/// Dónde está el servidor lo sabe el [ServidorCubit]. Si un pedido no llega,
+/// el bloc le pide buscarlo en la red: si encuentra uno solo, se cambia a él
+/// y el pedido se repite, sin que el jugador tenga que escribir la IP nueva.
 class SesionBloc extends Bloc<SesionEvent, SesionState> {
   final ClienteCuentas _cuentas;
   final AlmacenDeSesion _almacen;
-  final BuscadorDeServidores _buscador;
-
-  /// La dirección con la que se creó el cliente: a la que se vuelve al
-  /// restablecer.
-  final Uri servidorPorDefecto;
+  final ServidorCubit _servidor;
 
   /// La sesión iniciada, con su token. Es `null` sin sesión.
   Sesion? _sesion;
 
-  SesionBloc(this._cuentas, this._almacen, {this._buscador = const SinBuscar()})
-      : servidorPorDefecto = _cuentas.servidor,
-        super(const SesionState.revisando()) {
+  SesionBloc(this._cuentas, this._almacen, this._servidor)
+      : super(const SesionState.revisando()) {
     // Un solo manejador, que atiende los pedidos de a uno y en el orden en
     // que llegan: así un segundo toque, o cerrar sesión mientras se revisa
     // la guardada, no se cruza con el pedido anterior.
@@ -45,7 +39,6 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
         SalidaPedida() => _alSalir(emit),
         BorradoPedido() => _alBorrar(event, emit),
         AvisosDescartados() => emit(state.sinAvisos()),
-        ServidorCambiado() => _alCambiarServidor(event, emit),
       },
       transformer: (eventos, atender) => eventos.asyncExpand(atender),
     );
@@ -53,33 +46,6 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
   /// La dirección del servidor con la que se está hablando.
   Uri get servidor => _cuentas.servidor;
-
-  /// Si en esta plataforma se pueden buscar servidores en la red.
-  bool get puedeBuscar => _buscador.puedeBuscar;
-
-  /// Los servidores de la red que contestan. Si uno se anuncia con varias
-  /// IPs, aparece una vez, con la primera que contesta.
-  Future<List<ServidorEncontrado>> buscarServidores() async {
-    final anunciados = await _buscador.buscar();
-    final contestan = await Future.wait([
-      for (final anunciado in anunciados) _contesta(anunciado.direccion),
-    ]);
-
-    final porNombre = <String, ServidorEncontrado>{};
-    for (final (i, anunciado) in anunciados.indexed) {
-      if (contestan[i]) porNombre.putIfAbsent(anunciado.nombre, () => anunciado);
-    }
-    return [...porNombre.values];
-  }
-
-  Future<bool> _contesta(Uri direccion) async {
-    try {
-      await _cuentas.probarConexion(en: direccion);
-      return true;
-    } on Exception {
-      return false;
-    }
-  }
 
   /// Cuando no se puede hablar con el servidor: dice con qué dirección se
   /// intentó, para que se note si es la de otra red.
@@ -92,8 +58,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       );
 
   Future<void> _alRevisar(Emitter<SesionState> emit) async {
-    final elegido = await _almacen.leerServidor();
-    if (elegido != null) _cuentas.servidor = elegido;
+    // Primero, la dirección que eligió el jugador la última vez.
+    await _servidor.cargar();
 
     final guardada = await _almacen.leer();
     if (guardada == null) return emit(const SesionState.sinSesion());
@@ -185,49 +151,30 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  Future<void> _alCambiarServidor(ServidorCambiado event, Emitter<SesionState> emit) async {
-    // Solo se cambia sin sesión: la sesión es de un servidor en particular.
-    if (state.etapa != EtapaDeSesion.sinSesion) return;
-
-    final direccion = event.direccion ?? servidorPorDefecto;
-    _cuentas.servidor = direccion;
-    await _almacen.guardarServidor(event.direccion);
-
-    emit(state.esperando());
-    try {
-      await _cuentas.probarConexion();
-      emit(SesionState.sinSesion(
-        aviso: 'Conectado con el servidor en ${textoDeDireccion(direccion)}.',
-      ));
-    } on SinConexion {
-      emit(SesionState.sinSesion(error: _sinConexion));
-    } on ErrorDeCuenta catch (error) {
-      emit(SesionState.sinSesion(error: error));
-    }
-  }
-
-  /// Hace [pedido]; si el servidor no contesta, lo busca en la red, por si la
-  /// PC cambió de IP. Si contesta uno solo, se cambia a él, lo recuerda y
-  /// vuelve a intentar. Si contestan varios, no elige: el jugador elige en
-  /// "Servidor".
+  /// Hace [pedido]; si el servidor no contesta, le pide al [ServidorCubit]
+  /// buscarlo en la red, por si la PC o el aparato cambiaron de red. Si
+  /// contesta uno solo, el cubit se cambia a él y el pedido se repite. Si
+  /// contestan varios, no elige: el jugador elige en "Servidor".
   Future<T> _conElServidor<T>(Future<T> Function() pedido) async {
+    final intentada = servidor;
     try {
-      return await pedido();
+      final respuesta = await pedido();
+      _servidor.contesto();
+      return respuesta;
     } on SinConexion {
-      if (!puedeBuscar) rethrow;
-      final encontrados = await buscarServidores();
+      final encontrados = await _servidor.buscarOtro(intentada);
       if (encontrados.length > 1) {
         throw ErrorDeCuenta(generales: [
-          'No se pudo conectar con el servidor (${textoDeDireccion(servidor)}), y en la red '
+          'No se pudo conectar con el servidor (${textoDeDireccion(intentada)}), y en la red '
               'hay ${encontrados.length}. Elige uno en "Servidor".',
         ]);
       }
       if (encontrados.isEmpty) rethrow;
-
-      final encontrado = encontrados.single.direccion;
-      _cuentas.servidor = encontrado;
-      await _almacen.guardarServidor(encontrado);
       return pedido();
+    } on Exception {
+      // Contestó, aunque fuera para rechazar el pedido: está ahí.
+      _servidor.contesto();
+      rethrow;
     }
   }
 

@@ -9,7 +9,7 @@ void main() {
     final servidor = ServidorFalso()..cuentas['ana'] = contrasenaDePrueba;
     final buscador = BuscadorFalso([anunciado('192.168.137.252')]);
     await abrirApp(tester, servidor: servidor, conSesion: false, buscador: buscador);
-    expect(find.text('Servidor: servidor.test'), findsOneWidget);
+    expect(indicadorDelServidor(tester), 'Servidor disponible · servidor.test');
 
     // La PC cambió de red: en la dirección vieja ya no contesta nadie, y el
     // jugador no escribe la nueva.

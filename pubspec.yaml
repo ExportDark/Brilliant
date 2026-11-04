@@ -39,6 +39,7 @@ dependencies:
   http: ^1.6.0
   flutter_secure_storage: ^11.2.0
   nsd: ^5.0.1
+  connectivity_plus: ^7.3.2
 
 dev_dependencies:
   flutter_test:

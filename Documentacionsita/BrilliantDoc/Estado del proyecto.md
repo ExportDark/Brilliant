@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-03 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-11-04 · Repo: https://github.com/ExportDark/Brilliant
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
@@ -78,10 +78,14 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       (mDNS) y se cambia solo. En "Iniciar sesión" > Servidor se elige de la lista de los
       que encuentra, o se escribe la IP. Ya no hay que recompilar el APK si cambia la IP
       de la PC. Ver [[Cuentas en la app#Encontrar el servidor]]
+- [x] **El servidor disponible, a la vista** (2026-11-04) — "Iniciar sesión" muestra
+      "Servidor disponible" con un punto verde, o "Sin servidor" con uno rojo. Lo vuelve
+      a revisar solo al abrir, al volver a la app, al cambiar la red del aparato y cada
+      10 segundos mientras no hay. Ver [[Cuentas en la app#Si está disponible, a la vista]]
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 451 tests de la app y 34 del servidor, todos pasando.
+cerrarla es el puntaje. 468 tests de la app y 34 del servidor, todos pasando.
 
 ## Qué falta
 

@@ -3,16 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../cuenta/buscador_de_servidores.dart';
 import '../../cuenta/direccion_del_servidor.dart';
-import '../../cuenta/sesion_bloc.dart';
-import '../../cuenta/sesion_event.dart';
+import '../../cuenta/servidor_cubit.dart';
+import '../tema.dart';
 
 /// El diálogo para elegir el servidor de cuentas. Al abrirse busca los que
 /// hay en la red, y basta con tocar uno. Si no aparece (por ejemplo, en la
 /// web, donde no se puede buscar), se escribe la IP de la PC donde corre
 /// `servidor\iniciar.bat`, que la muestra al arrancar.
 ///
-/// Al elegir o guardar, el bloc la guarda en el aparato y prueba que el
-/// servidor conteste ahí; el resultado aparece en "Iniciar sesión".
+/// Al elegir o guardar, el [ServidorCubit] la guarda en el aparato y revisa
+/// que el servidor conteste ahí; el resultado se ve en "Iniciar sesión".
 class DialogoDelServidor extends StatefulWidget {
   const DialogoDelServidor({super.key});
 
@@ -22,8 +22,10 @@ class DialogoDelServidor extends StatefulWidget {
 
 class _DialogoDelServidorState extends State<DialogoDelServidor> {
   final _formulario = GlobalKey<FormState>();
-  late final _bloc = context.read<SesionBloc>();
-  late final _direccion = TextEditingController(text: textoDeDireccion(_bloc.servidor));
+  late final _servidor = context.read<ServidorCubit>();
+  late final _direccion = TextEditingController(
+    text: textoDeDireccion(_servidor.state.direccion),
+  );
 
   /// La búsqueda en la red en curso o la última; `null` si no se puede buscar.
   Future<List<ServidorEncontrado>>? _busqueda;
@@ -31,7 +33,7 @@ class _DialogoDelServidorState extends State<DialogoDelServidor> {
   @override
   void initState() {
     super.initState();
-    if (_bloc.puedeBuscar) _busqueda = _bloc.buscarServidores();
+    if (_servidor.puedeBuscar) _busqueda = _servidor.buscarServidores();
   }
 
   @override
@@ -43,12 +45,12 @@ class _DialogoDelServidorState extends State<DialogoDelServidor> {
   void _buscarDeNuevo() {
     // Con llaves: setState no acepta una función que devuelva un Future.
     setState(() {
-      _busqueda = _bloc.buscarServidores();
+      _busqueda = _servidor.buscarServidores();
     });
   }
 
-  void _usar(Uri? direccion) {
-    _bloc.add(ServidorCambiado(direccion));
+  void _usar(Uri? direccion, {String? nombre}) {
+    _servidor.elegir(direccion, nombre: nombre);
     Navigator.of(context).pop();
   }
 
@@ -76,8 +78,9 @@ class _DialogoDelServidorState extends State<DialogoDelServidor> {
               const SizedBox(height: 8),
               _ServidoresDeLaRed(
                 busqueda: busqueda,
-                actual: _bloc.servidor,
-                alElegir: _usar,
+                actual: _servidor.state.direccion,
+                alElegir: (encontrado) =>
+                    _usar(encontrado.direccion, nombre: encontrado.nombre),
                 alBuscarDeNuevo: _buscarDeNuevo,
               ),
               const SizedBox(height: 16),
@@ -113,7 +116,7 @@ class _DialogoDelServidorState extends State<DialogoDelServidor> {
         ),
       ),
       actions: [
-        if (_bloc.servidor != _bloc.servidorPorDefecto)
+        if (_servidor.state.direccion != _servidor.porDefecto)
           TextButton(onPressed: () => _usar(null), child: const Text('Restablecer')),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
@@ -140,7 +143,7 @@ class _ServidoresDeLaRed extends StatelessWidget {
   /// El servidor que se usa ahora, que lleva una palomita.
   final Uri actual;
 
-  final void Function(Uri direccion) alElegir;
+  final void Function(ServidorEncontrado servidor) alElegir;
   final VoidCallback alBuscarDeNuevo;
 
   const _ServidoresDeLaRed({
@@ -178,11 +181,11 @@ class _ServidoresDeLaRed extends StatelessWidget {
               ListTile(
                 key: ValueKey('servidor-${textoDeDireccion(servidor.direccion)}'),
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.dns_rounded),
+                leading: const Icon(Icons.dns_rounded, color: Paleta.disponible),
                 title: Text(servidor.nombre, overflow: TextOverflow.ellipsis),
-                subtitle: Text(textoDeDireccion(servidor.direccion)),
+                subtitle: Text('Disponible · ${textoDeDireccion(servidor.direccion)}'),
                 trailing: servidor.direccion == actual ? const Icon(Icons.check_rounded) : null,
-                onTap: () => alElegir(servidor.direccion),
+                onTap: () => alElegir(servidor),
               ),
             Align(
               alignment: AlignmentDirectional.centerStart,

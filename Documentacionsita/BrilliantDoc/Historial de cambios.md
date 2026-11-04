@@ -7,6 +7,27 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-04 — El servidor disponible, a la vista
+
+- **"Iniciar sesión" muestra si se puede entrar**, antes de intentarlo: un punto verde y
+  "Servidor disponible" (con su dirección, y su nombre si lo encontró buscando), uno rojo
+  y "Sin servidor", o una ruedita mientras busca. Tocándolo se abre "Servidor", donde cada
+  servidor de la red dice "Disponible". Ver [[Cuentas en la app#Si está disponible, a la vista]].
+- **Vuelve a revisar solo:** al abrir, al volver a la app, cuando cambia la red del
+  aparato (paquete connectivity_plus) y cada 10 segundos mientras no hay servidor. Si no
+  contesta, lo busca en la red. Así, si la PC y el celular se pasan a otra WiFi, la app
+  lo encuentra en la nueva.
+- **`ServidorCubit`**, aparte del `SesionBloc`: sabe dónde está el servidor y si
+  contesta. La sesión le pide buscarlo cuando un pedido no llega, y le avisa cuando
+  contesta. Revisar espera 4 segundos como mucho.
+- **Tests:** los del cubit (18), los del bloc con el cubit, y widget tests del
+  indicador, del cambio de red, de volver a la app y de cuando el servidor se enciende.
+  Se comprobó que cada uno falla si se quita lo que prueba. Ver [[Pruebas]].
+- **En el emulador, con el servidor de verdad:** "Servidor disponible"; al cortarle la red
+  pasa solo a "Sin servidor", y al devolvérsela vuelve solo a "Servidor disponible".
+  Crear una cuenta y borrarla funcionan.
+- 468 tests de la app (más 2 contra el servidor).
+
 ## 2026-11-03 — La app encuentra el servidor
 
 - **La dirección del servidor es dinámica.** En "Iniciar sesión", **"Servidor: …"** abre

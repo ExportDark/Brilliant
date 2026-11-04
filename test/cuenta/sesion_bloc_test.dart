@@ -1,6 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/cuenta/almacen_de_sesion.dart';
+import 'package:brilliant/cuenta/buscador_de_servidores.dart';
+import 'package:brilliant/cuenta/servidor_cubit.dart';
+import 'package:brilliant/cuenta/servidor_state.dart';
 import 'package:brilliant/cuenta/sesion_bloc.dart';
 import 'package:brilliant/cuenta/sesion_event.dart';
 import 'package:brilliant/cuenta/sesion_state.dart';
@@ -25,7 +28,14 @@ void main() {
     almacen = AlmacenEnMemoria();
   });
 
-  SesionBloc nuevoBloc() => SesionBloc(servidor.cliente(), almacen);
+  /// El servidor del último bloc creado.
+  late ServidorCubit cubit;
+
+  SesionBloc nuevoBloc({BuscadorDeServidores buscador = const SinBuscar()}) {
+    final cuentas = servidor.cliente();
+    cubit = ServidorCubit(cuentas, almacen, buscador: buscador);
+    return SesionBloc(cuentas, almacen, cubit);
+  }
 
   group('SesionBloc al abrir la app', () {
     blocTest<SesionBloc, SesionState>(
@@ -227,14 +237,25 @@ void main() {
     );
   });
 
-  group('SesionBloc y la dirección del servidor', () {
+  group('SesionBloc y el servidor', () {
     final nueva = Uri.parse('https://192.168.137.252:8443/');
+    late BuscadorFalso buscador;
+
+    setUp(() => buscador = BuscadorFalso());
+
+    /// Un bloc creado con la dirección de siempre, y luego la PC cambió de
+    /// red: ahí ya no contesta nadie.
+    SesionBloc blocConLaPcEnOtraRed() {
+      final bloc = nuevoBloc(buscador: buscador);
+      servidor.direccion = '192.168.137.252';
+      return bloc;
+    }
 
     blocTest<SesionBloc, SesionState>(
       'al abrir, usa la dirección que eligió el jugador',
       build: () {
         final bloc = nuevoBloc();
-        // La PC cambió de red, y el jugador ya había escrito la nueva.
+        // La PC cambió de red, y el jugador ya había elegido la nueva.
         servidor.direccion = '192.168.137.252';
         almacen
           ..servidor = nueva
@@ -249,88 +270,10 @@ void main() {
     );
 
     blocTest<SesionBloc, SesionState>(
-      'cambiarla la guarda, prueba que el servidor conteste y avisa',
-      build: () {
-        final bloc = nuevoBloc();
-        servidor.direccion = '192.168.137.252';
-        return bloc;
-      },
-      act: (bloc) => bloc
-        ..add(const SesionRevisada())
-        ..add(ServidorCambiado(nueva)),
-      verify: (bloc) {
-        expect(_resumen(bloc.state), 'sinSesion · Conectado con el servidor en 192.168.137.252.');
-        expect(almacen.servidor, nueva);
-        expect(servidor.pedidos.last.url.host, '192.168.137.252');
-      },
-    );
-
-    blocTest<SesionBloc, SesionState>(
-      'si ahí no contesta nadie, la guarda igual y dice con qué dirección intentó',
-      build: nuevoBloc,
-      act: (bloc) => bloc
-        ..add(const SesionRevisada())
-        ..add(ServidorCambiado(Uri.parse('https://10.0.0.9:8443/'))),
-      verify: (bloc) {
-        expect(
-          bloc.state.error!.generales.single,
-          startsWith('No se pudo conectar con el servidor (10.0.0.9)'),
-        );
-        expect(almacen.servidor, Uri.parse('https://10.0.0.9:8443/'));
-      },
-    );
-
-    blocTest<SesionBloc, SesionState>(
-      'restablecer vuelve a la dirección de siempre y olvida la elegida',
-      build: () {
-        almacen.servidor = nueva;
-        return nuevoBloc();
-      },
-      act: (bloc) => bloc
-        ..add(const SesionRevisada())
-        ..add(const ServidorCambiado(null)),
-      verify: (bloc) {
-        expect(bloc.servidor, bloc.servidorPorDefecto);
-        expect(almacen.servidor, isNull);
-        expect(_resumen(bloc.state), 'sinSesion · Conectado con el servidor en servidor.test.');
-      },
-    );
-
-    blocTest<SesionBloc, SesionState>(
-      'con la sesión iniciada no se cambia: la sesión es de ese servidor',
-      build: () {
-        almacen.sesion = servidor.sesionIniciada('ana');
-        return nuevoBloc();
-      },
-      act: (bloc) => bloc
-        ..add(const SesionRevisada())
-        ..add(ServidorCambiado(nueva)),
-      verify: (bloc) {
-        expect(bloc.servidor, bloc.servidorPorDefecto);
-        expect(almacen.servidor, isNull);
-      },
-    );
-  });
-
-  group('SesionBloc buscando el servidor en la red', () {
-    final nueva = Uri.parse('https://192.168.137.252:8443/');
-    late BuscadorFalso buscador;
-
-    setUp(() => buscador = BuscadorFalso());
-
-    /// Un bloc creado con la dirección de siempre, y luego la PC cambió de
-    /// red: ahí ya no contesta nadie.
-    SesionBloc blocConLaPcEnOtraRed() {
-      final bloc = SesionBloc(servidor.cliente(), almacen, buscador: buscador);
-      servidor.direccion = '192.168.137.252';
-      return bloc;
-    }
-
-    blocTest<SesionBloc, SesionState>(
-      'mientras el servidor contesta, no busca',
+      'mientras el servidor contesta, no busca, y el servidor queda disponible',
       build: () {
         servidor.cuentas['ana'] = contrasenaDePrueba;
-        return SesionBloc(servidor.cliente(), almacen, buscador: buscador);
+        return nuevoBloc(buscador: buscador);
       },
       act: (bloc) => bloc
         ..add(const SesionRevisada())
@@ -338,6 +281,22 @@ void main() {
       verify: (bloc) {
         expect(_resumen(bloc.state), 'conSesion · ana');
         expect(buscador.busquedas, 0);
+        expect(cubit.state.disponibilidad, Disponibilidad.disponible);
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'una contraseña mala también dice que el servidor está',
+      build: () {
+        servidor.cuentas['ana'] = contrasenaDePrueba;
+        return nuevoBloc();
+      },
+      act: (bloc) => bloc
+        ..add(const SesionRevisada())
+        ..add(const EntradaPedida(usuario: 'ana', contrasena: 'otra-contrasena-1')),
+      verify: (bloc) {
+        expect(bloc.state.error, isNotNull);
+        expect(cubit.state.disponibilidad, Disponibilidad.disponible);
       },
     );
 
@@ -355,6 +314,14 @@ void main() {
         expect(_resumen(bloc.state), 'conSesion · ana');
         expect(bloc.servidor, nueva);
         expect(almacen.servidor, nueva, reason: 'la recuerda para la próxima vez');
+        expect(
+          cubit.state,
+          ServidorState(
+            direccion: nueva,
+            disponibilidad: Disponibilidad.disponible,
+            nombre: 'Brilliant en ORION',
+          ),
+        );
       },
     );
 
@@ -398,24 +365,8 @@ void main() {
       },
     );
 
-    test('un servidor que se anuncia con varias IPs aparece una vez, con la que contesta', () async {
-      buscador.anunciados.addAll([anunciado('10.0.0.9'), anunciado('192.168.137.252')]);
-      final bloc = blocConLaPcEnOtraRed();
-      addTearDown(bloc.close);
-
-      expect(await bloc.buscarServidores(), [anunciado('192.168.137.252')]);
-    });
-
-    test('los que se anuncian pero no contestan no aparecen', () async {
-      buscador.anunciados.add(anunciado('10.0.0.9', pc: 'VEGA'));
-      final bloc = blocConLaPcEnOtraRed();
-      addTearDown(bloc.close);
-
-      expect(await bloc.buscarServidores(), isEmpty);
-    });
-
     blocTest<SesionBloc, SesionState>(
-      'si no encuentra ninguno, da el error de siempre y no cambia la dirección',
+      'si no encuentra ninguno, da el error de siempre y el servidor no está disponible',
       build: blocConLaPcEnOtraRed,
       act: (bloc) => bloc
         ..add(const SesionRevisada())
@@ -426,8 +377,9 @@ void main() {
           startsWith('No se pudo conectar con el servidor (servidor.test)'),
         );
         expect(buscador.busquedas, 1);
-        expect(bloc.servidor, bloc.servidorPorDefecto);
+        expect(bloc.servidor, cubit.porDefecto);
         expect(almacen.servidor, isNull);
+        expect(cubit.state.disponibilidad, Disponibilidad.noDisponible);
       },
     );
 
@@ -450,16 +402,8 @@ void main() {
           'No se pudo conectar con el servidor (servidor.test), y en la red hay 2. '
           'Elige uno en "Servidor".',
         );
-        expect(bloc.servidor, bloc.servidorPorDefecto);
+        expect(bloc.servidor, cubit.porDefecto);
       },
     );
-
-    test('sin buscador, como en la web, no se puede buscar', () async {
-      final bloc = nuevoBloc();
-      addTearDown(bloc.close);
-
-      expect(bloc.puedeBuscar, isFalse);
-      expect(await bloc.buscarServidores(), isEmpty);
-    });
   });
 }

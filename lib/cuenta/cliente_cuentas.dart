@@ -83,9 +83,11 @@ class ClienteCuentas {
   ///
   /// Como el cliente solo confía en la autoridad de Brilliant, un servidor
   /// ajeno que se haga pasar por el de Brilliant no contesta: da [SinConexion].
-  Future<void> probarConexion({Uri? en}) async {
+  /// Espera la respuesta hasta [espera]: para revisar si está, no hace falta
+  /// tanto como para un pedido de verdad.
+  Future<void> probarConexion({Uri? en, Duration espera = _espera}) async {
     try {
-      await _pedir('GET', 'auth/users/me/', en: en);
+      await _pedir('GET', 'auth/users/me/', en: en, espera: espera);
     } on SesionVencida {
       return;
     }
@@ -110,6 +112,7 @@ class ClienteCuentas {
     String? token,
     Map<String, String>? cuerpo,
     Uri? en,
+    Duration espera = _espera,
   }) async {
     final pedido = http.Request(metodo, (en ?? servidor).resolve(ruta))
       ..headers['Accept'] = 'application/json';
@@ -121,7 +124,7 @@ class ClienteCuentas {
 
     final http.Response respuesta;
     try {
-      respuesta = await http.Response.fromStream(await _http.send(pedido).timeout(_espera));
+      respuesta = await http.Response.fromStream(await _http.send(pedido).timeout(espera));
     } on Exception {
       // Sin red, servidor apagado, certificado ajeno o tiempo agotado: para
       // el jugador es lo mismo, no hay con quién hablar.

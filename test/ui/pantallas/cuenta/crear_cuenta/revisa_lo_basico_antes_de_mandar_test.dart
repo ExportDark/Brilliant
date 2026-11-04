@@ -28,7 +28,8 @@ void main() {
     await tocar(tester, botonCrearCuenta);
     expect(find.text('Las contraseñas no coinciden'), findsOneWidget);
 
-    expect(servidor.pedidos, isEmpty);
+    // Al abrir, la app solo revisó que el servidor estuviera: no mandó nada.
+    expect(servidor.pedidos.where((pedido) => pedido.method == 'POST'), isEmpty);
     expect(servidor.cuentas, isEmpty);
   });
 }

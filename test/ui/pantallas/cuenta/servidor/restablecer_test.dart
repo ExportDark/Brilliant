@@ -15,12 +15,15 @@ void main() {
     await tocar(tester, find.widgetWithText(TextButton, 'Cancelar'));
 
     await cambiarServidor(tester, '10.0.0.9');
-    expect(find.text('Servidor: 10.0.0.9'), findsOneWidget);
+    expect(
+      indicadorDelServidor(tester),
+      'Sin servidor · No contesta en 10.0.0.9. Toca para buscar otro.',
+    );
 
     await tocar(tester, botonServidor);
     await tocar(tester, find.widgetWithText(TextButton, 'Restablecer'));
 
-    expect(find.text('Servidor: servidor.test'), findsOneWidget);
+    expect(indicadorDelServidor(tester), 'Servidor disponible · servidor.test');
     expect(almacen.servidor, isNull);
   });
 }

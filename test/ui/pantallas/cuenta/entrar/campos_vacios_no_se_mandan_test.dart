@@ -14,6 +14,7 @@ void main() {
 
     expect(find.text('Escribe tu usuario'), findsOneWidget);
     expect(find.text('Escribe tu contraseña'), findsOneWidget);
-    expect(servidor.pedidos, isEmpty);
+    // Al abrir, la app solo revisó que el servidor estuviera: no mandó nada.
+    expect(servidor.pedidos.where((pedido) => pedido.method == 'POST'), isEmpty);
   });
 }

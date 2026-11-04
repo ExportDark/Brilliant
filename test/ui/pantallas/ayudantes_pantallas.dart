@@ -10,6 +10,7 @@ import 'package:brilliant/modelo/tablero.dart';
 import 'package:brilliant/ui/pantallas/pantalla_partida.dart';
 import 'package:brilliant/ui/pantallas/pantalla_preparacion.dart';
 import 'package:brilliant/ui/widgets/celda_widget.dart';
+import 'package:brilliant/ui/widgets/indicador_del_servidor.dart';
 
 import '../../cuenta/ayudantes_cuenta.dart';
 import '../../juego/ayudantes.dart';
@@ -38,7 +39,9 @@ void _superficie(WidgetTester tester, Size tamano) {
 /// Con [conSesion], la app ya tiene guardada una sesión de "ana" y arranca
 /// directo en "Elige un mapa"; sin ella, en "Iniciar sesión". Con [almacen],
 /// usa ese, con lo que tenga guardado. Con [buscador], busca servidores en la
-/// red con ese; sin él, no busca.
+/// red con ese; sin él, no busca. Con [cambiosDeRed], cada evento es como si
+/// el aparato cambiara de red; con [revisarCada], revisa solo el servidor
+/// mientras no hay.
 Future<void> abrirApp(
   WidgetTester tester, {
   int Function()? tirarDado,
@@ -47,6 +50,8 @@ Future<void> abrirApp(
   bool conSesion = true,
   AlmacenEnMemoria? almacen,
   BuscadorDeServidores buscador = const SinBuscar(),
+  Stream<Object?>? cambiosDeRed,
+  Duration? revisarCada,
 }) async {
   _superficie(tester, tamano);
   final elServidor = servidor ?? ServidorFalso();
@@ -57,6 +62,8 @@ Future<void> abrirApp(
       cuentas: elServidor.cliente(),
       almacen: elAlmacen,
       buscador: buscador,
+      cambiosDeRed: cambiosDeRed,
+      revisarCada: revisarCada,
       tirarDado: tirarDado,
     ),
   );
@@ -121,6 +128,15 @@ final enlaceCrearCuenta = find.widgetWithText(TextButton, '¿No tienes cuenta? C
 final botonMiCuenta = find.byKey(const ValueKey('boton-mi-cuenta'));
 
 final botonServidor = find.byKey(const ValueKey('boton-servidor'));
+
+/// Lo que dice el indicador del servidor de "Iniciar sesión", con sus textos
+/// unidos por " · ". Por ejemplo, "Servidor disponible · servidor.test".
+String indicadorDelServidor(WidgetTester tester) => tester
+    .widgetList<Text>(
+      find.descendant(of: find.byType(IndicadorDelServidor), matching: find.byType(Text)),
+    )
+    .map((texto) => texto.data)
+    .join(' · ');
 
 /// Escribe [direccion] en el diálogo del servidor y la guarda.
 Future<void> cambiarServidor(WidgetTester tester, String direccion) async {

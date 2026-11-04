@@ -36,6 +36,7 @@ contraseña otra vez.
 | `direccion_del_servidor.dart` | La dirección por defecto, leer la que escribe el jugador (`192.168.137.252`, `ip:puerto` o una URL `https`) y mostrarla corta |
 | `buscador_de_servidores.dart` + `_io` / `_web` | `BuscadorDeServidores`: busca en la red los servidores que se anuncian. En Android, `BuscadorNsd`, con el paquete nsd; en la web, `SinBuscar` |
 | `almacen_de_sesion.dart` | `AlmacenSeguro` guarda el usuario, el token y la dirección del servidor elegida con `flutter_secure_storage`: cifrados, con una clave del Keystore de Android. La contraseña nunca se guarda |
+| `servidor_cubit.dart` (+ `_state`) | `ServidorCubit`: dónde está el servidor y si contesta (`revisando`, `disponible`, `noDisponible`), arriba de toda la app |
 | `sesion_bloc.dart` (+ `_event`, `_state`) | `SesionBloc`: la sesión del jugador, arriba de toda la app |
 
 Las pantallas están en `lib/ui/pantallas/`:
@@ -43,7 +44,8 @@ Las pantallas están en `lib/ui/pantallas/`:
 - `pantalla_entrar.dart`;
 - `pantalla_crear_cuenta.dart`;
 - `pantalla_mi_cuenta.dart`, con el diálogo de borrar;
-- `dialogo_del_servidor.dart`, que se abre con "Servidor: …" en "Iniciar sesión";
+- `dialogo_del_servidor.dart`, que se abre tocando el indicador del servidor en "Iniciar
+  sesión";
 - `puerta_de_sesion.dart`, la raíz: muestra "Iniciar sesión" o "Elige un mapa" según la
   sesión.
 
@@ -95,36 +97,69 @@ Se elige al compilar, con `--dart-define=SERVIDOR=...`. Sin eso:
 
 Si el jugador elige otra, se guarda en el aparato y se usa desde que se abre la app.
 
+### Si está disponible, a la vista
+
+En "Iniciar sesión", debajo de los botones, el **indicador del servidor** dice si se puede
+entrar, antes de intentarlo:
+
+| Se ve | Cuándo |
+|---|---|
+| Una ruedita y "Buscando el servidor…" | Mientras revisa o busca |
+| Un punto verde y **"Servidor disponible"**, con la dirección (y el nombre, como "Brilliant en ORION", si lo encontró buscando) | El servidor contesta |
+| Un punto rojo y **"Sin servidor"**: "No contesta en 10.0.2.2. Toca para buscar otro." | No contesta, y en la red no se encontró otro |
+
+Tocándolo se abre el diálogo "Servidor".
+
+Lo lleva el `ServidorCubit`, que **vuelve a revisar solo**:
+
+- al abrir la app;
+- al volver a la app desde segundo plano (por ejemplo, después de cambiar de WiFi en los
+  ajustes), con un `AppLifecycleListener`;
+- cuando cambia la red del aparato (otra WiFi, o se queda sin red), con el paquete
+  connectivity_plus;
+- cada 10 segundos mientras no hay servidor, para notar cuando se enciende;
+- cuando un pedido de la sesión no llega.
+
+Revisar es preguntar "quién soy" sin token, esperando 4 segundos como mucho: el servidor
+contesta 401, y eso es que está. Si no contesta, se busca en la red.
+
 ### Si no contesta, se busca en la red
 
 El servidor se anuncia en la WiFi con mDNS / DNS-SD, como un servicio `_brilliant._tcp`
-(ver [[Servidor de cuentas]]). Cuando un pedido da `SinConexion` (al abrir con la sesión
-guardada, al entrar, al crear la cuenta o al borrarla), el bloc:
+(ver [[Servidor de cuentas]]). Cuando el servidor no contesta, al revisarlo o en un pedido
+de la sesión (al abrir con la sesión guardada, al entrar, al crear la cuenta o al
+borrarla), el `ServidorCubit`:
 
 1. busca en la red los servidores que se anuncian, unos 3 segundos;
 2. le pregunta a cada dirección si contesta, con el mismo cliente que solo confía en la
    autoridad de Brilliant. Si un servidor se anuncia con varias IPs, queda la primera que
    contesta;
 3. según cuántos contestan:
-   - **uno**: se cambia a él, lo guarda y repite el pedido. El jugador no nota nada;
+   - **uno**: se cambia a él y lo guarda; si era un pedido, el `SesionBloc` lo repite. El
+     jugador no nota nada;
    - **varios**: no elige, porque cada uno tiene sus propias cuentas. Pide elegir uno en
      "Servidor";
-   - **ninguno**: el error de siempre, con la dirección que se intentó.
+   - **ninguno**: "Sin servidor", y en un pedido, el error de siempre con la dirección
+     que se intentó.
 
-Mientras el servidor contesta, no se busca nada.
+Mientras el servidor contesta, no se busca nada. Así, **si la PC y el celular se pasan a
+otra WiFi**, el servidor se vuelve a levantar y a anunciar en la nueva, y la app, al
+notar el cambio de red, lo encuentra ahí.
 
 ### El diálogo "Servidor"
 
-En "Iniciar sesión", el botón **"Servidor: 192.168.137.252"** abre un diálogo con:
+El indicador abre un diálogo con:
 
-- **"En tu red"**: los servidores que encuentra al abrirse, como "Brilliant en ORION".
-  Basta con tocar uno; el que se usa ahora lleva una palomita. Si no hay ninguno, lo dice
-  y deja **buscar de nuevo**;
+- **"En tu red"**: los servidores que encuentra al abrirse, cada uno con "Disponible" y su
+  dirección, como "Brilliant en ORION". Solo aparecen los que contestan. Basta con tocar
+  uno; el que se usa ahora lleva una palomita. Si no hay ninguno, lo dice y deja
+  **buscar de nuevo**;
 - **la dirección a mano**, por si no aparece: la IP que muestra `servidor\iniciar.bat`;
 - **Restablecer**, que vuelve a la dirección de partida.
 
-Al elegir o guardar, el bloc prueba que el servidor conteste y avisa "Conectado con el
-servidor en …". Solo se cambia sin sesión: la sesión es de un servidor en particular.
+Al elegir o guardar, el `ServidorCubit` lo guarda y revisa que conteste, y el indicador lo
+muestra. El diálogo solo se abre desde "Iniciar sesión": la sesión es de un servidor en
+particular.
 
 ### Decisiones
 
@@ -138,8 +173,17 @@ servidor en …". Solo se cambia sin sesión: la sesión es de un servidor en pa
 - **El permiso `CHANGE_WIFI_MULTICAST_STATE`** en `AndroidManifest.xml`, para que Android
   deje recibir el multicast de mDNS. Además del de internet, que el APK de release no
   traía. Ver [[Versión Android]].
-- **El buscador se inyecta** en `BrilliantApp` y en el bloc, como el cliente y el almacén:
-  los tests usan `BuscadorFalso`, que "encuentra" lo que cada test anuncia.
+- **Un cubit aparte para el servidor**, no un pedazo del `SesionBloc`: dónde está el
+  servidor y si contesta no es lo mismo que quién inició sesión, y así cualquier pantalla
+  puede mostrarlo. Es un cubit y no un bloc con eventos porque la sesión necesita la
+  respuesta de `buscarOtro` para saber si puede repetir el pedido.
+- **Revisar, buscar y elegir van de a uno** en el cubit, y dos revisiones pedidas antes de
+  empezar son una sola: al cambiar de WiFi llegan varios avisos de red seguidos.
+- **Si mientras tanto ya se cambió a otro**, la sesión no vuelve a buscar: al abrir con la
+  sesión guardada, la revisión del cubit y la de la sesión no buscan dos veces.
+- **Todo se inyecta en `BrilliantApp`**: el cliente, el almacén, el buscador, los avisos
+  de cambio de red y cada cuánto revisar. Los tests usan `BuscadorFalso`, que
+  "encuentra" lo que cada test anuncia, y un `StreamController` como red.
 
 ## Cómo se probó
 
@@ -159,7 +203,14 @@ servidor en …". Solo se cambia sin sesión: la sesión es de un servidor en pa
 - **En Edge sin ventana** (ignorando el certificado): crear la cuenta, mi cuenta y
   borrarla en la versión web.
 - **Al cambiar la PC de red** (a 192.168.137.252), en el emulador: escribir la
-  dirección nueva en "Servidor" muestra "Conectado con el servidor en 192.168.137.252.".
+  dirección nueva en "Servidor" conecta.
+- **El indicador, con el servidor de verdad**, en el emulador (2026-11-04):
+  - al abrir, "Servidor disponible · 10.0.2.2";
+  - al apagarle la WiFi y los datos al emulador (`adb shell svc wifi disable`), la app
+    lo nota sola y pasa a "Sin servidor";
+  - al prenderlos, vuelve sola a "Servidor disponible", sin tocar nada;
+  - crear una cuenta lleva a "Elige un mapa", y borrarla vuelve a "Iniciar sesión" con el
+    indicador en verde.
 - **La búsqueda en la red**, en el emulador: el registro de Android muestra que la app
   toma el permiso de multicast y busca `_brilliant._tcp.local` durante 3 segundos, y el
   diálogo pasa de "Buscando servidores…" a "No se encontró ningún servidor". El emulador

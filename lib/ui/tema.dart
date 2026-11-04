@@ -27,6 +27,9 @@ abstract final class Paleta {
 
   /// Lo que no se puede deshacer, como borrar la cuenta.
   static const peligro = Color(0xFFC0473F);
+
+  /// El punto de "Servidor disponible".
+  static const disponible = Color(0xFF3E9B6A);
 }
 
 /// El color de cada zona del tablero, en tonos suaves pero fáciles de
