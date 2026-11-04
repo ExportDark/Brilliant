@@ -126,6 +126,33 @@ void main() {
       expect(error.generales.single, contains('El servidor tuvo un problema'));
     });
 
+    test('al cambiar la dirección del servidor, los pedidos van a la nueva', () async {
+      final (:cuentas, :pedidos) = _contestando(200, {'username': 'ana'});
+
+      cuentas.servidor = Uri.parse('https://192.168.137.252:8443/');
+      await cuentas.quienSoy('abc123');
+
+      expect(pedidos.single.url.toString(), 'https://192.168.137.252:8443/auth/users/me/');
+    });
+
+    test('probarConexion da por bueno el 401 de quién soy sin token: el servidor está ahí', () async {
+      final (:cuentas, :pedidos) = _contestando(401, {'detail': 'Sin credenciales.'});
+
+      await cuentas.probarConexion();
+
+      expect(pedidos.single.headers.containsKey('Authorization'), isFalse);
+    });
+
+    test('probarConexion en otra dirección no cambia la del servidor', () async {
+      final (:cuentas, :pedidos) = _contestando(401, {'detail': 'Sin credenciales.'});
+      final antes = cuentas.servidor;
+
+      await cuentas.probarConexion(en: Uri.parse('https://192.168.137.252:8443/'));
+
+      expect(pedidos.single.url.toString(), 'https://192.168.137.252:8443/auth/users/me/');
+      expect(cuentas.servidor, antes);
+    });
+
     test('si no se puede hablar con el servidor, es SinConexion', () async {
       final cuentas = ClienteCuentas(
         MockClient((pedido) async => throw http.ClientException('sin red', pedido.url)),

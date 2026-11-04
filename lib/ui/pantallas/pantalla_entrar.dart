@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../cuenta/direccion_del_servidor.dart';
 import '../../cuenta/sesion_bloc.dart';
 import '../../cuenta/sesion_event.dart';
 import '../../cuenta/sesion_state.dart';
@@ -8,10 +9,12 @@ import '../tema.dart';
 import '../widgets/campo_de_contrasena.dart';
 import '../widgets/logo_brilliant.dart';
 import '../widgets/recuadro_de_aviso.dart';
+import 'dialogo_del_servidor.dart';
 import 'pantalla_crear_cuenta.dart';
 
 /// "Iniciar sesión": la pantalla con la que arranca la app si no hay sesión.
-/// Sin sesión no se puede jugar; desde aquí también se crea la cuenta.
+/// Sin sesión no se puede jugar; desde aquí también se crea la cuenta, y se
+/// cambia la dirección del servidor si la PC cambió de red.
 class PantallaEntrar extends StatefulWidget {
   const PantallaEntrar({super.key});
 
@@ -43,6 +46,11 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
     if (_sesion.state.error != null || _sesion.state.aviso != null) {
       _sesion.add(const AvisosDescartados());
     }
+  }
+
+  void _cambiarServidor() {
+    _sesion.add(const AvisosDescartados());
+    showDialog<void>(context: context, builder: (_) => const DialogoDelServidor());
   }
 
   void _irACrearCuenta() {
@@ -133,6 +141,18 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
                           TextButton(
                             onPressed: state.ocupado ? null : _irACrearCuenta,
                             child: const Text('¿No tienes cuenta? Crea una'),
+                          ),
+                          const SizedBox(height: 16),
+                          Center(
+                            child: TextButton.icon(
+                              key: const ValueKey('boton-servidor'),
+                              onPressed: state.ocupado ? null : _cambiarServidor,
+                              icon: const Icon(Icons.dns_outlined, size: 18),
+                              label: Text(
+                                'Servidor: ${textoDeDireccion(_sesion.servidor)}',
+                                style: textos.bodyMedium?.copyWith(color: Paleta.tintaSuave),
+                              ),
+                            ),
                           ),
                         ],
                       ),

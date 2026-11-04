@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Para hablar con el servidor de cuentas. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Para buscar el servidor en la WiFi (mDNS usa multicast). -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
 
     <application
         android:label="Brilliant"

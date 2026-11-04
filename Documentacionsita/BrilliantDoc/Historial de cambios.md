@@ -7,6 +7,37 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-03 — La app encuentra el servidor
+
+- **La dirección del servidor es dinámica.** En "Iniciar sesión", **"Servidor: …"** abre
+  un diálogo con los servidores que encuentra en la WiFi, para tocar uno, o para escribir
+  la IP a mano. Lo elegido se recuerda, y "Restablecer" vuelve a la de partida.
+- **Si el servidor no contesta, lo busca solo**: al abrir con la sesión guardada, al
+  entrar, al crear la cuenta y al borrarla. Les pregunta a los que se anuncian, con el
+  cliente que solo confía en la autoridad de Brilliant:
+  - si contesta uno, se cambia a él y repite el pedido;
+  - si contestan varios, pide elegir;
+  - si no contesta ninguno, da el error de siempre.
+
+  Ver [[Cuentas en la app#Encontrar el servidor]].
+- **Piezas nuevas:**
+  - `direccion_del_servidor.dart`;
+  - `BuscadorDeServidores`, con el paquete nsd en Android y sin buscar en la web;
+  - `DialogoDelServidor`;
+  - el permiso `CHANGE_WIFI_MULTICAST_STATE`.
+- **Tests:**
+  - `BuscadorFalso`;
+  - `ServidorFalso` solo contesta en su dirección, como la PC;
+  - casos nuevos del cliente, del bloc y de las pantallas, y el diálogo en los 5 tamaños.
+
+  Encontraron que "Buscar de nuevo" no hacía nada (un `setState` que devolvía un
+  `Future`). Ver [[Pruebas]].
+- **En el emulador:**
+  - escribir la IP nueva conecta;
+  - la búsqueda corre, pero no encuentra el servidor de la PC, porque el NAT del
+    emulador no deja pasar el multicast. Falta probarlo en un celular.
+- 451 tests de la app (más 2 contra el servidor).
+
 ## 2026-11-03 — El servidor se anuncia en la red
 
 - **Por qué:** la PC se conectó a otra WiFi y su IP pasó de `192.168.100.5` a

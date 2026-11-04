@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brilliant/cuenta/buscador_de_servidores.dart';
 import 'package:brilliant/main.dart';
 import 'package:brilliant/modelo/mapa.dart';
 import 'package:brilliant/modelo/tablero.dart';
@@ -35,19 +36,29 @@ void _superficie(WidgetTester tester, Size tamano) {
 /// (sin él, al azar). Habla con [servidor] (por defecto, uno falso nuevo).
 ///
 /// Con [conSesion], la app ya tiene guardada una sesión de "ana" y arranca
-/// directo en "Elige un mapa"; sin ella, en "Iniciar sesión".
+/// directo en "Elige un mapa"; sin ella, en "Iniciar sesión". Con [almacen],
+/// usa ese, con lo que tenga guardado. Con [buscador], busca servidores en la
+/// red con ese; sin él, no busca.
 Future<void> abrirApp(
   WidgetTester tester, {
   int Function()? tirarDado,
   Size tamano = const Size(1000, 1400),
   ServidorFalso? servidor,
   bool conSesion = true,
+  AlmacenEnMemoria? almacen,
+  BuscadorDeServidores buscador = const SinBuscar(),
 }) async {
   _superficie(tester, tamano);
   final elServidor = servidor ?? ServidorFalso();
-  final almacen = AlmacenEnMemoria(conSesion ? elServidor.sesionIniciada('ana') : null);
+  final elAlmacen = almacen ??
+      AlmacenEnMemoria(conSesion ? elServidor.sesionIniciada('ana') : null);
   await tester.pumpWidget(
-    BrilliantApp(cuentas: elServidor.cliente(), almacen: almacen, tirarDado: tirarDado),
+    BrilliantApp(
+      cuentas: elServidor.cliente(),
+      almacen: elAlmacen,
+      buscador: buscador,
+      tirarDado: tirarDado,
+    ),
   );
   await tester.pumpAndSettle();
 }
@@ -108,6 +119,15 @@ final botonCrearCuenta = find.widgetWithText(FilledButton, 'Crear cuenta');
 final enlaceCrearCuenta = find.widgetWithText(TextButton, '¿No tienes cuenta? Crea una');
 
 final botonMiCuenta = find.byKey(const ValueKey('boton-mi-cuenta'));
+
+final botonServidor = find.byKey(const ValueKey('boton-servidor'));
+
+/// Escribe [direccion] en el diálogo del servidor y la guarda.
+Future<void> cambiarServidor(WidgetTester tester, String direccion) async {
+  await tocar(tester, botonServidor);
+  await escribir(tester, 'campo-servidor', direccion);
+  await tocar(tester, find.widgetWithText(FilledButton, 'Guardar'));
+}
 
 /// Inicia sesión desde "Iniciar sesión" con [usuario] y [contrasena].
 Future<void> entrarCon(WidgetTester tester, String usuario, String contrasena) async {

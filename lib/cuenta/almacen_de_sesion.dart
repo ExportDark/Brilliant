@@ -9,11 +9,19 @@ class Sesion {
   const Sesion({required this.usuario, required this.token});
 }
 
-/// Dónde se guarda la sesión entre una vez que se abre la app y la otra.
+/// Dónde se guarda la sesión entre una vez que se abre la app y la otra, y
+/// la dirección del servidor, si el jugador eligió una.
 abstract interface class AlmacenDeSesion {
   Future<Sesion?> leer();
   Future<void> guardar(Sesion sesion);
   Future<void> borrar();
+
+  /// La dirección del servidor que eligió el jugador, o `null` si usa la de
+  /// siempre.
+  Future<Uri?> leerServidor();
+
+  /// Guarda la dirección del servidor; con `null`, vuelve a la de siempre.
+  Future<void> guardarServidor(Uri? servidor);
 }
 
 /// Guarda la sesión cifrada: en Android, con una clave del Keystore del
@@ -21,6 +29,7 @@ abstract interface class AlmacenDeSesion {
 class AlmacenSeguro implements AlmacenDeSesion {
   static const _usuario = 'sesion.usuario';
   static const _token = 'sesion.token';
+  static const _servidor = 'servidor.direccion';
 
   final FlutterSecureStorage _almacen;
 
@@ -44,5 +53,17 @@ class AlmacenSeguro implements AlmacenDeSesion {
   Future<void> borrar() async {
     await _almacen.delete(key: _usuario);
     await _almacen.delete(key: _token);
+  }
+
+  @override
+  Future<Uri?> leerServidor() async {
+    final guardado = await _almacen.read(key: _servidor);
+    return guardado == null ? null : Uri.tryParse(guardado);
+  }
+
+  @override
+  Future<void> guardarServidor(Uri? servidor) async {
+    if (servidor == null) return _almacen.delete(key: _servidor);
+    await _almacen.write(key: _servidor, value: servidor.toString());
   }
 }

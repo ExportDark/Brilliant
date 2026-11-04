@@ -1,8 +1,8 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 419 tests, todos pasando, más 2 que hablan con el servidor de verdad y solo corren si se
-piden (2026-11-02).
+las pruebas y qué se aprendió de ellas. 451 tests, todos pasando, más 2 que hablan con el servidor de verdad y solo corren si se
+piden (2026-11-03).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -24,8 +24,8 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 80 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
 | `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 128 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
-| `test/cuenta/` | 25 (+2) | `ClienteCuentas` (cada pedido y cada error), `SesionBloc` (abrir, entrar, crear, salir y borrar) y, si se pide, la prueba contra el servidor de verdad |
-| `test/ui/` | 138 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/cuenta/` | 50 (+2) | `ClienteCuentas` (cada pedido y cada error), `SesionBloc` (abrir, entrar, crear, salir, borrar, cambiar la dirección del servidor y buscarlo en la red), leer la dirección que escribe el jugador y, si se pide, la prueba contra el servidor de verdad |
+| `test/ui/` | 145 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta y el diálogo del servidor, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
 | `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
 ## Cómo están organizadas
@@ -326,25 +326,36 @@ así que los del juego siguen igual.
 
 | Archivo | Qué prueba |
 |---|---|
-| `cuenta/cliente_cuentas_test.dart` | La ruta, el método, el cuerpo y el header `Authorization` de cada pedido; 400 → `ErrorDeCuenta` por campo y general; 429; 401 → `SesionVencida`; 500; sin red → `SinConexion` (11 casos) |
-| `cuenta/sesion_bloc_test.dart` | Al abrir: sin sesión, con una que sirve, con una vencida y sin conexión. Entrar bien, mal y sin conexión. Crear la cuenta, y con un usuario repetido. Cerrar sesión, también sin conexión. Borrar con la contraseña mala y con la buena. Descartar los avisos (14 casos) |
+| `cuenta/cliente_cuentas_test.dart` | La ruta, el método, el cuerpo y el header `Authorization` de cada pedido; 400 → `ErrorDeCuenta` por campo y general; 429; 401 → `SesionVencida`; 500; sin red → `SinConexion`; cambiar la dirección; probar la conexión, también en otra dirección sin cambiar la suya (14 casos) |
+| `cuenta/sesion_bloc_test.dart` | Al abrir: sin sesión, con una que sirve, con una vencida y sin conexión. Entrar bien, mal y sin conexión. Crear la cuenta, y con un usuario repetido. Cerrar sesión, también sin conexión. Borrar con la contraseña mala y con la buena. Descartar los avisos. La dirección del servidor: usar la elegida al abrir, cambiarla, restablecerla, y que no se cambie con sesión. Buscarlo en la red: no busca mientras contesta; si no contesta, al entrar, al crear la cuenta y al abrir con la sesión guardada lo encuentra y se cambia; uno con varias IPs aparece una vez; los que no contestan no cuentan; ninguno da el error de siempre; con varios pide elegir (28 casos) |
+| `cuenta/direccion_del_servidor_test.dart` | Leer lo que escribe el jugador: una IP, `ip:puerto` o una URL `https`; rechazar `http`, vacíos y espacios; mostrarla corta (8 casos) |
 | `cuenta/contra_el_servidor_test.dart` | Con el servidor levantado y `--dart-define=CON_SERVIDOR=true`: el recorrido completo por HTTPS, y que un cliente sin la autoridad local no se conecta (2 casos) |
 | `ui/pantallas/cuenta/entrar/…` | Los campos vacíos no se mandan; el error del servidor se muestra y se va al escribir; sin conexión avisa; entrar lleva a elegir el mapa; el enlace lleva a crear cuenta |
 | `ui/pantallas/cuenta/crear_cuenta/…` | Revisa lo básico antes de mandar; el usuario repetido va en su campo; crear la cuenta entra sola |
 | `ui/pantallas/cuenta/mi_cuenta/…` | Muestra el usuario; cerrar sesión vuelve a entrar; borrar pide la contraseña y se puede cancelar; con la mala no borra; con la buena borra y vuelve a entrar |
 | `ui/camino_feliz/cuentas_de_punta_a_punta_test.dart` | Crear la cuenta, jugar un turno, cerrar sesión, volver a entrar, reabrir la app (sigue la sesión), borrar la cuenta y que ya no se pueda entrar |
-| `ui/pantallas/tamanos/cuentas_sin_desbordes_test.dart` | Las pantallas de cuenta y el diálogo de borrar, en los 5 tamaños (10 casos) |
+| `ui/pantallas/cuenta/servidor/…` | Cambiar la dirección a mano cuando la PC cambia de red, que se recuerde, una dirección inválida, restablecer; los servidores de la red aparecen ("Buscando servidores…" mientras busca) y basta con tocar uno; si no hay ninguno lo dice y se puede buscar de nuevo; entrar sin escribir la dirección nueva |
+| `ui/pantallas/tamanos/cuentas_sin_desbordes_test.dart` | Las pantallas de cuenta, el diálogo del servidor (con dos servidores encontrados, uno de nombre largo) y el de borrar, en los 5 tamaños (10 casos) |
 
-Encontraron dos cosas:
+Encontraron tres cosas:
 
 - **Que bloc atiende los eventos al mismo tiempo.** Cerrar sesión se cruzaba con la
   revisión de la sesión guardada. Ahora el `SesionBloc` los atiende de a uno.
 - **Dos desbordes en los celulares chicos.** El texto de los botones de "Mi cuenta" se
   desbordaba, y ahora se acorta. El diálogo de borrar no cabía de alto, y ahora se
   desplaza.
+- **"Buscar de nuevo" no hacía nada.** `setState(() => _busqueda = buscar())` devuelve el
+  `Future` de la asignación, y `setState` no acepta eso: lanza un error y no redibuja.
+  Ahora va con llaves.
 
-Se comprobó que detectan errores: si el cliente no mandara el token, fallan 12 tests
-entre el cliente, el bloc y las pantallas. Ver [[Cuentas en la app]].
+Se comprobó que detectan errores:
+
+- si el cliente no mandara el token, fallan 12 tests entre el cliente, el bloc y las
+  pantallas;
+- si el bloc no buscara el servidor cuando no contesta, fallan 6;
+- si probar una dirección encontrada fuera siempre a la de siempre, fallan 9.
+
+Ver [[Cuentas en la app]].
 
 ## El servidor de cuentas
 

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'cuenta/almacen_de_sesion.dart';
+import 'cuenta/buscador_de_servidores.dart';
 import 'cuenta/cliente_cuentas.dart';
 import 'cuenta/cliente_http.dart';
+import 'cuenta/direccion_del_servidor.dart';
 import 'cuenta/sesion_bloc.dart';
 import 'cuenta/sesion_event.dart';
 import 'cuenta/sesion_state.dart';
@@ -15,8 +17,9 @@ Future<void> main() async {
   final http = await crearClienteHttp();
 
   runApp(BrilliantApp(
-    cuentas: ClienteCuentas(http, direccionDelServidor()),
+    cuentas: ClienteCuentas(http, direccionPorDefecto()),
     almacen: const AlmacenSeguro(),
+    buscador: crearBuscador(),
   ));
 }
 
@@ -30,6 +33,10 @@ class BrilliantApp extends StatefulWidget {
   /// Dónde se guarda la sesión. Los tests pasan uno en memoria.
   final AlmacenDeSesion almacen;
 
+  /// Con qué se buscan servidores en la red. Sin él no se buscan; los tests
+  /// pasan uno falso.
+  final BuscadorDeServidores buscador;
+
   /// Decide qué sale en los dados. Sin él salen al azar; los tests lo fijan.
   final int Function()? tirarDado;
 
@@ -37,6 +44,7 @@ class BrilliantApp extends StatefulWidget {
     super.key,
     required this.cuentas,
     required this.almacen,
+    this.buscador = const SinBuscar(),
     this.tirarDado,
   });
 
@@ -50,7 +58,8 @@ class _BrilliantAppState extends State<BrilliantApp> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => SesionBloc(widget.cuentas, widget.almacen)..add(const SesionRevisada()),
+      create: (_) => SesionBloc(widget.cuentas, widget.almacen, buscador: widget.buscador)
+        ..add(const SesionRevisada()),
       child: BlocListener<SesionBloc, SesionState>(
         // Al entrar o salir, se cierra todo lo que haya encima (crear cuenta,
         // mi cuenta, el diálogo de borrar) y la raíz muestra lo que toca.

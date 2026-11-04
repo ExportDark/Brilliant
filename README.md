@@ -30,6 +30,7 @@ Construcción incremental, módulo por módulo:
 - [x] Los 4 mapas oficiales, y una pantalla para elegir uno al abrir la app
 - [x] Cuentas: un servidor aparte (`servidor/`) y en la app crear la cuenta, iniciar y
       cerrar sesión, y borrarla
+- [x] La app encuentra el servidor sola en la WiFi (mDNS), aunque la PC cambie de red
 - [ ] Puntuación
 
 ## Estructura
@@ -40,11 +41,12 @@ lib/
   reglas/   reglas de colocación por color
   juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
   cuenta/   la sesión del jugador: el cliente del servidor de cuentas, el almacén
-            cifrado y el SesionBloc
+            cifrado, el buscador de servidores en la red y el SesionBloc
   ui/
     widgets/    CeldaWidget, TableroWidget, DadoWidget
-    pantallas/  PuertaDeSesion, PantallaEntrar, PantallaCrearCuenta, PantallaMiCuenta,
-                PantallaEleccionDeMapa, PantallaPreparacion, PantallaPartida
+    pantallas/  PuertaDeSesion, PantallaEntrar, DialogoDelServidor, PantallaCrearCuenta,
+                PantallaMiCuenta, PantallaEleccionDeMapa, PantallaPreparacion,
+                PantallaPartida
     tema.dart   colores y estilo de la app
   main.dart
 test/       tests, misma estructura que lib/
@@ -345,12 +347,23 @@ contraseña en un diálogo. La sesión se recuerda al cerrar y abrir la app.
   servidor por campo), `SesionVencida` o `SinConexion`.
 - `cliente_http.dart`: en Android y Windows, un cliente HTTP que **solo confía en la
   autoridad local** del servidor (`assets/certificados/brilliant_ca.pem`); en la web, el
-  del navegador. La dirección del servidor se elige con `--dart-define=SERVIDOR=...`.
-- `almacen_de_sesion.dart`: el usuario y el token, cifrados con `flutter_secure_storage`.
+  del navegador.
+- `direccion_del_servidor.dart`: la dirección de partida (`--dart-define=SERVIDOR=...`, o
+  `10.0.2.2` en Android y `localhost` en lo demás) y leer la que escribe el jugador.
+- `buscador_de_servidores.dart`: busca en la WiFi los servidores que se anuncian con mDNS
+  (`_brilliant._tcp`), con el paquete nsd. En la web no se puede buscar.
+- `almacen_de_sesion.dart`: el usuario, el token y la dirección del servidor elegida,
+  cifrados con `flutter_secure_storage`.
 - `sesion_bloc.dart`: `SesionBloc`, arriba de toda la app. Atiende los pedidos de a uno.
+  Si el servidor no contesta, lo busca en la red: si contesta uno solo, se cambia a él y
+  repite el pedido.
 
-`BrilliantApp` recibe el cliente y el almacén, para que los tests usen un servidor falso
-en memoria.
+**La dirección del servidor es dinámica**, porque la IP de la PC cambia con la red. En
+"Iniciar sesión", **"Servidor: …"** abre un diálogo con los servidores que encuentra en la
+WiFi, para tocar uno, o para escribir la IP a mano. Lo que se elige se recuerda.
+
+`BrilliantApp` recibe el cliente, el almacén y el buscador, para que los tests usen un
+servidor falso en memoria y un buscador falso.
 
 ## Tests del camino feliz
 

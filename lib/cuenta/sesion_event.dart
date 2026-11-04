@@ -43,3 +43,12 @@ final class BorradoPedido extends SesionEvent {
 final class AvisosDescartados extends SesionEvent {
   const AvisosDescartados();
 }
+
+/// Cambiar la dirección del servidor, por ejemplo porque la PC cambió de red.
+/// Con `null`, vuelve a la de siempre. Después prueba que el servidor
+/// conteste ahí.
+final class ServidorCambiado extends SesionEvent {
+  final Uri? direccion;
+
+  const ServidorCambiado(this.direccion);
+}

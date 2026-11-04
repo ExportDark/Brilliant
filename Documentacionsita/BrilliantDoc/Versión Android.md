@@ -54,19 +54,33 @@ vuelve a correr: es OneDrive bloqueando archivos de la compilación. Ver
 ### El servidor de cuentas
 
 Sin sesión no se puede jugar, y la sesión se pide al [[Servidor de cuentas]], que corre en
-la PC. El APK de siempre lo busca en `10.0.2.2`, que es como el **emulador** ve a la PC.
-**Para el celular** hay que decirle la IP de la PC al compilar:
+la PC. El APK de siempre lo busca primero en `10.0.2.2`, que es como el **emulador** ve a
+la PC. **En el celular lo encuentra solo**: si ahí no contesta, lo busca en la WiFi (el
+servidor se anuncia con mDNS) y se cambia a él. Si no aparece, en "Iniciar sesión" >
+Servidor se elige de la lista o se escribe la IP que muestra `servidor\iniciar.bat`. Ver
+[[Cuentas en la app#Encontrar el servidor]].
+
+Se le puede dar una dirección de partida al compilar, para que no tenga que buscar la
+primera vez:
 
 ```bash
-C:\src\flutter\bin\flutter.bat build apk --release --split-per-abi --dart-define=SERVIDOR=https://192.168.100.5:8443
+C:\src\flutter\bin\flutter.bat build apk --release --split-per-abi --dart-define=SERVIDOR=https://192.168.137.252:8443
 ```
 
 El celular tiene que estar en la misma WiFi que la PC, con el servidor levantado
 (`servidor\iniciar.bat`), y Windows tiene que dejar entrar conexiones al puerto 8443.
-Si cambia la IP de la PC, hay que volver a compilar con la nueva.
+Ya no hace falta recompilar si cambia la IP de la PC.
 
-El manifiesto principal pide el permiso de internet (`android.permission.INTERNET`). El
-de release no lo traía: solo el de depuración.
+El manifiesto principal pide dos permisos:
+
+- `android.permission.INTERNET`, para hablar con el servidor. El de release no lo traía:
+  solo el de depuración;
+- `android.permission.CHANGE_WIFI_MULTICAST_STATE`, para buscar el servidor en la WiFi
+  (mDNS usa multicast).
+
+> [!note] El emulador no encuentra el servidor de la PC
+> Su red pasa por un NAT que no deja pasar el multicast. En el emulador la búsqueda corre
+> pero no encuentra nada; se usa `10.0.2.2`. Buscar se prueba en un celular de verdad.
 
 ## Instalarlo en el teléfono
 

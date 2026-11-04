@@ -74,13 +74,20 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Las cuentas en la app** (2026-11-02) — "Iniciar sesión", "Crear cuenta" y
       "Mi cuenta" (cerrar sesión y borrar la cuenta, con la contraseña). Sin sesión no
       se juega, y la sesión se recuerda. Ver [[Cuentas en la app]]
+- [x] **La app encuentra el servidor** (2026-11-03) — si no contesta, lo busca en la WiFi
+      (mDNS) y se cambia solo. En "Iniciar sesión" > Servidor se elige de la lista de los
+      que encuentra, o se escribe la IP. Ya no hay que recompilar el APK si cambia la IP
+      de la PC. Ver [[Cuentas en la app#Encontrar el servidor]]
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 419 tests de la app y 34 del servidor, todos pasando.
+cerrarla es el puntaje. 451 tests de la app y 34 del servidor, todos pasando.
 
 ## Qué falta
 
+- [ ] **Probar en un celular de verdad que encuentra el servidor solo.** En el emulador
+      la búsqueda corre, pero no puede encontrar el de la PC: su red (NAT) no deja pasar
+      el multicast
 - [ ] **Decidir cómo se puntúa.** Con las reglas actuales el tablero **siempre** termina
       lleno, así que contar casillas no distingue a nadie. Hay que elegir entre contar
       turnos o fijar un número de rondas ([[Puntuación]])

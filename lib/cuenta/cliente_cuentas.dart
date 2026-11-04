@@ -41,9 +41,12 @@ class ClienteCuentas {
   static const _espera = Duration(seconds: 10);
 
   final http.Client _http;
-  final Uri _servidor;
 
-  ClienteCuentas(this._http, this._servidor);
+  /// La dirección del servidor. Se puede cambiar: si la PC cambia de red, el
+  /// jugador escribe la nueva en la app.
+  Uri servidor;
+
+  ClienteCuentas(this._http, this.servidor);
 
   /// Crea la cuenta. La contraseña va dos veces: [repetida] es la que el
   /// jugador escribió para confirmarla.
@@ -75,6 +78,19 @@ class ClienteCuentas {
     return respuesta['username'] as String;
   }
 
+  /// Revisa que el servidor conteste en [en] (por defecto, en [servidor]).
+  /// Sin token, el servidor responde 401 a `quién soy`: eso es que está ahí.
+  ///
+  /// Como el cliente solo confía en la autoridad de Brilliant, un servidor
+  /// ajeno que se haga pasar por el de Brilliant no contesta: da [SinConexion].
+  Future<void> probarConexion({Uri? en}) async {
+    try {
+      await _pedir('GET', 'auth/users/me/', en: en);
+    } on SesionVencida {
+      return;
+    }
+  }
+
   /// Cierra la sesión de [token] en el servidor: el token deja de servir.
   Future<void> salir(String token) async {
     await _pedir('POST', 'auth/token/logout/', token: token);
@@ -93,8 +109,9 @@ class ClienteCuentas {
     String ruta, {
     String? token,
     Map<String, String>? cuerpo,
+    Uri? en,
   }) async {
-    final pedido = http.Request(metodo, _servidor.resolve(ruta))
+    final pedido = http.Request(metodo, (en ?? servidor).resolve(ruta))
       ..headers['Accept'] = 'application/json';
     if (token != null) pedido.headers['Authorization'] = 'Token $token';
     if (cuerpo != null) {
