@@ -57,8 +57,9 @@ Los errores vienen en español y por campo, como `{"password": [...]}`, o en
   números y que no se parezca al usuario.
 - **knox en vez del token de DRF.** DRF guarda el token tal cual en la base, así que si se
   filtrara, cualquiera podría usarlo. knox guarda solo su hash SHA-512 (y un prefijo
-  corto para buscarlo), los tokens vencen (7 días, y se renuevan al usarse) y cada
-  aparato tiene el suyo: cerrar sesión en uno no cierra los demás.
+  corto para buscarlo), y los tokens vencen (7 días, y se renuevan al usarse).
+- **Las reglas del nombre de usuario y de la contraseña**, y **una sola sesión activa por
+  cuenta**: ver [[#Las reglas de las cuentas]].
 - **Borrar la cuenta pide la contraseña actual**, aunque haya sesión: si alguien agarra
   el celular con la sesión abierta, no puede borrar la cuenta. Al borrarla se borran
   todos sus tokens.
@@ -71,6 +72,53 @@ Los errores vienen en español y por campo, como `{"password": [...]}`, o en
 - **CORS solo para la web local** (`localhost` y `127.0.0.1`).
 - **`DEBUG` apagado**, `ALLOWED_HOSTS` solo con las direcciones de la PC, y la
   `SECRET_KEY` generada en `servidor/.env`, que no se sube.
+
+## Las reglas de las cuentas
+
+Se agregaron el 2026-11-04, al revisar todas las validaciones de las cuentas.
+
+### El nombre de usuario
+
+- **De 3 a 20 caracteres: letras sin acento, números, `.`, `_` y `-`.** Django acepta de
+  1 a 150, con letras de cualquier alfabeto, `@` y `+`. Así, "аna", con una "а"
+  cirílica, se hacía pasar por "ana". Ahora lo rechaza con "Solo puede tener letras sin
+  acento, números, punto, guion y guion bajo.".
+- **"Ana" y "ana" son la misma cuenta.** No se puede crear la otra, y se entra
+  escribiéndola de cualquier forma: un backend de autenticación,
+  `SinDistinguirMayusculas`, busca la cuenta con `iexact` y deja el resto al de Django.
+  El nombre se guarda como se escribió.
+- **Un índice único sobre `lower(username)`** (la migración de `cuentas`), por si dos
+  registros llegan a la vez y los dos pasan la revisión.
+- Las reglas están en `cuentas/serializers.py` (`CrearCuenta`), que reemplaza al
+  serializer de djoser con `DJOSER['SERIALIZERS']`. El campo `username` se declara
+  aparte para que solo valgan estas reglas, con sus mensajes.
+
+### La contraseña
+
+- **Se recibe tal cual.** DRF recorta los espacios del borde de cualquier texto: djoser
+  los recortaba al crear la cuenta y al borrarla, pero knox no al entrar. Quien pusiera
+  un espacio al principio o al final **no podía entrar nunca**. Ahora los tres campos
+  (`password`, `re_password`, `current_password`) y el de entrar usan
+  `trim_whitespace=False`.
+- **De 8 a 128 caracteres.** Sin un máximo, alguien podría mandar una contraseña gigante
+  para que el servidor se cansara calculando su hash con Argon2.
+- Se aceptan ñ, acentos y emojis.
+
+### Una sola sesión activa por cuenta
+
+Si se entra con una cuenta que tiene la sesión **activa** en otro aparato, responde **409**:
+"Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o espera unos
+minutos si ya no la usas."
+
+- **Activa es usada en los últimos 5 minutos** (`SESION_ACTIVA`). knox renueva el
+  vencimiento cada vez que se usa el token, así que vence = último uso + 7 días, y no
+  hace falta guardar nada más. La app, mientras está abierta, avisa cada 2 minutos.
+- **Una sesión sin usar desde antes no cuenta, y la entrada nueva la cierra.** Si no,
+  reinstalar la app, borrar sus datos o perder el celular dejaría la cuenta bloqueada
+  hasta 7 días.
+- **El aviso solo sale con la contraseña correcta**: con una mala, el error de siempre.
+- `TOKEN_LIMIT_PER_USER` pasó de 10 a 1, como respaldo. Con 10, el aparato número 11
+  recibía un 403 en inglés (`{"error": ...}`) que la app no mostraba.
 
 ## HTTPS con una autoridad local
 
@@ -137,14 +185,17 @@ ORION" en `192.168.137.252`, puerto 8443.
 
 ## Tests
 
-34 tests con pytest en `servidor/cuentas/tests/`, un archivo por tema:
+76 tests con pytest en `servidor/cuentas/tests/`, un archivo por tema:
 
 | Archivo | Qué prueba |
 |---|---|
 | `test_crear_cuenta.py` | Crea la cuenta y no devuelve la contraseña; usuario repetido; contraseñas débiles (corta, común, numérica, parecida al usuario); contraseñas que no coinciden; mensajes en español; límite de cuentas por IP |
-| `test_entrar.py` | Devuelve un token que vence; un token distinto cada vez; el mismo error con contraseña mala o usuario inexistente; límite de intentos |
+| `test_nombre_de_usuario.py` | De 3 a 20 letras sin acento, números, `.`, `_` y `-`; rechaza, con su mensaje, otros largos, espacios, acentos, ñ, cirílico, `@`, `+`, emojis, `<script>`, `' OR 1=1 --`, tabs y saltos de línea; vacíos, nulos y lo que no es texto; recorta los espacios del borde; "Ana" y "ana" son la misma, y la base tampoco deja las dos |
+| `test_contrasena.py` | Con espacios al borde se crea, se entra y se borra la cuenta; con ñ, acentos y emoji; 128 sí y 129 no, ni al crear ni al entrar |
+| `test_entrar.py` | Devuelve un token que vence; un token distinto cada vez; sin distinguir mayúsculas; lo que no es texto no entra; el mismo error con contraseña mala o usuario inexistente; límite de intentos |
+| `test_una_sesion_por_cuenta.py` | Con la sesión activa en otro aparato, 409 y la otra sigue; tampoco con otras mayúsculas; con la contraseña mala no dice nada de la sesión; cerrada allá, deja entrar; sin usar hace más de 5 minutos, la entrada nueva la cierra; usarla la vuelve a activar; otra cuenta no se ve afectada |
 | `test_quien_soy.py` | Sin token, con un token inventado o con uno vencido da 401; con el token, el usuario |
-| `test_salir.py` | Cerrar sesión invalida ese token y no los de otros aparatos |
+| `test_salir.py` | Cerrar sesión invalida ese token y deja entrar desde otro aparato |
 | `test_borrar_cuenta.py` | Sin contraseña, con una mala o sin sesión no borra; con la buena borra la cuenta y todos sus tokens, y ya no se puede entrar |
 | `test_privacidad.py` | No se puede listar, pedir ni borrar la cuenta de otro, y borrar la propia no toca las demás |
 | `test_almacenamiento.py` | La contraseña está en Argon2id y nunca en texto; el token completo no está en la base |
@@ -154,5 +205,14 @@ ORION" en `192.168.137.252`, puerto 8443.
 Cada test vacía la caché antes y después, porque ahí se cuentan los intentos: si no,
 un test heredaría el límite del anterior.
 
-Se comprobó que detectan errores: si borrar la cuenta no pidiera la contraseña (otro
-serializer de djoser), fallan dos tests de `test_borrar_cuenta.py`.
+Se comprobó que detectan errores, rompiendo cada cosa a propósito:
+
+- si borrar la cuenta no pidiera la contraseña (otro serializer de djoser), fallan dos
+  tests de `test_borrar_cuenta.py`;
+- si "Ana" y "ana" pudieran ser dos cuentas, si la contraseña se volviera a recortar, si
+  no se revisara la sesión activa, si knox no renovara la sesión al usarla o si se
+  entrara distinguiendo mayúsculas, falla cada vez el test de eso.
+
+Ese ejercicio encontró un test que no probaba nada: "usarla la mantiene activa" partía
+de una sesión todavía activa, así que pasaba aunque knox no la renovara. Ahora parte de
+una sin usar.

@@ -7,6 +7,25 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-04 — Las reglas de las cuentas, en el servidor
+
+- **Por qué:** al revisar todas las validaciones de las cuentas aparecieron huecos y dos
+  errores. Ver [[Servidor de cuentas#Las reglas de las cuentas]].
+- **Error: una contraseña con espacios al borde no dejaba entrar nunca.** djoser los
+  recortaba al crear la cuenta y knox no al entrar. Ahora se recibe tal cual.
+- **Error: el aparato número 11 con la misma cuenta fallaba en silencio**, con un 403 en
+  inglés que la app no mostraba.
+- **Nombre de usuario:**
+  - de 3 a 20 caracteres, solo letras sin acento, números, `.`, `_` y `-`; antes
+    aceptaba de 1 a 150, con letras de cualquier alfabeto;
+  - "Ana" y "ana" son la misma cuenta, también al entrar, con un índice único en la
+    base.
+- **Contraseña:** como mucho 128 caracteres.
+- **Una sola sesión activa por cuenta.** Si se usó en otro aparato en los últimos 5
+  minutos, entrar responde 409; si no, la entrada nueva cierra la vieja.
+- 76 tests con pytest (42 nuevos). Se rompió a propósito cada regla para ver que su test
+  falla, y eso encontró un test que no probaba nada.
+
 ## 2026-11-04 — El servidor disponible, a la vista
 
 - **"Iniciar sesión" muestra si se puede entrar**, antes de intentarlo: un punto verde y
