@@ -348,7 +348,7 @@ entre el cliente, el bloc y las pantallas. Ver [[Cuentas en la app]].
 
 ## El servidor de cuentas
 
-El servidor tiene sus propios tests, en Python: 29 con pytest, en
+El servidor tiene sus propios tests, en Python: 34 con pytest, en
 `servidor/cuentas/tests/`. No entran en la cuenta de los tests de la app. Qué prueba cada
 archivo está en [[Servidor de cuentas]].
 

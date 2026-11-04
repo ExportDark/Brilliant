@@ -7,6 +7,24 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-03 — El servidor se anuncia en la red
+
+- **Por qué:** la PC se conectó a otra WiFi y su IP pasó de `192.168.100.5` a
+  `192.168.137.252`. El APK, compilado con la vieja, dejó de encontrar el servidor.
+- **Las IPs de todas las interfaces** (`red_local.py`, con psutil). Antes se sacaban con
+  `socket.gethostbyname_ex`, que se salta interfaces, así que al certificado y a
+  `ALLOWED_HOSTS` les faltaban IPs.
+- **Se anuncia en la WiFi** con mDNS / DNS-SD (`servir.py`, con zeroconf): un servicio
+  `_brilliant._tcp` llamado "Brilliant en <PC>", con sus IPs y el puerto 8443.
+- **Se vuelve a levantar solo si la PC cambia de red.** `servir.py` revisa las IPs cada
+  5 segundos; si cambian, termina con el código 3, e `iniciar.bat` regenera el
+  certificado y lo levanta con el anuncio nuevo.
+- **zeroconf va en Python puro**, porque el Control de Aplicaciones de Windows bloquea sus
+  DLL compiladas (`--no-binary zeroconf` y `SKIP_CYTHON=1`).
+- `generar_certificados.py` muestra la IP de la PC, por si hay que escribirla en la app.
+- 34 tests con pytest (5 nuevos). Se comprobó desde la PC que el anuncio se encuentra.
+  Ver [[Servidor de cuentas#Cuando la PC cambia de red]].
+
 ## 2026-11-02 — Cuentas en la app
 
 - **Sin sesión no se juega.** La app abre en **"Iniciar sesión"**, con un enlace a

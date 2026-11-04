@@ -51,8 +51,10 @@ que los archivos `.dart` se reconocen solos (resaltado, análisis, botón Run/De
 servidor\iniciar.bat
 ```
 
-Lo deja en `https://localhost:8443`. La primera vez crea `servidor\.venv` e instala los
-paquetes (Python 3.12 ya está en la PC). Sus tests:
+Lo deja en `https://localhost:8443`, muestra la IP de la PC y lo anuncia en la WiFi para
+que la app lo encuentre sola. Si la PC cambia de red, se vuelve a levantar solo. La
+primera vez crea `servidor\.venv` e instala los paquetes (Python 3.12 ya está en la PC).
+Sus tests:
 
 ```bat
 cd servidor
@@ -61,6 +63,10 @@ cd servidor
 
 Para probarlo a mano se usa Python, no `curl`: el `curl` de Windows no respeta
 `--cacert` con la autoridad local. Ver [[Servidor de cuentas]].
+
+Si se instalan los paquetes a mano, hay que poner antes `set SKIP_CYTHON=1`: el Control
+de Aplicaciones de Windows bloquea las DLL compiladas de zeroconf. `iniciar.bat` ya lo
+hace. Ver [[Servidor de cuentas#Cuando la PC cambia de red]].
 
 ## Probar la app en el navegador (sin Chrome)
 
