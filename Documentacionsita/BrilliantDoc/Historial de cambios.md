@@ -26,9 +26,17 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
   fallo; sin reintento para crear y borrar ni en un tiempo agotado), uno del bloc (salir
   después de entrar con "Entrar" manda el cierre; antes ningún test lo comprobaba) y la
   prueba contra el servidor de verdad ahora espera 8 s antes de salir.
-- **Pendiente de este plan:** que la sesión venza sola a los 5 minutos sin uso, que
-  reiniciar el servidor cierre todas, y que la app guarde y reintente el cierre que no
-  llegó (hoy, si de verdad no hay red, sigue diciendo "Cerraste sesión.").
+- **Servidor, el mismo día:**
+  - la sesión **vence a los 5 minutos sin uso** (antes 7 días), así que un cierre que no
+    llegó no bloquea la cuenta más de 5 minutos; el 409 dice cuántos minutos faltan;
+  - **reiniciar cierra todas las sesiones** (`manage.py cerrar_sesiones`, desde
+    `iniciar.bat`);
+  - el 403 de knox, en inglés, se traduce; si ya hay un servidor en el puerto 8443, lo dice
+    claro en vez de un traceback, y `iniciar.bat` ya no sale en silencio con código 0;
+  - 86 tests con pytest (10 nuevos); se rompió a propósito el TTL y `cerrar_sesiones`
+    y sus tests fallaron.
+- **Pendiente:** que la app guarde y reintente el cierre que no llegó cuando de verdad no
+  hay red (hoy sigue diciendo "Cerraste sesión.").
 
 ## 2026-11-04 — Las reglas de las cuentas, en la app
 

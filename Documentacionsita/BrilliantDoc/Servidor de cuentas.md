@@ -110,12 +110,22 @@ Si se entra con una cuenta que tiene la sesión **activa** en otro aparato, resp
 "Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o espera unos
 minutos si ya no la usas."
 
-- **Activa es usada en los últimos 5 minutos** (`SESION_ACTIVA`). knox renueva el
-  vencimiento cada vez que se usa el token, así que vence = último uso + 7 días, y no
-  hace falta guardar nada más. La app, mientras está abierta, avisa cada 2 minutos.
-- **Una sesión sin usar desde antes no cuenta, y la entrada nueva la cierra.** Si no,
-  reinstalar la app, borrar sus datos o perder el celular dejaría la cuenta bloqueada
-  hasta 7 días.
+- **Una sesión vence a los 5 minutos sin usarse** (`SESION_SIN_USO`, que es también el
+  `TOKEN_TTL` de knox). knox renueva el vencimiento cada vez que se usa el token, así que
+  una sesión sin vencer es una usada hace poco. La app, mientras está abierta, avisa cada
+  2 minutos. (Antes duraba 7 días y "activa" era una ventana aparte de 5 minutos; se
+  simplificó el 2026-11-10.)
+- **La entrada nueva borra las sesiones vencidas.** Si no, reinstalar la app, borrar sus
+  datos o perder el celular dejaría la cuenta bloqueada.
+- **El 409 dice cuántos minutos faltan** para que venza la otra sesión.
+- **Reiniciar el servidor cierra todas las sesiones** (`manage.py cerrar_sesiones`, desde
+  `iniciar.bat`): viven en la base de datos y sobrevivían al reinicio. No corre cuando
+  `servir.py` se relanza solo por un cambio de red.
+- **El 403 de knox** (dos entradas al mismo tiempo), que salía en inglés, se traduce al
+  mismo 409.
+- **Arranque doble:** si el puerto 8443 ya está ocupado, `servir.py` lo dice y termina
+  con el código 2 en vez de un traceback de zeroconf; si otra PC se llama igual,
+  zeroconf cambia el nombre del anuncio.
 - **El aviso solo sale con la contraseña correcta**: con una mala, el error de siempre.
 - `TOKEN_LIMIT_PER_USER` pasó de 10 a 1, como respaldo. Con 10, el aparato número 11
   recibía un 403 en inglés (`{"error": ...}`) que la app no mostraba.
@@ -185,7 +195,7 @@ ORION" en `192.168.137.252`, puerto 8443.
 
 ## Tests
 
-76 tests con pytest en `servidor/cuentas/tests/`, un archivo por tema:
+86 tests con pytest en `servidor/cuentas/tests/`, un archivo por tema:
 
 | Archivo | Qué prueba |
 |---|---|
@@ -193,7 +203,9 @@ ORION" en `192.168.137.252`, puerto 8443.
 | `test_nombre_de_usuario.py` | De 3 a 20 letras sin acento, números, `.`, `_` y `-`; rechaza, con su mensaje, otros largos, espacios, acentos, ñ, cirílico, `@`, `+`, emojis, `<script>`, `' OR 1=1 --`, tabs y saltos de línea; vacíos, nulos y lo que no es texto; recorta los espacios del borde; "Ana" y "ana" son la misma, y la base tampoco deja las dos |
 | `test_contrasena.py` | Con espacios al borde se crea, se entra y se borra la cuenta; con ñ, acentos y emoji; 128 sí y 129 no, ni al crear ni al entrar |
 | `test_entrar.py` | Devuelve un token que vence; un token distinto cada vez; sin distinguir mayúsculas; lo que no es texto no entra; el mismo error con contraseña mala o usuario inexistente; límite de intentos |
-| `test_una_sesion_por_cuenta.py` | Con la sesión activa en otro aparato, 409 y la otra sigue; tampoco con otras mayúsculas; con la contraseña mala no dice nada de la sesión; cerrada allá, deja entrar; sin usar hace más de 5 minutos, la entrada nueva la cierra; usarla la vuelve a activar; otra cuenta no se ve afectada |
+| `test_una_sesion_por_cuenta.py` | Con una sesión sin vencer en otro aparato, 409 con los minutos que faltan (en singular y plural) y la otra sigue; tampoco con otras mayúsculas; con la contraseña mala no dice nada de la sesión; cerrada allá, deja entrar; vencida (5 minutos sin uso), la entrada nueva la borra y la vieja da 401; usarla le devuelve los 5 minutos; una vencida no se reactiva usándola; otra cuenta no se ve afectada |
+| `test_cerrar_sesiones.py` | `cerrar_sesiones` borra las sesiones de todas las cuentas, se puede volver a entrar y sin sesiones lo dice |
+| `test_arranque_doble.py` | Un puerto libre y uno ocupado; si el puerto está ocupado, lo dice y no se levanta |
 | `test_quien_soy.py` | Sin token, con un token inventado o con uno vencido da 401; con el token, el usuario |
 | `test_salir.py` | Cerrar sesión invalida ese token y deja entrar desde otro aparato |
 | `test_borrar_cuenta.py` | Sin contraseña, con una mala o sin sesión no borra; con la buena borra la cuenta y todos sus tokens, y ya no se puede entrar |
