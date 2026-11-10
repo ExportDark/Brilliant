@@ -20,6 +20,9 @@ class AlmacenEnMemoria implements AlmacenDeSesion {
   /// La dirección del servidor que eligió el jugador, si eligió una.
   Uri? servidor;
 
+  /// La sesión cerrada aquí que el servidor todavía no sabe que se cerró.
+  Sesion? porCerrar;
+
   AlmacenEnMemoria([this.sesion]);
 
   @override
@@ -30,6 +33,12 @@ class AlmacenEnMemoria implements AlmacenDeSesion {
 
   @override
   Future<void> borrar() async => sesion = null;
+
+  @override
+  Future<Sesion?> leerPorCerrar() async => porCerrar;
+
+  @override
+  Future<void> guardarPorCerrar(Sesion? sesion) async => porCerrar = sesion;
 
   @override
   Future<Uri?> leerServidor() async => servidor;
@@ -74,7 +83,7 @@ ServidorEncontrado anunciado(String ip, {String pc = 'ORION'}) => ServidorEncont
 /// aparato (`servidor/cuentas/views.py`).
 const sesionEnOtroAparato =
     'Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o espera '
-    'unos minutos si ya no la usas.';
+    '5 minutos si ya no la usas.';
 
 /// Un servidor de cuentas en memoria, que contesta como el de verdad: las
 /// mismas rutas, los mismos códigos y los mismos mensajes en español, con las
@@ -85,8 +94,8 @@ const sesionEnOtroAparato =
 /// Solo contesta en su [direccion], como el de verdad solo está en la IP de
 /// la PC: un pedido a otra dirección no llega.
 class ServidorFalso {
-  /// Una sesión usada hace menos que esto está activa: no deja entrar con la
-  /// misma cuenta en otro aparato.
+  /// Una sesión que pasa esto sin usarse vence sola, y mientras no venza no deja
+  /// entrar con la misma cuenta en otro aparato.
   static const sesionActiva = Duration(minutes: 5);
 
   /// El reloj del servidor. Los tests lo adelantan para que una sesión deje
@@ -159,7 +168,12 @@ class ServidorFalso {
         ? const <String, dynamic>{}
         : jsonDecode(pedido.body) as Map<String, dynamic>;
     final token = pedido.headers['Authorization']?.replaceFirst('Token ', '');
-    final usuarioDelToken = sesiones[token];
+    var usuarioDelToken = sesiones[token];
+    if (usuarioDelToken != null && ahora().difference(_ultimoUso[token]!) >= sesionActiva) {
+      // Venció: el servidor la borra y responde como si nunca hubiera existido.
+      sesiones.remove(token);
+      usuarioDelToken = null;
+    }
     // Usar el token lo renueva, como knox: la sesión sigue activa.
     if (usuarioDelToken != null) _ultimoUso[token!] = ahora();
     final ruta = '${pedido.method} ${pedido.url.path}';

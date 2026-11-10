@@ -47,8 +47,14 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
   /// El aviso cuando la sesión de este aparato dejó de valer mientras se usaba.
   static const sesionCerrada =
-      'Tu sesión se cerró: venció, o se entró con tu cuenta en otro aparato. Vuelve a '
-      'iniciar sesión.';
+      'Tu sesión se cerró: pasó mucho tiempo sin usarla, el servidor se reinició o se '
+      'entró con tu cuenta en otro aparato. Vuelve a iniciar sesión.';
+
+  /// El aviso al cerrar sesión cuando el servidor no se enteró: no se puede
+  /// decir "Cerraste sesión." a secas, porque en el servidor sigue abierta.
+  static const cierreSinServidor =
+      'Cerraste sesión en este aparato. El servidor no contestó: se le avisará al '
+      'volver a conectar, y si no, la sesión vence sola en 5 minutos.';
 
   /// La dirección del servidor con la que se está hablando.
   Uri get servidor => _cuentas.servidor;
@@ -66,6 +72,9 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   Future<void> _alRevisar(Emitter<SesionState> emit) async {
     // Primero, la dirección que eligió el jugador la última vez.
     await _servidor.cargar();
+
+    // Un cierre de sesión que no llegó la última vez, se vuelve a mandar.
+    await _cerrarPendiente();
 
     final guardada = await _almacen.leer();
     if (guardada == null) return emit(const SesionState.sinSesion());
@@ -123,7 +132,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
   Future<void> _alLatir(Emitter<SesionState> emit) async {
     final sesion = _sesion;
-    if (sesion == null) return;
+    if (sesion == null) return _cerrarPendiente();
 
     try {
       await _conElServidor(() => _cuentas.quienSoy(sesion.token));
@@ -141,16 +150,34 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   Future<void> _alSalir(Emitter<SesionState> emit) async {
     final sesion = _sesion;
     emit(state.esperando());
-    if (sesion != null) {
-      try {
-        await _cuentas.salir(sesion.token);
-      } on Exception {
-        // Aunque el servidor no conteste, en este aparato la sesión se
-        // cierra igual: el token se olvida y vence solo.
-      }
-    }
+    final llego = sesion == null || await _cerrarEnElServidor(sesion);
+    // Aunque el servidor no conteste, en este aparato la sesión se cierra
+    // igual: el token se olvida. Si el servidor no se enteró, queda anotado para
+    // volver a avisarle, y si no, la sesión vence sola.
     await _olvidarSesion();
-    emit(const SesionState.sinSesion(aviso: 'Cerraste sesión.'));
+    if (!llego) await _almacen.guardarPorCerrar(sesion);
+    emit(SesionState.sinSesion(aviso: llego ? 'Cerraste sesión.' : cierreSinServidor));
+  }
+
+  /// Le avisa al servidor que [sesion] se cerró. Es verdadero si ya está
+  /// cerrada allá: porque se cerró ahora, o porque ya no valía (venció).
+  Future<bool> _cerrarEnElServidor(Sesion sesion) async {
+    try {
+      await _conElServidor(() => _cuentas.salir(sesion.token));
+      return true;
+    } on SesionVencida {
+      return true;
+    } on Exception {
+      return false;
+    }
+  }
+
+  /// Si quedó una sesión que se cerró aquí sin que el servidor se enterara,
+  /// intenta cerrarla ahora. Si tampoco llega, sigue anotada.
+  Future<void> _cerrarPendiente() async {
+    final pendiente = await _almacen.leerPorCerrar();
+    if (pendiente == null) return;
+    if (await _cerrarEnElServidor(pendiente)) await _almacen.guardarPorCerrar(null);
   }
 
   Future<void> _alBorrar(BorradoPedido event, Emitter<SesionState> emit) async {
@@ -202,6 +229,10 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   }
 
   Future<void> _iniciar(String usuario, String contrasena) async {
+    // Antes de entrar, se cierra la sesión que quedó abierta en el servidor, si
+    // la hay: si no, en este mismo celular el servidor diría que la cuenta ya
+    // está en uso en otro aparato.
+    await _cerrarPendiente();
     final token = await _conElServidor(
       () => _cuentas.entrar(usuario: usuario, contrasena: contrasena),
     );

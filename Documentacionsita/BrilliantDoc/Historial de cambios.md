@@ -35,8 +35,22 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
     claro en vez de un traceback, y `iniciar.bat` ya no sale en silencio con código 0;
   - 86 tests con pytest (10 nuevos); se rompió a propósito el TTL y `cerrar_sesiones`
     y sus tests fallaron.
-- **Pendiente:** que la app guarde y reintente el cierre que no llegó cuando de verdad no
-  hay red (hoy sigue diciendo "Cerraste sesión.").
+- **App, el mismo día:** si el cierre de sesión de verdad no llega (sin red), la app ya no
+  dice "Cerraste sesión." a secas: lo dice con la verdad, guarda la **sesión por cerrar** y
+  la reintenta al abrir, antes de entrar o crear cuenta, y en cada latido. En tu mismo
+  celular el caso de "ya aparece que está logueado" se resuelve solo.
+- **Verificado en el emulador con el servidor de verdad:**
+  - tras 12 s de conexión inactiva, cerrar sesión llega (`POST logout → 204`; antes no
+    aparecía en el registro);
+  - con la red cortada, el aviso dice que el servidor no contestó y la sesión sigue
+    abierta en el servidor; al volver la red y entrar de nuevo, la app manda primero el
+    logout pendiente (204) y luego entra (200), sin 409;
+  - al arrancar, el servidor cerró las sesiones abiertas.
+- **Tests:** 524 de la app (más 3 contra el servidor) y 86 del servidor. Se rompió a
+  propósito el cierre antes de entrar y la anotación de la sesión por cerrar, y sus
+  tests fallaron. Los tests contra el servidor de verdad chocan con el límite de 5
+  inicios de sesión por minuto si se repiten seguidos: hay que esperar o reiniciar el
+  servidor.
 
 ## 2026-11-04 — Las reglas de las cuentas, en la app
 

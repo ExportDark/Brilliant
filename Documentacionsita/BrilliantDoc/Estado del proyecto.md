@@ -91,7 +91,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
 Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 518 tests de la app y 86 del servidor, todos pasando.
+cerrarla es el puntaje. 524 tests de la app y 86 del servidor, todos pasando.
 
 ## Qué falta
 

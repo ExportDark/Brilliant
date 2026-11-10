@@ -113,6 +113,23 @@ vez, por una conexión nueva, los pedidos que no cambian nada (todos menos crear
 cuenta) cuando el primero falla por conexión. Antes, el primer pedido después de una pausa
 fallaba sin llegar y el cierre de sesión se perdía. Ver [[Historial de cambios]].
 
+### Si el cierre de sesión no llega: "sesión por cerrar"
+
+Al cerrar sesión, `SesionBloc` le avisa al servidor (pasando por `_conElServidor`, así
+lo encuentra si cambió de IP). En este aparato la sesión se cierra siempre, pero:
+
+- si el servidor se enteró (204, o 401 porque ya no valía), dice "Cerraste sesión.";
+- si no, guarda el token como **sesión por cerrar** (`AlmacenDeSesion.leerPorCerrar` /
+  `guardarPorCerrar`) y lo dice con la verdad: "Cerraste sesión en este aparato. El
+  servidor no contestó: se le avisará al volver a conectar, y si no, la sesión vence sola
+  en 5 minutos."
+
+`_cerrarPendiente()` lo reintenta **al abrir la app, antes de entrar o de crear la cuenta**
+(así, en el mismo celular, nunca te bloquea el 409 de tu propia sesión) **y en cada latido
+sin sesión**. Si el servidor ya no sabe de esa sesión (se reinició o venció), se da por
+cerrada. Antes, `_alSalir` se tragaba el error y decía "Cerraste sesión." aunque la sesión
+siguiera abierta en el servidor.
+
 ### Una sola sesión activa: el latido
 
 Una cuenta tiene una sola sesión **activa**: usada en los últimos 5 minutos. Para que la
@@ -124,10 +141,11 @@ del aparato que se está usando cuente como activa:
 - **en segundo plano no**: un celular guardado en el bolsillo deja de contar como activo
   y se puede entrar en otro.
 
-Si el latido recibe 401 (la sesión venció, o se entró con la cuenta en otro aparato
-mientras este no la usaba), la app vuelve a "Iniciar sesión" con el aviso "Tu sesión se
-cerró: venció, o se entró con tu cuenta en otro aparato. Vuelve a iniciar sesión.". Sin
-conexión no cierra nada: el juego sigue.
+Si el latido recibe 401 (la sesión venció a los 5 minutos sin uso, el servidor se
+reinició o se entró con la cuenta en otro aparato), la app vuelve a "Iniciar sesión" con el
+aviso "Tu sesión se cerró: pasó mucho tiempo sin usarla, el servidor se reinició o se entró
+con tu cuenta en otro aparato. Vuelve a iniciar sesión.". Sin conexión no cierra nada: el
+juego sigue.
 
 Entrar con la cuenta activa en otro aparato muestra el mensaje del servidor en el recuadro
 de avisos: "Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o

@@ -16,6 +16,13 @@ abstract interface class AlmacenDeSesion {
   Future<void> guardar(Sesion sesion);
   Future<void> borrar();
 
+  /// La sesión que se cerró en este aparato pero que el servidor todavía no
+  /// sabe que se cerró (el cierre de sesión no llegó), o `null` si no hay.
+  Future<Sesion?> leerPorCerrar();
+
+  /// Guarda la sesión por cerrar en el servidor; con `null`, ya no hay ninguna.
+  Future<void> guardarPorCerrar(Sesion? sesion);
+
   /// La dirección del servidor que eligió el jugador, o `null` si usa la de
   /// siempre.
   Future<Uri?> leerServidor();
@@ -29,6 +36,8 @@ abstract interface class AlmacenDeSesion {
 class AlmacenSeguro implements AlmacenDeSesion {
   static const _usuario = 'sesion.usuario';
   static const _token = 'sesion.token';
+  static const _usuarioPorCerrar = 'porcerrar.usuario';
+  static const _tokenPorCerrar = 'porcerrar.token';
   static const _servidor = 'servidor.direccion';
 
   final FlutterSecureStorage _almacen;
@@ -53,6 +62,25 @@ class AlmacenSeguro implements AlmacenDeSesion {
   Future<void> borrar() async {
     await _almacen.delete(key: _usuario);
     await _almacen.delete(key: _token);
+  }
+
+  @override
+  Future<Sesion?> leerPorCerrar() async {
+    final usuario = await _almacen.read(key: _usuarioPorCerrar);
+    final token = await _almacen.read(key: _tokenPorCerrar);
+    if (usuario == null || token == null) return null;
+    return Sesion(usuario: usuario, token: token);
+  }
+
+  @override
+  Future<void> guardarPorCerrar(Sesion? sesion) async {
+    if (sesion == null) {
+      await _almacen.delete(key: _usuarioPorCerrar);
+      await _almacen.delete(key: _tokenPorCerrar);
+      return;
+    }
+    await _almacen.write(key: _usuarioPorCerrar, value: sesion.usuario);
+    await _almacen.write(key: _tokenPorCerrar, value: sesion.token);
   }
 
   @override

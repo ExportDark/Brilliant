@@ -217,8 +217,10 @@ void main() {
         bloc.add(const SalidaPedida());
       },
       verify: (bloc) {
-        expect(_resumen(bloc.state), 'sinSesion · Cerraste sesión.');
+        // No dice "Cerraste sesión." a secas: en el servidor sigue abierta.
+        expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.cierreSinServidor}');
         expect(almacen.sesion, isNull);
+        expect(almacen.porCerrar?.token, sesion.token, reason: 'queda anotada para avisarle');
       },
     );
 
@@ -530,6 +532,101 @@ void main() {
       verify: (bloc) {
         expect(_resumen(bloc.state), 'sinSesion');
         expect(servidor.pedidos.where((pedido) => pedido.headers.containsKey('Authorization')), isEmpty);
+      },
+    );
+  });
+
+  group('SesionBloc cuando el cierre de sesión no llega al servidor', () {
+    /// Entra con "ana", y le apaga el servidor justo antes de cerrar sesión.
+    Future<void> entrarYSalirSinServidor(SesionBloc bloc) async {
+      bloc.add(const SesionRevisada());
+      bloc.add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba));
+      await bloc.stream.firstWhere((state) => state.etapa == EtapaDeSesion.conSesion);
+      servidor.apagado = true;
+      bloc.add(const SalidaPedida());
+      await bloc.stream.firstWhere((state) => state.etapa == EtapaDeSesion.sinSesion);
+      servidor.apagado = false;
+    }
+
+    setUp(() => servidor.cuentas['ana'] = contrasenaDePrueba);
+
+    blocTest<SesionBloc, SesionState>(
+      'el caso de la vida real: no llegó, se vuelve a entrar en el mismo celular y entra',
+      build: nuevoBloc,
+      act: (bloc) async {
+        await entrarYSalirSinServidor(bloc);
+        // En el servidor la sesión sigue abierta, y sin esto daría 409.
+        expect(servidor.sesiones.values, contains('ana'));
+        expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.cierreSinServidor}');
+        bloc.add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba));
+      },
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'conSesion · ana');
+        expect(almacen.porCerrar, isNull);
+        expect(servidor.sesiones.values.where((usuario) => usuario == 'ana'), hasLength(1));
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'al abrir la app, se le avisa al servidor que esa sesión se cerró',
+      build: nuevoBloc,
+      act: (bloc) async {
+        await entrarYSalirSinServidor(bloc);
+        bloc.add(const SesionRevisada());
+      },
+      verify: (bloc) {
+        expect(almacen.porCerrar, isNull);
+        expect(servidor.sesiones, isEmpty);
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'el latido en "Iniciar sesión" lo reintenta, y mientras no haya servidor sigue anotado',
+      build: nuevoBloc,
+      act: (bloc) async {
+        await entrarYSalirSinServidor(bloc);
+        servidor.apagado = true;
+        bloc.add(const SesionLatido());
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(almacen.porCerrar, isNotNull, reason: 'sin servidor, sigue anotado');
+        servidor.apagado = false;
+        bloc.add(const SesionLatido());
+      },
+      verify: (bloc) {
+        expect(almacen.porCerrar, isNull);
+        expect(servidor.sesiones, isEmpty);
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
+      'si el servidor se reinició y ya no sabe de la sesión, igual se da por cerrada',
+      build: nuevoBloc,
+      act: (bloc) async {
+        await entrarYSalirSinServidor(bloc);
+        servidor.sesiones.clear();
+        bloc.add(const SesionLatido());
+      },
+      verify: (bloc) => expect(almacen.porCerrar, isNull),
+    );
+  });
+
+  group('SesionBloc cuando el servidor cierra las sesiones', () {
+    blocTest<SesionBloc, SesionState>(
+      'una sesión que pasó 5 minutos sin usarse vence: el latido vuelve a "Iniciar sesión"',
+      build: () {
+        almacen.sesion = servidor.sesionIniciada('ana');
+        return nuevoBloc();
+      },
+      act: (bloc) async {
+        bloc.add(const SesionRevisada());
+        await bloc.stream.firstWhere((state) => state.etapa == EtapaDeSesion.conSesion);
+        final despues = DateTime.now().add(const Duration(minutes: 6));
+        servidor.ahora = () => despues;
+        bloc.add(const SesionLatido());
+      },
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.sesionCerrada}');
+        expect(almacen.sesion, isNull);
       },
     );
   });

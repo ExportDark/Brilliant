@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 512 tests, todos pasando, más 3 que hablan con el servidor de verdad y solo corren si se
+las pruebas y qué se aprendió de ellas. 524 tests, todos pasando, más 3 que hablan con el servidor de verdad y solo corren si se
 piden (2026-11-04).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
@@ -24,8 +24,8 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 80 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
 | `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 128 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
-| `test/cuenta/` | 96 (+3) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
-| `test/ui/` | 160 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta, el indicador y el diálogo del servidor, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/cuenta/` | 107 (+3) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
+| `test/ui/` | 161 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta, el indicador y el diálogo del servidor, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
 | `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
 ## Cómo están organizadas
