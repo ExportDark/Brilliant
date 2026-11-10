@@ -43,6 +43,10 @@ void main() {
       final token = await cuentas.entrar(usuario: usuario, contrasena: contrasena);
       expect(await cuentas.quienSoy(token), usuario);
 
+      // El servidor cierra las conexiones inactivas a los 5 s. Antes, el primer
+      // pedido después de esa pausa fallaba sin llegar, y el cierre de sesión se
+      // perdía: la sesión quedaba abierta en el servidor.
+      await Future<void>.delayed(const Duration(seconds: 8));
       await cuentas.salir(token);
       await expectLater(cuentas.quienSoy(token), throwsA(isA<SesionVencida>()));
 

@@ -184,6 +184,30 @@ void main() {
     );
 
     blocTest<SesionBloc, SesionState>(
+      'una sesión iniciada con "Entrar" también se cierra en el servidor al salir',
+      build: () {
+        almacen.sesion = null;
+        servidor.cuentas['beto'] = contrasenaDePrueba;
+        return nuevoBloc();
+      },
+      act: (bloc) async {
+        bloc.add(const SesionRevisada());
+        bloc.add(const EntradaPedida(usuario: 'beto', contrasena: contrasenaDePrueba));
+        await bloc.stream.firstWhere((state) => state.etapa == EtapaDeSesion.conSesion);
+        bloc.add(const SalidaPedida());
+      },
+      verify: (bloc) {
+        expect(_resumen(bloc.state), 'sinSesion · Cerraste sesión.');
+        expect(
+          servidor.pedidos.where((pedido) => pedido.url.path == '/auth/token/logout/'),
+          hasLength(1),
+          reason: 'la app tiene que mandar el cierre de sesión',
+        );
+        expect(servidor.sesiones.values, isNot(contains('beto')));
+      },
+    );
+
+    blocTest<SesionBloc, SesionState>(
       'cerrar sesión sin conexión la cierra igual en el aparato',
       build: nuevoBloc,
       act: (bloc) async {

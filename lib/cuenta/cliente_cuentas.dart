@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -55,7 +56,7 @@ class ClienteCuentas {
     required String contrasena,
     required String repetida,
   }) async {
-    await _pedir('POST', 'auth/users/', cuerpo: {
+    await _pedir('POST', 'auth/users/', reintentar: false, cuerpo: {
       'username': usuario,
       'password': contrasena,
       're_password': repetida,
@@ -101,7 +102,7 @@ class ClienteCuentas {
   /// Borra la cuenta de la sesión de [token]. El servidor pide la
   /// [contrasena] actual para confirmarlo.
   Future<void> borrarCuenta({required String token, required String contrasena}) async {
-    await _pedir('DELETE', 'auth/users/me/', token: token, cuerpo: {
+    await _pedir('DELETE', 'auth/users/me/', token: token, reintentar: false, cuerpo: {
       'current_password': contrasena,
     });
   }
@@ -113,18 +114,38 @@ class ClienteCuentas {
     Map<String, String>? cuerpo,
     Uri? en,
     Duration espera = _espera,
+    bool reintentar = true,
   }) async {
-    final pedido = http.Request(metodo, (en ?? servidor).resolve(ruta))
-      ..headers['Accept'] = 'application/json';
-    if (token != null) pedido.headers['Authorization'] = 'Token $token';
-    if (cuerpo != null) {
-      pedido.headers['Content-Type'] = 'application/json';
-      pedido.body = jsonEncode(cuerpo);
+    // Un pedido enviado ya no se puede volver a enviar: se arma de nuevo.
+    http.Request armar() {
+      final pedido = http.Request(metodo, (en ?? servidor).resolve(ruta))
+        ..headers['Accept'] = 'application/json';
+      if (token != null) pedido.headers['Authorization'] = 'Token $token';
+      if (cuerpo != null) {
+        pedido.headers['Content-Type'] = 'application/json';
+        pedido.body = jsonEncode(cuerpo);
+      }
+      return pedido;
     }
 
-    final http.Response respuesta;
+    Future<http.Response> enviar() async =>
+        http.Response.fromStream(await _http.send(armar()).timeout(espera));
+
+    http.Response respuesta;
     try {
-      respuesta = await http.Response.fromStream(await _http.send(pedido).timeout(espera));
+      try {
+        respuesta = await enviar();
+      } on TimeoutException {
+        rethrow;
+      } on Exception {
+        // El servidor cierra las conexiones que pasan unos segundos sin usarse,
+        // y el cliente puede intentar reusar una ya cerrada: el primer pedido
+        // falla sin haber llegado y el siguiente sale por una conexión nueva.
+        // Sin esto, el cierre de sesión se perdía en silencio. Un tiempo
+        // agotado no se reintenta: el pedido pudo haber llegado.
+        if (!reintentar) rethrow;
+        respuesta = await enviar();
+      }
     } on Exception {
       // Sin red, servidor apagado, certificado ajeno o tiempo agotado: para
       // el jugador es lo mismo, no hay con quién hablar.

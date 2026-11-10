@@ -7,6 +7,29 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-10 — El cierre de sesión se perdía en silencio
+
+- **Síntoma:** se cerraba sesión en la app ("Cerraste sesión.") y el servidor seguía con
+  la sesión abierta, así que entrar de nuevo daba 409; reiniciar el servidor no ayudaba
+  (las sesiones están en la base).
+- **Causa, reproducida en el emulador con el servidor de verdad:** el servidor (uvicorn)
+  cierra las conexiones inactivas a los 5 segundos, y el cliente HTTP intentaba reusar
+  una ya cerrada: el primer pedido tras una pausa fallaba **sin llegar al servidor**
+  (en el registro no aparecía ningún `POST /auth/token/logout/`). `SesionBloc._alSalir`
+  se traga todos los errores, así que la app decía que había cerrado sesión. Afectaba a
+  cualquier primer pedido después de una pausa, no solo a cerrar sesión.
+- **Arreglo:** el cliente cierra sus conexiones inactivas a los 2 segundos (antes que el
+  servidor) y reintenta una vez los pedidos que no cambian nada si el primero falla por
+  conexión. Crear la cuenta y borrarla no se reintentan solos, y un tiempo agotado
+  tampoco (el pedido pudo llegar).
+- **Tests:** 5 del cliente (reintento una vez, con el mismo token; se rinde al segundo
+  fallo; sin reintento para crear y borrar ni en un tiempo agotado), uno del bloc (salir
+  después de entrar con "Entrar" manda el cierre; antes ningún test lo comprobaba) y la
+  prueba contra el servidor de verdad ahora espera 8 s antes de salir.
+- **Pendiente de este plan:** que la sesión venza sola a los 5 minutos sin uso, que
+  reiniciar el servidor cierre todas, y que la app guarde y reintente el cierre que no
+  llegó (hoy, si de verdad no hay red, sigue diciendo "Cerraste sesión.").
+
 ## 2026-11-04 — Las reglas de las cuentas, en la app
 
 - **"Crear cuenta" revisa las reglas antes de mandar nada**, con los mismos mensajes que

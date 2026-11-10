@@ -105,6 +105,14 @@ escribiéndolo con cualquier mayúscula.
 Los largos se cuentan en caracteres (runas), como Python, y no en unidades de UTF-16:
 un emoji cuenta como uno.
 
+### Cerrar sesión llega al servidor
+
+El servidor cierra las conexiones inactivas a los 5 segundos. El cliente HTTP
+(`cliente_http_io.dart`) cierra las suyas a los 2, y `ClienteCuentas._pedir` reintenta una
+vez, por una conexión nueva, los pedidos que no cambian nada (todos menos crear y borrar la
+cuenta) cuando el primero falla por conexión. Antes, el primer pedido después de una pausa
+fallaba sin llegar y el cierre de sesión se perdía. Ver [[Historial de cambios]].
+
 ### Una sola sesión activa: el latido
 
 Una cuenta tiene una sola sesión **activa**: usada en los últimos 5 minutos. Para que la

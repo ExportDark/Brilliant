@@ -16,5 +16,10 @@ Future<http.Client> crearClienteHttp() async {
 http.Client clienteQueSoloConfiaEn(List<int> certificadoPem) {
   final contexto = SecurityContext(withTrustedRoots: false)
     ..setTrustedCertificatesBytes(certificadoPem);
-  return IOClient(HttpClient(context: contexto));
+  return IOClient(
+    HttpClient(context: contexto)
+      // El servidor cierra las conexiones inactivas a los 5 segundos (uvicorn):
+      // el cliente las cierra antes, y no intenta reusar una ya muerta.
+      ..idleTimeout = const Duration(seconds: 2),
+  );
 }

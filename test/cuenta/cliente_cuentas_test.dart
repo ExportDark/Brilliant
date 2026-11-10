@@ -182,6 +182,88 @@ void main() {
 
       expect(() => cuentas.entrar(usuario: 'ana', contrasena: 'x'), throwsA(isA<SinConexion>()));
     });
+
+    group('con una conexión inactiva que el servidor ya cerró', () {
+      /// Un servidor cuya primera conexión ya se cerró: el primer intento falla
+      /// como falla `HttpClient` al reusarla, y el siguiente llega.
+      ({ClienteCuentas cuentas, List<http.Request> intentos}) conUnaConexionMuerta() {
+        final intentos = <http.Request>[];
+        final mock = MockClient((pedido) async {
+          intentos.add(pedido);
+          if (intentos.length == 1) {
+            throw http.ClientException('Connection closed before full header was received');
+          }
+          return http.Response('', 204);
+        });
+        return (cuentas: ClienteCuentas(mock, Uri.parse('https://servidor.test/')), intentos: intentos);
+      }
+
+      test('cerrar sesión se reintenta una vez, con el mismo token', () async {
+        final (:cuentas, :intentos) = conUnaConexionMuerta();
+
+        await cuentas.salir('abc123');
+
+        expect(intentos, hasLength(2));
+        expect(intentos.last.headers['Authorization'], 'Token abc123');
+        expect(intentos.last.url.path, '/auth/token/logout/');
+      });
+
+      test('revisar quién soy también', () async {
+        final (:cuentas, :intentos) = conUnaConexionMuerta();
+
+        await cuentas.quienSoy('abc123').catchError((_) => '');
+
+        expect(intentos, hasLength(2));
+      });
+
+      test('si el segundo intento también falla, es SinConexion', () async {
+        var intentos = 0;
+        final cuentas = ClienteCuentas(
+          MockClient((pedido) async {
+            intentos++;
+            throw http.ClientException('sin red', pedido.url);
+          }),
+          Uri.parse('https://servidor.test/'),
+        );
+
+        await expectLater(cuentas.salir('abc123'), throwsA(isA<SinConexion>()));
+        expect(intentos, 2);
+      });
+
+      test('crear la cuenta y borrarla no se reintentan solos: podrían repetirse', () async {
+        final (:cuentas, :intentos) = conUnaConexionMuerta();
+        await expectLater(
+          cuentas.crearCuenta(usuario: 'ana', contrasena: 'x', repetida: 'x'),
+          throwsA(isA<SinConexion>()),
+        );
+        expect(intentos, hasLength(1));
+
+        final otras = conUnaConexionMuerta();
+        await expectLater(
+          otras.cuentas.borrarCuenta(token: 't', contrasena: 'x'),
+          throwsA(isA<SinConexion>()),
+        );
+        expect(otras.intentos, hasLength(1));
+      });
+
+      test('un tiempo agotado no se reintenta: el pedido pudo haber llegado', () async {
+        var intentos = 0;
+        final cuentas = ClienteCuentas(
+          MockClient((pedido) async {
+            intentos++;
+            await Future<void>.delayed(const Duration(seconds: 5));
+            return http.Response('', 204);
+          }),
+          Uri.parse('https://servidor.test/'),
+        );
+
+        await expectLater(
+          cuentas.probarConexion(espera: const Duration(milliseconds: 20)),
+          throwsA(isA<SinConexion>()),
+        );
+        expect(intentos, 1);
+      });
+    });
   });
 }
 
