@@ -4,6 +4,7 @@ import '../../modelo/mapa.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
 import '../widgets/tablero_widget.dart';
+import 'multijugador/pantalla_multijugador.dart';
 import 'pantalla_mi_cuenta.dart';
 import 'pantalla_preparacion.dart';
 
@@ -35,6 +36,14 @@ class PantallaEleccionDeMapa extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Brilliant'),
         actions: [
+          IconButton(
+            key: const ValueKey('boton-multijugador'),
+            tooltip: 'Jugar con otros',
+            icon: const Icon(Icons.groups_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PantallaMultijugador()),
+            ),
+          ),
           IconButton(
             key: const ValueKey('boton-mi-cuenta'),
             tooltip: 'Mi cuenta',

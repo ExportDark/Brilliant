@@ -4,6 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/cuenta/buscador_de_servidores.dart';
+import 'package:brilliant/multijugador/cliente_salas.dart';
+import 'package:brilliant/multijugador/modelos.dart';
+import 'package:brilliant/ui/pantallas/multijugador/pantalla_multijugador.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:brilliant/main.dart';
 import 'package:brilliant/modelo/mapa.dart';
 import 'package:brilliant/modelo/tablero.dart';
@@ -13,6 +17,7 @@ import 'package:brilliant/ui/widgets/celda_widget.dart';
 import 'package:brilliant/ui/widgets/indicador_del_servidor.dart';
 
 import '../../cuenta/ayudantes_cuenta.dart';
+import '../../multijugador/ayudantes_salas.dart';
 import '../../juego/ayudantes.dart';
 
 /// Los tamaños de pantalla en los que se prueba que todo quepa, en píxeles
@@ -54,6 +59,7 @@ Future<void> abrirApp(
   Stream<Object?>? cambiosDeRed,
   Duration? revisarCada,
   Duration? latidoCada,
+  ClienteSalas? salas,
 }) async {
   _superficie(tester, tamano);
   final elServidor = servidor ?? ServidorFalso();
@@ -67,6 +73,7 @@ Future<void> abrirApp(
       cambiosDeRed: cambiosDeRed,
       revisarCada: revisarCada,
       latidoCada: latidoCada,
+      salas: salas,
       tirarDado: tirarDado,
     ),
   );
@@ -214,4 +221,59 @@ bool habilitado(WidgetTester tester, Finder boton) =>
 Future<void> tirarYElegirAncla(WidgetTester tester, int indice) async {
   await tocar(tester, botonTirar);
   await tocar(tester, dadoEn(indice));
+}
+
+final botonMultijugador = find.byKey(const ValueKey('boton-multijugador'));
+
+/// Abre la app con [salas] (una sala falsa) y entra al multijugador desde "Elige un mapa".
+Future<void> abrirMultijugador(
+  WidgetTester tester,
+  SalasFalsas salas, {
+  Size tamano = const Size(1000, 1400),
+}) async {
+  await abrirApp(tester, salas: salas, tamano: tamano);
+  await tocar(tester, botonMultijugador);
+}
+
+/// Abre solo la pantalla del multijugador, sin la app alrededor, para controlar cada
+/// cuánto pregunta y la hora ([ahora]).
+Future<void> abrirSalaSola(
+  WidgetTester tester,
+  SalasFalsas salas, {
+  Duration? intervalo = const Duration(seconds: 1),
+  DateTime Function()? ahora,
+  Size tamano = const Size(1000, 1400),
+}) async {
+  _superficie(tester, tamano);
+  await tester.pumpWidget(
+    MaterialApp(
+      home: RepositoryProvider<ClienteSalas>.value(
+        value: salas,
+        child: PantallaMultijugador(intervalo: intervalo, ahora: ahora),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Que pase [segundos] de reloj de los tests, preguntándole a la sala cada segundo como
+/// hace la app.
+Future<void> pasarSegundos(WidgetTester tester, int segundos) async {
+  for (var i = 0; i < segundos; i++) {
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+  }
+  await tester.pumpAndSettle();
+}
+
+final botonCrearSala = find.byKey(const ValueKey('boton-crear-sala'));
+final botonUnirse = find.byKey(const ValueKey('boton-unirse'));
+final campoCodigo = find.byKey(const ValueKey('campo-codigo'));
+final botonEmpezar = find.byKey(const ValueKey('boton-empezar'));
+final errorDeSala = find.byKey(const ValueKey('error-de-sala'));
+
+/// Crea una sala desde la pantalla, con [salas] contestando [vista].
+Future<void> crearSala(WidgetTester tester, SalasFalsas salas, VistaDeSala vista) async {
+  salas.vista = vista;
+  await tocar(tester, botonCrearSala);
 }

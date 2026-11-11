@@ -13,6 +13,7 @@ import 'cuenta/servidor_cubit.dart';
 import 'cuenta/sesion_bloc.dart';
 import 'cuenta/sesion_event.dart';
 import 'cuenta/sesion_state.dart';
+import 'multijugador/cliente_salas.dart';
 import 'ui/pantallas/puerta_de_sesion.dart';
 import 'ui/tema.dart';
 
@@ -58,6 +59,10 @@ class BrilliantApp extends StatefulWidget {
   /// se avisa solo.
   final Duration? latidoCada;
 
+  /// Con qué se habla para las salas del multijugador. Sin él, con el servidor de
+  /// cuentas; los tests pasan una sala falsa.
+  final ClienteSalas? salas;
+
   /// Decide qué sale en los dados. Sin él salen al azar; los tests lo fijan.
   final int Function()? tirarDado;
 
@@ -69,6 +74,7 @@ class BrilliantApp extends StatefulWidget {
     this.cambiosDeRed,
     this.revisarCada,
     this.latidoCada,
+    this.salas,
     this.tirarDado,
   });
 
@@ -81,6 +87,7 @@ class _BrilliantAppState extends State<BrilliantApp> {
 
   late final ServidorCubit _servidor;
   late final SesionBloc _sesion;
+  late final ClienteSalas _salas;
   late final AppLifecycleListener _ciclo;
   StreamSubscription<Object?>? _red;
   Timer? _latidos;
@@ -95,6 +102,8 @@ class _BrilliantAppState extends State<BrilliantApp> {
       reintentarCada: widget.revisarCada,
     )..revisar();
     _sesion = SesionBloc(widget.cuentas, widget.almacen, _servidor)..add(const SesionRevisada());
+    // Las salas piden el token prestado a la sesión: no sale de ahí.
+    _salas = widget.salas ?? ClienteSalasHttp(widget.cuentas, _sesion.conToken);
 
     // Al volver a la app (por ejemplo, después de cambiar de WiFi en los
     // ajustes) y al cambiar la red, el servidor puede estar en otra parte.
@@ -132,23 +141,30 @@ class _BrilliantAppState extends State<BrilliantApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _servidor),
-        BlocProvider.value(value: _sesion),
-      ],
-      child: BlocListener<SesionBloc, SesionState>(
-        // Al entrar o salir, se cierra todo lo que haya encima (crear cuenta,
-        // mi cuenta, el diálogo de borrar) y la raíz muestra lo que toca.
-        listenWhen: (antes, ahora) => antes.etapa != ahora.etapa,
-        listener: (context, state) => _navegador.currentState?.popUntil((ruta) => ruta.isFirst),
-        child: MaterialApp(
-          title: 'Brilliant',
-          navigatorKey: _navegador,
-          debugShowCheckedModeBanner: false,
-          theme: temaBrilliant(),
-          home: PuertaDeSesion(tirarDado: widget.tirarDado),
-        ),
+    return RepositoryProvider<ClienteSalas>.value(
+      value: _salas,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: _servidor),
+          BlocProvider.value(value: _sesion),
+        ],
+        child: _conLaSesion(),
+      ),
+    );
+  }
+
+  Widget _conLaSesion() {
+    return BlocListener<SesionBloc, SesionState>(
+      // Al entrar o salir, se cierra todo lo que haya encima (crear cuenta,
+      // mi cuenta, el diálogo de borrar) y la raíz muestra lo que toca.
+      listenWhen: (antes, ahora) => antes.etapa != ahora.etapa,
+      listener: (context, state) => _navegador.currentState?.popUntil((ruta) => ruta.isFirst),
+      child: MaterialApp(
+        title: 'Brilliant',
+        navigatorKey: _navegador,
+        debugShowCheckedModeBanner: false,
+        theme: temaBrilliant(),
+        home: PuertaDeSesion(tirarDado: widget.tirarDado),
       ),
     );
   }

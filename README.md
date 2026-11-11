@@ -374,6 +374,13 @@ que se elige se recuerda.
 `BrilliantApp` recibe el cliente, el almacén, el buscador y los avisos de cambio de red,
 para que los tests usen un servidor falso en memoria, un buscador falso y una red falsa.
 
+## Módulo: multijugador (`lib/multijugador/` y `lib/ui/pantallas/multijugador/`)
+
+Salas en línea con código, hasta 6 jugadores. El servidor tira los dados, valida y calcula
+puntos; la app (`ClienteSalas`, `SalaBloc`) pregunta cada segundo y dibuja. Nadie ve el
+tablero de los demás; un panel de zonas dice cuáles siguen dando puntos. Ver la nota
+"Multijugador" del vault.
+
 ## Tests del camino feliz
 
 Hay dos, y los dos juegan una partida entera de la preparación al tablero lleno, en cada

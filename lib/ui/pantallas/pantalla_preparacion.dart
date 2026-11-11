@@ -25,7 +25,20 @@ class PantallaPreparacion extends StatelessWidget {
   /// salen al azar; los tests lo fijan.
   final int Function()? tirarDado;
 
-  const PantallaPreparacion({super.key, this.mapa = nivel1, this.tirarDado});
+  /// En el multijugador, qué hacer con el reparto al tocar "Inicio" en vez de
+  /// pasar a la partida de un jugador: se le manda al servidor.
+  final void Function(Map<Posicion, int> valores)? alConfirmar;
+
+  /// El título de la barra de arriba, si no es el nombre del mapa.
+  final String? titulo;
+
+  const PantallaPreparacion({
+    super.key,
+    this.mapa = nivel1,
+    this.tirarDado,
+    this.alConfirmar,
+    this.titulo,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +49,12 @@ class PantallaPreparacion extends StatelessWidget {
         // los números de su rango.
         admite: Tablero.desdeMapa(mapa).aceptaComoInicial,
       ),
-      child: _VistaPreparacion(mapa: mapa, tirarDado: tirarDado),
+      child: _VistaPreparacion(
+        mapa: mapa,
+        tirarDado: tirarDado,
+        alConfirmar: alConfirmar,
+        titulo: titulo,
+      ),
     );
   }
 }
@@ -44,8 +62,15 @@ class PantallaPreparacion extends StatelessWidget {
 class _VistaPreparacion extends StatefulWidget {
   final Mapa mapa;
   final int Function()? tirarDado;
+  final void Function(Map<Posicion, int> valores)? alConfirmar;
+  final String? titulo;
 
-  const _VistaPreparacion({required this.mapa, required this.tirarDado});
+  const _VistaPreparacion({
+    required this.mapa,
+    required this.tirarDado,
+    required this.alConfirmar,
+    required this.titulo,
+  });
 
   @override
   State<_VistaPreparacion> createState() => _VistaPreparacionState();
@@ -129,6 +154,8 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
     return BlocConsumer<PreparacionBloc, PreparacionState>(
       listenWhen: (antes, ahora) => !antes.confirmada && ahora.confirmada,
       listener: (context, state) {
+        final alConfirmar = widget.alConfirmar;
+        if (alConfirmar != null) return alConfirmar(state.valores);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => PantallaPartida(
@@ -144,7 +171,7 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
         final textos = Theme.of(context).textTheme;
 
         return Scaffold(
-          appBar: AppBar(title: Text(widget.mapa.nombre)),
+          appBar: AppBar(title: Text(widget.titulo ?? widget.mapa.nombre)),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),

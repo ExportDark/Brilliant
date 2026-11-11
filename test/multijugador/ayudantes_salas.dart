@@ -105,12 +105,14 @@ VistaDeSala vistaDePrueba({
   String accion = 'pendiente',
   Map<String, int> tablero = const {},
   List<Map<String, dynamic>> jugadas = const [],
+  bool puedePasar = false,
   List<Map<String, dynamic>>? jugadores,
   List<Map<String, dynamic>>? zonas,
   Map<String, dynamic>? resultado,
   double? segundosRestantes,
 }) {
   return VistaDeSala.desdeJson(vistaJson(
+    puedePasar: puedePasar,
     codigo: codigo,
     version: version,
     estado: estado,

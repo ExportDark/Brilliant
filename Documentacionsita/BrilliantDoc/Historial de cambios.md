@@ -503,3 +503,5 @@ Primer paso para jugar los 4 mapas oficiales. Es un refactor: el juego no cambia
 - **Las 5 reglas de color**, una por commit: rojo (`e4cc27a`), amarillo (`a97670e`),
   verde (`55a14d3`), azul (`12b0b29`) y morado (`c36f24c`). Ver
   [[Reglas de color en código]].
+
+- Pantallas del multijugador: lobby, preparación en línea, partida con panel de zonas y resultado, con sus tests. Ver [[Multijugador]].
