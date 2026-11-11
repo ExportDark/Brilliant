@@ -1,3 +1,6 @@
+@Timeout(Duration(minutes: 15))
+library;
+
 import 'dart:io';
 import 'dart:math';
 
@@ -35,7 +38,7 @@ class Jugador {
       try {
         return await cuentas.entrar(usuario: usuario, contrasena: contrasenaDePrueba);
       } on ErrorDeCuenta catch (error) {
-        if (!error.toString().contains('regulada') || intento == 2) rethrow;
+        if (!error.toString().contains('Demasiados intentos') || intento == 2) rethrow;
         await Future<void>.delayed(const Duration(seconds: 61));
       }
     }
@@ -99,19 +102,31 @@ class Jugador {
   }
 }
 
-late Jugador ana, beto, carla;
+late Jugador ana, beto, carla, dario, elena, fabio;
 
 /// Juega hasta que la partida termina, con cada jugador de [activos] haciendo lo suyo.
+///
+/// [silencios] dice quién se queda sin hablar con el servidor, como si se le fuera la
+/// señal: de qué segundo a qué segundo (contados desde que empieza esta función); sin
+/// segundo final, para siempre.
 Future<VistaDeSala> jugarHastaElFinal(
   String codigo,
   List<Jugador> activos, {
   Future<void> Function(int ronda)? alEmpezarRonda,
+  Map<Jugador, (int desde, int? hasta)> silencios = const {},
 }) async {
   var ronda = 0;
+  final reloj = Stopwatch()..start();
   final limite = DateTime.now().add(const Duration(minutes: 3));
   while (DateTime.now().isBefore(limite)) {
     VistaDeSala? ultima;
     for (final jugador in List.of(activos)) {
+      final silencio = silencios[jugador];
+      final segundos = reloj.elapsed.inSeconds;
+      final callado = silencio != null &&
+          segundos >= silencio.$1 &&
+          (silencio.$2 == null || segundos < silencio.$2!);
+      if (callado) continue;
       var sala = (await jugador.salas.estado(codigo))!;
       if (sala.estado == EstadoDeSala.terminada) return sala;
       if (sala.ronda != ronda) {
@@ -163,14 +178,17 @@ void main() {
     ana = nuevo('prueba_sala_ana');
     beto = nuevo('prueba_sala_beto');
     carla = nuevo('prueba_sala_carla');
-    for (final jugador in [ana, beto, carla]) {
+    dario = nuevo('prueba_sala_dario');
+    elena = nuevo('prueba_sala_elena');
+    fabio = nuevo('prueba_sala_fabio');
+    for (final jugador in [ana, beto, carla, dario, elena, fabio]) {
       await jugador.entrar();
     }
   });
 
   tearDownAll(() async {
     if (!_conServidor) return;
-    for (final jugador in [ana, beto, carla]) {
+    for (final jugador in [ana, beto, carla, dario, elena, fabio]) {
       await jugador.salir();
     }
   });
@@ -299,6 +317,134 @@ void main() {
       expect(fin.estado, EstadoDeSala.terminada);
     },
     timeout: const Timeout(Duration(minutes: 8)),
+    skip: _conServidor ? false : _sinServidor,
+  );
+
+  test(
+    'Una partida de 6 jugadores, la sala llena, se juega entera y el ranking sale ordenado',
+    () async {
+      final todos = [ana, beto, carla, dario, elena, fabio];
+      final codigo = await empezarPartida(todos, 3, Random(11));
+
+      final fin = await jugarHastaElFinal(codigo, todos);
+
+      expect(fin.resultado!.ranking, hasLength(6));
+      expect(fin.resultado!.ganadores, isNotEmpty);
+      // Los puntos salen en orden de mayor a menor.
+      final puntos = [for (final f in fin.resultado!.ranking) f.puntos];
+      expect(puntos, orderedEquals([...puntos]..sort((a, b) => b.compareTo(a))));
+    },
+    timeout: const Timeout(Duration(minutes: 8)),
+    skip: _conServidor ? false : _sinServidor,
+  );
+
+  test(
+    'Dos partidas a la vez, de jugadores distintos, no se mezclan',
+    () async {
+      final codigoA = await empezarPartida([ana, beto], 1, Random(21));
+      final codigoB = await empezarPartida([carla, dario, elena], 4, Random(22));
+      expect(codigoA, isNot(codigoB));
+
+      final fines = await Future.wait([
+        jugarHastaElFinal(codigoA, [ana, beto]),
+        jugarHastaElFinal(codigoB, [carla, dario, elena]),
+      ]);
+
+      expect(
+        fines[0].resultado!.ranking.map((f) => f.usuario),
+        unorderedEquals([ana.usuario, beto.usuario]),
+      );
+      expect(
+        fines[1].resultado!.ranking.map((f) => f.usuario),
+        unorderedEquals([carla.usuario, dario.usuario, elena.usuario]),
+      );
+      // Una persona de la partida A no ve la sala B.
+      expect((await errorDe(ana.salas.estado(codigoB))).estadoHttp, 403);
+    },
+    timeout: const Timeout(Duration(minutes: 8)),
+    skip: _conServidor ? false : _sinServidor,
+  );
+
+  test(
+    'Si el anfitrión se desconecta a media partida de 3, la partida termina y ganan los demás',
+    () async {
+      final codigo = await empezarPartida([ana, beto, carla], 2, Random(31));
+
+      final fin = await jugarHastaElFinal(
+        codigo,
+        [ana, beto, carla],
+        silencios: {ana: (1, null)},
+      );
+
+      expect(fin.resultado!.ganadores, unorderedEquals([beto.usuario, carla.usuario]));
+      final filaAna = fin.resultado!.ranking.firstWhere((f) => f.usuario == ana.usuario);
+      expect(filaAna.estado, 'desconectado');
+    },
+    timeout: const Timeout(Duration(minutes: 3)),
+    skip: _conServidor ? false : _sinServidor,
+  );
+
+  test(
+    'Si dos de cuatro se desconectan a la vez, los otros dos terminan la partida y los que se '
+    'fueron no ganan',
+    () async {
+      final codigo = await empezarPartida([ana, beto, carla, dario], 2, Random(41));
+
+      final fin = await jugarHastaElFinal(
+        codigo,
+        [ana, beto, carla, dario],
+        silencios: {carla: (1, null), dario: (1, null)},
+      );
+
+      expect(fin.resultado!.ganadores, isNot(contains(carla.usuario)));
+      expect(fin.resultado!.ganadores, isNot(contains(dario.usuario)));
+      for (final usuario in [carla.usuario, dario.usuario]) {
+        expect(
+          fin.resultado!.ranking.firstWhere((f) => f.usuario == usuario).estado,
+          'desconectado',
+        );
+      }
+      for (final usuario in [ana.usuario, beto.usuario]) {
+        expect(fin.resultado!.ranking.firstWhere((f) => f.usuario == usuario).estado, 'activo');
+      }
+    },
+    timeout: const Timeout(Duration(minutes: 3)),
+    skip: _conServidor ? false : _sinServidor,
+  );
+
+  test(
+    'Un corte breve (6 segundos sin preguntar) no saca a nadie de la partida',
+    () async {
+      final codigo = await empezarPartida([ana, beto], 2, Random(51));
+
+      final fin = await jugarHastaElFinal(
+        codigo,
+        [ana, beto],
+        silencios: {beto: (1, 7)},
+      );
+
+      for (final fila in fin.resultado!.ranking) {
+        expect(fila.estado, 'activo', reason: '${fila.usuario} no debía quedar fuera');
+      }
+    },
+    timeout: const Timeout(Duration(minutes: 3)),
+    skip: _conServidor ? false : _sinServidor,
+  );
+
+  test(
+    'Quien se desconectó vuelve a preguntar: ve que quedó fuera, y después puede crear otra sala',
+    () async {
+      final codigo = await empezarPartida([ana, beto], 2, Random(61));
+      await jugarHastaElFinal(codigo, [ana, beto], silencios: {beto: (1, null)});
+
+      final vista = await beto.salas.estado(codigo);
+
+      expect(vista?.estado ?? EstadoDeSala.terminada, EstadoDeSala.terminada);
+      final nueva = await beto.salas.crear();
+      expect(nueva.estado, EstadoDeSala.esperando);
+      await beto.salas.rendirse(nueva.codigo);
+    },
+    timeout: const Timeout(Duration(minutes: 3)),
     skip: _conServidor ? false : _sinServidor,
   );
 }
