@@ -64,8 +64,18 @@ class VistaResultado extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text('${fila.puntos} pts', style: textos.bodyLarge),
-                if (fila.primeros > 0) Text('  · ${fila.primeros} primeros'),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('${fila.puntos} pts', style: textos.bodyLarge),
+                    if (fila.primeros > 0)
+                      Text(
+                        '${fila.primeros} primeros',
+                        style: textos.bodySmall,
+                      ),
+                  ],
+                ),
               ],
             ),
           ),

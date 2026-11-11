@@ -41,13 +41,18 @@ class VistaLobby extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SelectableText(
-                  sala.codigo,
-                  key: const ValueKey('codigo-de-sala'),
-                  style: textos.displaySmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 6,
-                    color: Paleta.acento,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: SelectableText(
+                      sala.codigo,
+                      key: const ValueKey('codigo-de-sala'),
+                      style: textos.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 6,
+                        color: Paleta.acento,
+                      ),
+                    ),
                   ),
                 ),
                 IconButton(
