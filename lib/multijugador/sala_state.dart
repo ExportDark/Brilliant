@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'modelos.dart';
 
 /// Cómo va la conexión con el servidor. El servidor deja fuera a quien pasa 10 segundos
@@ -38,13 +40,31 @@ class SalaState {
   final Conexion conexion;
   final FinDeSala fin;
 
+  /// Cuándo llegó [vista] del servidor, y la hora de la última vez que se le preguntó.
+  /// Con ellas se descuenta el tiempo de la ronda mientras el servidor contesta "no
+  /// cambió nada" (304), que no trae los segundos nuevos.
+  final DateTime? recibida;
+  final DateTime? ahora;
+
   const SalaState({
     this.vista,
     this.ocupado = false,
     this.error,
     this.conexion = Conexion.conectada,
     this.fin = FinDeSala.ninguno,
+    this.recibida,
+    this.ahora,
   });
+
+  /// Los segundos que le quedan a la ronda (o a la preparación): los que dijo el servidor
+  /// al mandar [vista], menos lo que pasó desde entonces.
+  double? get segundosQueQuedan {
+    final segundos = vista?.segundosRestantes;
+    final desde = recibida;
+    final hasta = ahora;
+    if (segundos == null || desde == null || hasta == null) return segundos;
+    return max(0, segundos - hasta.difference(desde).inMilliseconds / 1000);
+  }
 
   bool get enSala => vista != null && fin == FinDeSala.ninguno;
 
@@ -54,6 +74,8 @@ class SalaState {
     String? Function()? error,
     Conexion? conexion,
     FinDeSala? fin,
+    DateTime? recibida,
+    DateTime? ahora,
   }) {
     return SalaState(
       vista: vista ?? this.vista,
@@ -61,6 +83,8 @@ class SalaState {
       error: error == null ? this.error : error(),
       conexion: conexion ?? this.conexion,
       fin: fin ?? this.fin,
+      recibida: recibida ?? this.recibida,
+      ahora: ahora ?? this.ahora,
     );
   }
 }

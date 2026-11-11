@@ -22,3 +22,5 @@ La app pregunta cada segundo (`SalaBloc`). 3 s sin respuesta: "Reconectando…";
 Diseño visual; prueba con dos clientes contra el servidor real; prueba de tamaños de pantalla.
 
 En el lobby el mapa se elige con las mismas tarjetas de "Elige un mapa" (`TarjetaDeMapa`, el tablero en miniatura); la elegida lleva el borde de color. Quien no es el anfitrión ve solo la tarjeta del mapa elegido.
+
+La cuenta regresiva de la ronda se descuenta en la app (`SalaState.segundosQueQuedan`): el servidor responde 304 cuando nada cambió y esa respuesta no trae los segundos nuevos. Sin esto el tiempo se quedaba congelado hasta que alguien jugaba.

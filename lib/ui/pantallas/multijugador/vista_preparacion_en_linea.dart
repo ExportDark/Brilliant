@@ -18,7 +18,7 @@ class PreparacionEnLinea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tiempo = sala.segundosRestantes;
+    final tiempo = context.select((SalaBloc bloc) => bloc.state.segundosQueQuedan);
     final mapa = mapas.firstWhere((m) => m.nivel == sala.nivel);
 
     return PantallaPreparacion(
@@ -44,7 +44,7 @@ class VistaPreparacionEnLinea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textos = Theme.of(context).textTheme;
-    final tiempo = sala.segundosRestantes;
+    final tiempo = context.select((SalaBloc bloc) => bloc.state.segundosQueQuedan);
     final cuenta = tiempo == null ? '' : ' · ${tiempo.ceil()} s';
 
     return Column(

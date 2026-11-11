@@ -182,21 +182,28 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
 
     try {
       final nueva = await _cliente.estado(vista.codigo, version: vista.version);
-      _ultimaRespuesta = _ahora();
+      final ahora = _ahora();
+      _ultimaRespuesta = ahora;
+      // Con "no cambió nada" (null) se queda la sala de antes, pero la hora avanza: así
+      // la cuenta regresiva sigue bajando aunque nadie juegue.
       emit(state.copiaCon(
         vista: nueva,
         conexion: Conexion.conectada,
         ocupado: state.ocupado,
+        recibida: nueva == null ? null : ahora,
+        ahora: ahora,
       ));
       if (nueva?.estado == EstadoDeSala.terminada) _pararDePreguntar();
     } on SinConexion {
-      final sinRespuesta = _ahora().difference(_ultimaRespuesta).inSeconds;
+      final ahora = _ahora();
+      final sinRespuesta = ahora.difference(_ultimaRespuesta).inSeconds;
       final conexion = sinRespuesta >= segundosParaPerder
           ? Conexion.perdida
           : sinRespuesta >= segundosParaReconectar
               ? Conexion.reconectando
               : state.conexion;
-      if (conexion != state.conexion) emit(state.copiaCon(conexion: conexion));
+      // Sin servidor, el tiempo de la ronda igual corre.
+      emit(state.copiaCon(conexion: conexion, ahora: ahora));
     } on ErrorDeSala catch (error) {
       await _alRechazar(error, emit);
     } on SesionVencida {
@@ -209,12 +216,15 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
   /// preguntar.
   void _recibir(VistaDeSala vista, Emitter<SalaState> emit) {
     final primera = state.vista == null;
-    _ultimaRespuesta = _ahora();
+    final ahora = _ahora();
+    _ultimaRespuesta = ahora;
     emit(state.copiaCon(
       vista: vista,
       ocupado: false,
       conexion: Conexion.conectada,
       error: () => null,
+      recibida: ahora,
+      ahora: ahora,
     ));
     if (vista.estado == EstadoDeSala.terminada) {
       _pararDePreguntar();

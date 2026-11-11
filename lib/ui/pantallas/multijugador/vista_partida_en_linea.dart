@@ -102,7 +102,7 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> {
         ? jugada.casillas.toSet()
         : const <String>{};
     final dados = sala.dados ?? const <int>[];
-    final tiempo = sala.segundosRestantes;
+    final tiempo = context.select((SalaBloc bloc) => bloc.state.segundosQueQuedan);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
