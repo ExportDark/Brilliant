@@ -1,7 +1,7 @@
 # Servidor de cuentas
 
 Un programa aparte de la app, en `Brilliant-servidor/` (una carpeta hermana, con su propio
-repositorio desde el 2026-11-10): guarda las cuentas de los jugadores y les da sesiones, y
+repositorio desde el 2026-11-10: https://github.com/ExportDark/Brilliant-Servidor): guarda las cuentas de los jugadores y les da sesiones, y
 desde el 2026-11-10 también lleva las **salas del multijugador** (`/salas/`, ver
 [[Multijugador]]). La app se registra ahí, inicia sesión, y puede cerrar la sesión y borrar
 la cuenta. Cómo se usa está en `Brilliant-servidor/README.md`; esta nota cuenta las

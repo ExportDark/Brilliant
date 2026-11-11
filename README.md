@@ -56,7 +56,8 @@ lib/
   main.dart
 tool/       exportar_para_el_servidor.dart: los mapas y las jugadas en JSON, para el servidor
 test/       tests, misma estructura que lib/
-(el servidor de cuentas vive en otro repositorio, `Brilliant-servidor`)
+(el servidor vive en otro repositorio: https://github.com/ExportDark/Brilliant-Servidor,
+ clonado en la carpeta hermana `Brilliant-servidor`)
 ```
 
 ## Correr el proyecto

@@ -3,7 +3,8 @@
 Recreación digital en Flutter/Dart del juego de mesa *Brilliant* (Ravensburger) —
 imitación casera con fines personales y educativos, sin afiliación oficial.
 
-Repositorio: https://github.com/ExportDark/Brilliant
+Repositorios: https://github.com/ExportDark/Brilliant (la app) y
+https://github.com/ExportDark/Brilliant-Servidor (el servidor)
 
 ---
 

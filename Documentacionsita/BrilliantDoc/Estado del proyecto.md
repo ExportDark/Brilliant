@@ -1,7 +1,8 @@
 # Estado del proyecto
 
 Última actualización: 2026-11-11 · Repos: https://github.com/ExportDark/Brilliant (la app)
-y `Brilliant-servidor` (el servidor, carpeta hermana)
+y https://github.com/ExportDark/Brilliant-Servidor (el servidor, en la carpeta hermana
+`Brilliant-servidor`)
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
