@@ -43,6 +43,7 @@ class PreparacionBloc extends Bloc<PreparacionEvent, PreparacionState> {
     on<RepartoAleatorio>(_alRepartirAlAzar);
     on<PreparacionConfirmada>(_alConfirmar);
     on<PreparacionReiniciada>(_alReiniciar);
+    on<PreparacionReabierta>(_alReabrir);
   }
 
   static bool _cualquiera(Posicion casilla, int valor) => true;
@@ -118,6 +119,11 @@ class PreparacionBloc extends Bloc<PreparacionEvent, PreparacionState> {
     if (!state.completa) return;
 
     emit(state.copiaCon(confirmada: true));
+  }
+
+  void _alReabrir(PreparacionReabierta event, Emitter<PreparacionState> emit) {
+    if (!state.confirmada) return;
+    emit(state.copiaCon(confirmada: false));
   }
 
   void _alReiniciar(PreparacionReiniciada event, Emitter<PreparacionState> emit) {

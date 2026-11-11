@@ -24,3 +24,5 @@ Diseño visual; prueba con dos clientes contra el servidor real; prueba de tama�
 En el lobby el mapa se elige con las mismas tarjetas de "Elige un mapa" (`TarjetaDeMapa`, el tablero en miniatura); la elegida lleva el borde de color. Quien no es el anfitrión ve solo la tarjeta del mapa elegido.
 
 La cuenta regresiva de la ronda se descuenta en la app (`SalaState.segundosQueQuedan`): el servidor responde 304 cuando nada cambió y esa respuesta no trae los segundos nuevos. Sin esto el tiempo se quedaba congelado hasta que alguien jugaba.
+
+Si el servidor rechaza el reparto (o no le llega), la preparación vuelve a quedar editable con sus números (`PreparacionReabierta`) para corregirla y mandarla otra vez. Antes quedaba bloqueada y solo "Reiniciar" la soltaba. Un segundo envío que llega tarde (`ya_preparaste`) no muestra error, igual que un doble toque en la partida.

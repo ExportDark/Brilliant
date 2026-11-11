@@ -150,8 +150,9 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
       case 'no_eres_parte' when state.vista != null:
         _pararDePreguntar();
         emit(state.copiaCon(ocupado: false, fin: FinDeSala.saliste, error: () => null));
-      case 'ya_jugaste':
-        // Un doble toque: la primera jugada ya llegó. No hay nada que decir.
+      case 'ya_jugaste' || 'ya_preparaste':
+        // Un doble toque: la primera jugada (o el primer reparto) ya llegó. No hay nada
+        // que decir.
         emit(state.copiaCon(ocupado: false));
       default:
         emit(state.copiaCon(ocupado: false, error: () => _mensajeDe(error)));

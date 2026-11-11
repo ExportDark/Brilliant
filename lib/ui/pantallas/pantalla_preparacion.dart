@@ -155,7 +155,14 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
       listenWhen: (antes, ahora) => !antes.confirmada && ahora.confirmada,
       listener: (context, state) {
         final alConfirmar = widget.alConfirmar;
-        if (alConfirmar != null) return alConfirmar(state.valores);
+        if (alConfirmar != null) {
+          alConfirmar(state.valores);
+          // En línea el reparto lo acepta o lo rechaza el servidor. Si lo acepta, esta
+          // pantalla se va sola; si lo rechaza o no le llega, se puede corregir y volver
+          // a mandar, sin tener que empezar de cero.
+          context.read<PreparacionBloc>().add(const PreparacionReabierta());
+          return;
+        }
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => PantallaPartida(

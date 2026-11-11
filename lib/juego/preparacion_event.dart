@@ -31,6 +31,13 @@ class PreparacionConfirmada extends PreparacionEvent {
   const PreparacionConfirmada();
 }
 
+/// Vuelve a dejar editable una preparación ya confirmada, con sus números. En línea,
+/// quien decide es el servidor: si rechaza el reparto, o no le llega, hay que poder
+/// corregirlo y volver a mandarlo.
+class PreparacionReabierta extends PreparacionEvent {
+  const PreparacionReabierta();
+}
+
 /// Borra lo repartido y vuelve a empezar.
 class PreparacionReiniciada extends PreparacionEvent {
   const PreparacionReiniciada();
