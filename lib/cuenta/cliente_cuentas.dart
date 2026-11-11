@@ -116,6 +116,36 @@ class ClienteCuentas {
     Duration espera = _espera,
     bool reintentar = true,
   }) async {
+    final (:estado, :datos) = await enviar(
+      metodo,
+      ruta,
+      token: token,
+      cuerpo: cuerpo,
+      en: en,
+      espera: espera,
+      reintentar: reintentar,
+    );
+    if (estado >= 200 && estado < 300) return datos;
+    if (estado == 401) throw const SesionVencida();
+    if (estado >= 500) {
+      throw const ErrorDeCuenta(generales: ['El servidor tuvo un problema. Intenta de nuevo.']);
+    }
+    throw _errorDe(datos);
+  }
+
+  /// Hace un pedido al servidor y devuelve lo que contestó, sea lo que sea: el
+  /// código HTTP y el cuerpo JSON (vacío si no hay). Solo lanza [SinConexion]:
+  /// qué hacer con cada código lo decide quien llama. Lo usan las cuentas
+  /// (`_pedir`) y las salas del multijugador.
+  Future<({int estado, Map<String, dynamic> datos})> enviar(
+    String metodo,
+    String ruta, {
+    String? token,
+    Map<String, Object?>? cuerpo,
+    Uri? en,
+    Duration espera = _espera,
+    bool reintentar = true,
+  }) async {
     // Un pedido enviado ya no se puede volver a enviar: se arma de nuevo.
     http.Request armar() {
       final pedido = http.Request(metodo, (en ?? servidor).resolve(ruta))
@@ -128,13 +158,13 @@ class ClienteCuentas {
       return pedido;
     }
 
-    Future<http.Response> enviar() async =>
+    Future<http.Response> intentar() async =>
         http.Response.fromStream(await _http.send(armar()).timeout(espera));
 
     http.Response respuesta;
     try {
       try {
-        respuesta = await enviar();
+        respuesta = await intentar();
       } on TimeoutException {
         rethrow;
       } on Exception {
@@ -144,7 +174,7 @@ class ClienteCuentas {
         // Sin esto, el cierre de sesión se perdía en silencio. Un tiempo
         // agotado no se reintenta: el pedido pudo haber llegado.
         if (!reintentar) rethrow;
-        respuesta = await enviar();
+        respuesta = await intentar();
       }
     } on Exception {
       // Sin red, servidor apagado, certificado ajeno o tiempo agotado: para
@@ -152,13 +182,7 @@ class ClienteCuentas {
       throw const SinConexion();
     }
 
-    final datos = _leerJson(respuesta);
-    if (respuesta.statusCode >= 200 && respuesta.statusCode < 300) return datos;
-    if (respuesta.statusCode == 401) throw const SesionVencida();
-    if (respuesta.statusCode >= 500) {
-      throw const ErrorDeCuenta(generales: ['El servidor tuvo un problema. Intenta de nuevo.']);
-    }
-    throw _errorDe(datos);
+    return (estado: respuesta.statusCode, datos: _leerJson(respuesta));
   }
 
   static Map<String, dynamic> _leerJson(http.Response respuesta) {

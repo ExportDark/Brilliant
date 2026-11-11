@@ -50,3 +50,9 @@ final class AvisosDescartados extends SesionEvent {
 final class SesionLatido extends SesionEvent {
   const SesionLatido();
 }
+
+/// El servidor dijo que el token ya no vale mientras se usaba para otra cosa (las
+/// salas del multijugador): la sesión se cierra, como cuando el latido lo descubre.
+final class SesionTerminada extends SesionEvent {
+  const SesionTerminada();
+}

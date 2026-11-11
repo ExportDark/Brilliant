@@ -40,6 +40,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
         BorradoPedido() => _alBorrar(event, emit),
         AvisosDescartados() => emit(state.sinAvisos()),
         SesionLatido() => _alLatir(emit),
+        SesionTerminada() => _alTerminar(emit),
       },
       transformer: (eventos, atender) => eventos.asyncExpand(atender),
     );
@@ -58,6 +59,23 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
   /// La dirección del servidor con la que se está hablando.
   Uri get servidor => _cuentas.servidor;
+
+  /// Le presta el token de la sesión a [pedido], para hablar con otras partes del
+  /// servidor (las salas del multijugador) sin que el token salga de aquí. Si el
+  /// servidor dice que ya no vale ([SesionVencida]), la sesión se cierra y la app
+  /// vuelve a "Iniciar sesión". Mientras se usa, la sesión cuenta como activa.
+  Future<T> conToken<T>(Future<T> Function(String token) pedido) async {
+    final sesion = _sesion;
+    if (sesion == null) throw const SesionVencida();
+    try {
+      final respuesta = await pedido(sesion.token);
+      _servidor.contesto();
+      return respuesta;
+    } on SesionVencida {
+      add(const SesionTerminada());
+      rethrow;
+    }
+  }
 
   /// Cuando no se puede hablar con el servidor: dice con qué dirección se
   /// intentó, para que se note si es la de otra red.
@@ -128,6 +146,12 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       // La cuenta sí se creó: solo falló iniciar la sesión.
       emit(const SesionState.sinSesion(aviso: 'Tu cuenta se creó. Inicia sesión para jugar.'));
     }
+  }
+
+  Future<void> _alTerminar(Emitter<SesionState> emit) async {
+    if (_sesion == null) return;
+    await _olvidarSesion();
+    emit(const SesionState.sinSesion(aviso: sesionCerrada));
   }
 
   Future<void> _alLatir(Emitter<SesionState> emit) async {
