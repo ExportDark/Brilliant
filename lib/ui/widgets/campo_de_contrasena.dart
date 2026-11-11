@@ -15,6 +15,7 @@ class CampoDeContrasena extends StatefulWidget {
   final bool habilitado;
   final TextInputAction accion;
   final Iterable<String> pistasDeAutocompletado;
+  final FocusNode? focusNode;
 
   const CampoDeContrasena({
     super.key,
@@ -28,6 +29,7 @@ class CampoDeContrasena extends StatefulWidget {
     this.habilitado = true,
     this.accion = TextInputAction.done,
     this.pistasDeAutocompletado = const [AutofillHints.password],
+    this.focusNode,
   });
 
   @override
@@ -41,6 +43,7 @@ class _CampoDeContrasenaState extends State<CampoDeContrasena> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controlador,
+      focusNode: widget.focusNode,
       obscureText: !_visible,
       enableSuggestions: false,
       autocorrect: false,

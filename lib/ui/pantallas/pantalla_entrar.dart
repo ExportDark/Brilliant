@@ -27,6 +27,22 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
   final _formulario = GlobalKey<FormState>();
   final _usuario = TextEditingController();
   final _contrasena = TextEditingController();
+  final _enContrasena = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _recordarUsuario();
+  }
+
+  /// Pone el último usuario que entró, y deja listo para escribir la contraseña. Si el
+  /// jugador ya escribió algo mientras tanto, no se pisa.
+  Future<void> _recordarUsuario() async {
+    final ultimo = await _sesion.ultimoUsuario();
+    if (!mounted || ultimo == null || _usuario.text.isNotEmpty) return;
+    _usuario.text = ultimo;
+    _enContrasena.requestFocus();
+  }
 
   SesionBloc get _sesion => context.read<SesionBloc>();
 
@@ -34,6 +50,7 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
   void dispose() {
     _usuario.dispose();
     _contrasena.dispose();
+    _enContrasena.dispose();
     super.dispose();
   }
 
@@ -119,6 +136,7 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
                           CampoDeContrasena(
                             key: const ValueKey('campo-contrasena'),
                             controlador: _contrasena,
+                            focusNode: _enContrasena,
                             etiqueta: 'Contraseña',
                             error: error?.de('password'),
                             habilitado: !state.ocupado,

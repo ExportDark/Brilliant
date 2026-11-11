@@ -29,6 +29,13 @@ abstract interface class AlmacenDeSesion {
 
   /// Guarda la dirección del servidor; con `null`, vuelve a la de siempre.
   Future<void> guardarServidor(Uri? servidor);
+
+  /// El último usuario que inició sesión en este aparato, para escribirlo solo en
+  /// "Iniciar sesión", o `null` si no hay. Nunca se guarda la contraseña.
+  Future<String?> leerUltimoUsuario();
+
+  /// Guarda el último usuario; con `null`, se olvida.
+  Future<void> guardarUltimoUsuario(String? usuario);
 }
 
 /// Guarda la sesión cifrada: en Android, con una clave del Keystore del
@@ -39,6 +46,7 @@ class AlmacenSeguro implements AlmacenDeSesion {
   static const _usuarioPorCerrar = 'porcerrar.usuario';
   static const _tokenPorCerrar = 'porcerrar.token';
   static const _servidor = 'servidor.direccion';
+  static const _ultimoUsuario = 'ultimo.usuario';
 
   final FlutterSecureStorage _almacen;
 
@@ -93,5 +101,14 @@ class AlmacenSeguro implements AlmacenDeSesion {
   Future<void> guardarServidor(Uri? servidor) async {
     if (servidor == null) return _almacen.delete(key: _servidor);
     await _almacen.write(key: _servidor, value: servidor.toString());
+  }
+
+  @override
+  Future<String?> leerUltimoUsuario() => _almacen.read(key: _ultimoUsuario);
+
+  @override
+  Future<void> guardarUltimoUsuario(String? usuario) async {
+    if (usuario == null) return _almacen.delete(key: _ultimoUsuario);
+    await _almacen.write(key: _ultimoUsuario, value: usuario);
   }
 }

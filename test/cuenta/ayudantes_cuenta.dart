@@ -45,6 +45,15 @@ class AlmacenEnMemoria implements AlmacenDeSesion {
 
   @override
   Future<void> guardarServidor(Uri? servidor) async => this.servidor = servidor;
+
+  /// El último usuario que inició sesión en este aparato.
+  String? ultimoUsuario;
+
+  @override
+  Future<String?> leerUltimoUsuario() async => ultimoUsuario;
+
+  @override
+  Future<void> guardarUltimoUsuario(String? usuario) async => ultimoUsuario = usuario;
 }
 
 /// Un buscador de servidores que "encuentra" los [anunciados], como si se

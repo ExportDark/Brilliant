@@ -60,6 +60,10 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   /// La dirección del servidor con la que se está hablando.
   Uri get servidor => _cuentas.servidor;
 
+  /// El último usuario que inició sesión en este aparato, para ponerlo solo en "Iniciar
+  /// sesión". La contraseña nunca se guarda.
+  Future<String?> ultimoUsuario() => _almacen.leerUltimoUsuario();
+
   /// Le presta el token de la sesión a [pedido], para hablar con otras partes del
   /// servidor (las salas del multijugador) sin que el token salga de aquí. Si el
   /// servidor dice que ya no vale ([SesionVencida]), la sesión se cierra y la app
@@ -214,6 +218,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
         () => _cuentas.borrarCuenta(token: sesion.token, contrasena: event.contrasena),
       );
       await _olvidarSesion();
+      await _almacen.guardarUltimoUsuario(null);
       emit(const SesionState.sinSesion(aviso: 'Tu cuenta se borró.'));
     } on ErrorDeCuenta catch (error) {
       emit(SesionState.conSesion(sesion.usuario, error: error));
@@ -262,6 +267,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     );
     final sesion = Sesion(usuario: usuario, token: token);
     await _almacen.guardar(sesion);
+    await _almacen.guardarUltimoUsuario(usuario);
     _sesion = sesion;
   }
 
