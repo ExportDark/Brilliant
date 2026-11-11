@@ -1,8 +1,9 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 524 tests, todos pasando, más 3 que hablan con el servidor de verdad y solo corren si se
-piden (2026-11-04).
+las pruebas y qué se aprendió de ellas. 710 tests, todos pasando, más 18 que hablan con el
+servidor de verdad y solo corren si se piden (2026-11-11). El servidor tiene los suyos
+(1029, ver abajo).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
@@ -23,9 +24,11 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 |---|---|---|
 | `test/modelo/` | 80 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
 | `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
-| `test/juego/` | 128 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
-| `test/cuenta/` | 107 (+3) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
-| `test/ui/` | 161 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta, el indicador y el diálogo del servidor, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/juego/` | 130 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
+| `test/cuenta/` | 113 (+4) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
+| `test/multijugador/` | 76 (+14) | Los modelos que manda el servidor, `ClienteSalas` (cada ruta y cada error, con `MockClient`) y `SalaBloc` (preguntar cada segundo, reconectando, conexión perdida, sala que desapareció, doble toque…); y, si se pide, partidas contra el servidor de verdad |
+| `test/ui/` | 260 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/herramientas/` | 3 | Que los JSON que se copian al servidor (`tool/exportado/`) coincidan con lo que generaría el código de hoy |
 | `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
 ## Cómo están organizadas
@@ -331,7 +334,7 @@ así que los del juego siguen igual.
 | `cuenta/sesion_bloc_test.dart` | Al abrir: sin sesión, con una que sirve, con una vencida y sin conexión. Entrar bien, mal y sin conexión. Crear la cuenta, y con un usuario repetido. Cerrar sesión, también sin conexión. Borrar con la contraseña mala y con la buena. Descartar los avisos. Con el servidor: usa la dirección elegida al abrir; no busca mientras contesta, y el servidor queda disponible (también con una contraseña mala); si no contesta, al entrar, al crear la cuenta y al abrir con la sesión guardada lo encuentra y se cambia; ninguno da el error de siempre y "Sin servidor"; con varios pide elegir. La sesión en otro aparato: entrar con la cuenta activa allá da el error y no guarda nada; si allá no se usa hace más de 5 minutos, entra y la vieja se cierra; el latido pregunta con el token, vuelve a "Iniciar sesión" si el servidor la cerró, no cierra nada sin conexión y sin sesión no hace nada (28 casos) |
 | `cuenta/servidor_cubit_test.dart` | Revisar: disponible sin buscar; primero la dirección elegida; si no contesta, buscar y cambiarse al único (con su nombre); ninguno o varios, no disponible; sin buscador, como en la web; volver a revisar solo hasta que se enciende; dos revisiones seguidas son una. Elegir: una dirección, uno de la red con su nombre, una que no contesta, restablecer. Para la sesión: `buscarOtro`, no volver a buscar si ya se cambió, `contesto()`. Buscar: uno con varias IPs aparece una vez, los que no contestan no aparecen (18 casos) |
 | `cuenta/direccion_del_servidor_test.dart` | Leer lo que escribe el jugador: una IP, `ip:puerto` o una URL `https`; rechazar `http`, vacíos y espacios; mostrarla corta (8 casos) |
-| `cuenta/contra_el_servidor_test.dart` | Con el servidor levantado y `--dart-define=CON_SERVIDOR=true`: el recorrido completo por HTTPS; que un cliente sin la autoridad local no se conecta; y las reglas: los mismos mensajes que la app, sin distinguir mayúsculas, la contraseña con espacios y una sola sesión activa (3 casos) |
+| `cuenta/contra_el_servidor_test.dart` | Con el servidor levantado y `--dart-define=CON_SERVIDOR=true`: el recorrido completo por HTTPS; que un cliente sin la autoridad local no se conecta; las reglas: los mismos mensajes que la app, sin distinguir mayúsculas, la contraseña con espacios y una sola sesión activa; y el límite de intentos llega como "demasiados intentos" con sus segundos (4 casos) |
 | `multijugador/contra_el_servidor_test.dart` | Con el servidor levantado y `--dart-define=CON_SERVIDOR=true`: jugadores que son clientes distintos juegan de verdad. 2 partidas seguidas de 2 jugadores en cada uno de los 4 mapas; 3 jugadores y uno se rinde a mitad; uno deja de preguntar 10 s y gana el otro; el anfitrión se va del lobby; no estar en dos salas, código que no existe, sala empezada, jugadas inventadas o fuera de ronda; una partida de 6 jugadores; dos partidas a la vez; se va el anfitrión a media partida; dos de cuatro se desconectan a la vez; un corte de 6 s no saca a nadie; quien se fue vuelve y puede crear otra sala (14 casos) |
 | `ui/pantallas/cuenta/entrar/…` | Los campos vacíos no se mandan; el error del servidor se muestra y se va al escribir; sin conexión avisa; entrar lleva a elegir el mapa; el enlace lleva a crear cuenta; se entra a "ana" escribiendo "ANA"; con la cuenta activa en otro aparato lo dice y no entra |
 | `ui/pantallas/cuenta/crear_cuenta/…` | Revisa lo básico antes de mandar; el usuario repetido va en su campo, también con otras mayúsculas; los caracteres raros y el largo del usuario avisan sin mandar nada (y no deja escribir más de 20); una contraseña de más de 128 avisa; la contraseña se manda tal cual, con sus espacios, y el usuario recortado; crear la cuenta entra sola |
@@ -339,6 +342,11 @@ así que los del juego siguen igual.
 | `ui/pantallas/cuenta/mi_cuenta/…` | Muestra el usuario; cerrar sesión vuelve a entrar; borrar pide la contraseña y se puede cancelar; con la mala no borra; con la buena borra y vuelve a entrar |
 | `ui/camino_feliz/cuentas_de_punta_a_punta_test.dart` | Crear la cuenta, jugar un turno, cerrar sesión, volver a entrar, reabrir la app (sigue la sesión), borrar la cuenta y que ya no se pueda entrar |
 | `ui/pantallas/cuenta/servidor/…` | El indicador: "Servidor disponible" con su punto verde, "Sin servidor" con el servidor apagado; vuelve a buscar al cambiar la red, al volver a la app y solo cada tanto hasta que se enciende. Cambiar la dirección a mano cuando la PC cambia de red, que se recuerde, una dirección inválida, restablecer; los servidores de la red aparecen ("Buscando servidores…" mientras busca, "Disponible" en cada uno) y basta con tocar uno; si no hay ninguno lo dice y se puede buscar de nuevo; entrar sin escribir la dirección nueva |
+| `ui/pantallas/cuenta/servidores/…` | Con varios servidores en la red, la lista aparece en "Iniciar sesión" y en "Crear cuenta", los botones esperan y tocar uno los habilita; "Buscar de nuevo" se queda con el único que sigue |
+| `ui/pantallas/cuenta/usuario_recordado/…` | Aparece el último usuario y el cursor queda en la contraseña; la primera vez está vacío; entrar bien lo guarda y entrar mal no; crear la cuenta también; al cerrar sesión queda escrito pero la contraseña no; al borrar la cuenta se olvida; un usuario viejo no impide entrar con otro |
+| `ui/pantallas/cuenta/mensajes/…` | "Demasiados intentos… espera N segundos" al entrar y al crear la cuenta; "tardó demasiado" si el servidor no contesta a tiempo, distinto de "no se pudo conectar" si no hay con quién hablar; usuario inexistente y contraseña mala dan el mismo mensaje |
+| `ui/pantallas/cuenta/entrar/sin_servidor_no_deja_entrar_test.dart` | Sin servidor, "Entrar" está deshabilitado y dice qué hacer, y se habilita solo cuando el servidor aparece |
+| `ui/pantallas/tamanos/lista_de_servidores_sin_desbordes_test.dart` | La lista con 6 servidores de nombres largos, en "Iniciar sesión" y "Crear cuenta", en los 5 tamaños |
 | `ui/pantallas/tamanos/cuentas_sin_desbordes_test.dart` | Las pantallas de cuenta (con los errores más largos de crear cuenta), el diálogo del servidor (con dos servidores encontrados, uno de nombre largo) y el de borrar, en los 5 tamaños (10 casos) |
 
 Encontraron tres cosas:
@@ -369,11 +377,48 @@ Se comprobó que detectan errores:
 
 Ver [[Cuentas en la app]].
 
-## El servidor de cuentas
+## El multijugador
 
-El servidor tiene sus propios tests, en Python: 86 con pytest, en
-`Brilliant-servidor/cuentas/tests/`. No entran en la cuenta de los tests de la app. Qué prueba cada
-archivo está en [[Servidor de cuentas]].
+Los tests de la app no hablan con el servidor de verdad: usan `SalasFalsas`
+(`test/multijugador/ayudantes_salas.dart`), que contesta la sala que el test le pone, cuenta
+los pedidos y puede fallar a propósito (sin conexión, o con un error del servidor). Con
+`abrirSalaSola` se controla la hora, para probar los avisos de conexión y la cuenta
+regresiva sin esperar.
+
+| Carpeta (`test/ui/pantallas/multijugador/`) | Qué prueba |
+|---|---|
+| `lobby/` | Crear la sala muestra el código; unirse con el código (en mayúsculas, sin símbolos), código vacío, que no existe o sala llena; "Empezar" solo con 2 o más y solo el anfitrión; el mapa se elige con las tarjetas con tablero, la elegida con borde, y quien no es anfitrión ve solo la elegida |
+| `preparacion/` | La preparación de siempre manda los 6 números; "Inicio" no manda nada si faltan; esperar a los demás viendo quién terminó; pasar sola a la partida; un reparto rechazado, o que no llegó por falta de conexión, se corrige y se vuelve a mandar |
+| `partida/` | Elegir el ancla y anotar; un doble toque no muestra error; pasar; cambiar de ronda olvida el ancla; la cuenta regresiva baja cada segundo aunque el servidor conteste 304, también sin conexión |
+| `desconexion/` | "Reconectando…" a los 3 s y "se perdió la conexión" a los 10; se sigue viendo el tablero; el aviso se va al volver; la sala que desapareció; rendirse con confirmación; el otro se desconecta; el anfitrión se va |
+| `privacidad/` | Se dibuja un solo tablero (el mío) y solo mis números; de los demás, solo nombre, estado, puntos y si jugaron |
+| `resultado/` | El panel de zonas (qué sigue dando puntos y qué se agotó); el ranking, el motivo y quién ganó; "Salir" vuelve a elegir mapa |
+| `../tamanos/multijugador_sin_desbordes_test.dart` | Lobby con 6 jugadores de nombres largos, preparación, partida con panel de zonas y resultado, en los 5 tamaños |
+
+`multijugador/contra_el_servidor_test.dart` juega de verdad, con el servidor levantado y
+`--dart-define=CON_SERVIDOR=true`: cada jugador es un cliente distinto con su sesión y,
+para jugar, anota en la primera casilla legal o pasa. 14 casos: 2 partidas seguidas en
+cada mapa, 6 jugadores, dos partidas a la vez, rendirse a mitad, el anfitrión que se va
+en el lobby y a media partida, uno o dos que dejan de preguntar, un corte de 6 s que no
+saca a nadie, quien vuelve y crea otra sala, y los errores de sala. Tarda unos 3 minutos,
+y si el servidor limita los inicios de sesión, espera el minuto.
+
+Encontraron: el código de la sala y el resultado no cabían en 320 px; la preparación
+quedaba bloqueada si el servidor rechazaba el reparto; la cuenta regresiva se congelaba.
+Ver [[Revisión de lógica]].
+
+## El servidor
+
+El servidor tiene sus propios tests, en Python, con pytest: **1029** (2026-11-11), que no
+entran en la cuenta de la app.
+
+- `cuentas/tests/` (86): ver [[Servidor de cuentas]].
+- `juego/tests/` (704): las reglas en Python; `test_paridad.py` exige que den lo mismo que
+  la app en todos los casos de `casos_de_jugadas.json` y en los 4 mapas.
+- `salas/tests/` (239): lobby, preparación, rondas, puntos, desconexiones, privacidad (las
+  respuestas no traen ningún número del tablero de otro), la API y partidas simuladas
+  enteras con dados al azar. El reloj y los dados los decide el test.
+
 
 ## Verificación en la app real
 

@@ -7,6 +7,50 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-11 — Revisión de lógica
+
+- Se revisaron la app y el servidor buscando errores de lógica; los que salieron se
+  arreglaron con su prueba, y cada prueba se comprobó fallando sin el arreglo. Todo, con
+  los riesgos que quedan, en [[Revisión de lógica]].
+- **La cuenta regresiva se congelaba** (`3d31d90`): el servidor contesta 304 cuando nada
+  cambió, sin los segundos nuevos. La app ahora descuenta el tiempo ella misma.
+- **Un reparto rechazado bloqueaba la preparación** (`fa6776d`): ya se puede corregir y
+  volver a mandar sin empezar de cero.
+- **Servidor** (`09928ab`): una jugada después de un silencio cuenta como contacto, igual
+  que preguntar; antes quien volvía jugando se sacaba a sí mismo.
+
+## 2026-11-10 — Multijugador, y el login más fácil de usar
+
+- **Las reglas en los dos repos** (app `28c0d86`, servidor `ba67a92`): el servidor tiene las
+  reglas del juego en Python. La app genera `mapas.json` y `casos_de_jugadas.json` y un
+  test de cada lado exige que coincidan; cambiar una regla en Python hizo fallar 185.
+- **Las salas en el servidor** (`30317f8`, `ea9679d`): lobby con código, preparación,
+  rondas con dados compartidos, puestos por zona, desconexiones y fin, con 236 tests y una
+  partida de 6 jugadores simulada de principio a fin. Ver [[Multijugador]].
+- **El multijugador en la app** (`29b0959`, `69ad4ca`): `ClienteSalas`, `SalaBloc` y las
+  pantallas del lobby, la preparación, la partida con el panel de zonas y el resultado.
+  Sin diseño todavía: primero, que sea jugable. La tabla de puntos, en [[Puntuación]].
+- **La carpeta de la app, solo con lo de la app** (`f45599d`): se quitó `windows/`, y las
+  notas sueltas pasaron a `notas-sueltas/` (fuera de git).
+- **Pantallas chicas** (`9fe363a`): el código de la sala y el resultado se desbordaban en
+  320 px.
+- **Pruebas contra el servidor real con varios clientes** (`8fa9569`, `cef7fec`): partidas
+  completas en los 4 mapas, 6 jugadores, dos partidas a la vez, rendirse y varias clases de
+  desconexión (14 casos). Y en el emulador, la app real contra el servidor con un rival
+  hecho con un script.
+- **El mapa del lobby, como en el inicio** (`8ef3fd4`): tarjetas con el tablero en
+  miniatura en vez de "Nivel 1, 2, 3, 4".
+- **El login** ([[Cuentas en la app]]):
+  - con **varios servidores en la red**, la lista aparece en "Iniciar sesión" y "Crear
+    cuenta" para tocar uno (`a778143`, `dd962a3`);
+  - **"Entrar" y "Crear cuenta" esperan al servidor**: deshabilitados sin él, y se
+    habilitan solos cuando aparece (`dd962a3`);
+  - **recuerda el último usuario** y deja el cursor en la contraseña, que nunca se
+    guarda (`7204535`);
+  - **mensajes más claros**: "Demasiados intentos… espera N segundos", y "el servidor
+    tardó demasiado" distinto de "no se pudo conectar" (`293cb0b`, `c3b2fb7`). De paso,
+    un servidor que limita los intentos ya no se toma por "sin servidor".
+
 ## 2026-11-10 — El servidor pasa a su propio repositorio
 
 - **El servidor vive ahora en `Brilliant-servidor`**, una carpeta hermana de esta, con su
@@ -503,5 +547,3 @@ Primer paso para jugar los 4 mapas oficiales. Es un refactor: el juego no cambia
 - **Las 5 reglas de color**, una por commit: rojo (`e4cc27a`), amarillo (`a97670e`),
   verde (`55a14d3`), azul (`12b0b29`) y morado (`c36f24c`). Ver
   [[Reglas de color en código]].
-
-- Pantallas del multijugador: lobby, preparación en línea, partida con panel de zonas y resultado, con sus tests. Ver [[Multijugador]].

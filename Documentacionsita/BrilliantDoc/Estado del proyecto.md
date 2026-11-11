@@ -1,13 +1,14 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-04 · Repo: https://github.com/ExportDark/Brilliant
+Última actualización: 2026-11-11 · Repos: https://github.com/ExportDark/Brilliant (la app)
+y `Brilliant-servidor` (el servidor, carpeta hermana)
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [[Historial de cambios]]
 
 ## Qué está construido
 
-- [x] **Scaffold** del proyecto Flutter, con las plataformas `web`, `windows` y, desde el
-      2026-10-17, `android`
+- [x] **Scaffold** del proyecto Flutter, con las plataformas `web` y, desde el
+      2026-10-17, `android` (`windows` se quitó el 2026-11-10: no se usaba)
 - [x] **`Posicion`** — value object con notación del manual ([[Sistema de coordenadas]])
 - [x] **`Celda`** + `CeldaWidget` para renderizarla
 - [x] **Las 5 reglas de color** — rojo, amarillo, verde, azul, morado
@@ -88,20 +89,38 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       sin recortar; y una sola sesión activa por cuenta, con un aviso cada 2 minutos. En
       el servidor y en la app, con los mismos mensajes. Ver
       [[Cuentas en la app#Las reglas de las cuentas]]
+- [x] **El servidor en su propio repositorio** (2026-11-10) — `Brilliant-servidor`, con su
+      historial. La app y el servidor solo se hablan por HTTPS. Ver [[Servidor de cuentas]]
+- [x] **El cierre de sesión llega** (2026-11-10) — antes se perdía en silencio; las sesiones
+      vencen a los 5 minutos sin uso y reiniciar el servidor las cierra todas
+- [x] **Multijugador** (2026-11-10) — salas con código de 2 a 6 jugadores, lobby con los
+      mapas en tarjetas, preparación con cuenta regresiva, rondas con dados compartidos,
+      panel de zonas, rendirse, desconexiones y resultado. El servidor manda; nadie ve el
+      tablero de otro. Jugable, sin diseño. Ver [[Multijugador]]
+- [x] **Puntos del multijugador** (2026-11-10) — la tabla por mapa y color, por puesto en
+      que se llena cada zona. Ver [[Puntuación]]
+- [x] **El login más fácil** (2026-11-10) — la lista de servidores en la misma pantalla
+      cuando hay varios, "Entrar" espera al servidor, se recuerda el último usuario, y
+      mensajes claros para el límite de intentos y el servidor lento. Ver
+      [[Cuentas en la app]]
+- [x] **Revisión de lógica** (2026-11-11) — 8 errores arreglados con su prueba, y los
+      riesgos que quedan anotados. Ver [[Revisión de lógica]]
 
-**Ya se puede jugar una partida de principio a fin**, en la PC (web) y en un teléfono
-Android, de la preparación hasta que ninguna tirada tiene jugada. Lo único que falta para
-cerrarla es el puntaje. 524 tests de la app y 86 del servidor, todos pasando.
+**Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
+la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
+puntos por zona. 710 tests de la app y 1029 del servidor, todos pasando, más 18 que
+juegan contra el servidor de verdad.
 
 ## Qué falta
 
 - [ ] **Probar en un celular de verdad que encuentra el servidor solo.** En el emulador
       la búsqueda corre, pero no puede encontrar el de la PC: su red (NAT) no deja pasar
       el multicast
-- [ ] **Decidir cómo se puntúa.** Con las reglas actuales el tablero **siempre** termina
-      lleno, así que contar casillas no distingue a nadie. Hay que elegir entre contar
-      turnos o fijar un número de rondas ([[Puntuación]])
-- [ ] **`puntuacion/`** — el cálculo de puntaje, y mostrarlo al terminar la partida
+- [ ] **El diseño del multijugador y del login.** Por ahora son pantallas funcionales
+- [ ] **Probar el multijugador con varios celulares** de verdad en la misma WiFi
+- [ ] **Decidir cómo se puntúa jugando solo.** Con las reglas actuales el tablero
+      **siempre** termina lleno, así que contar casillas no distingue a nadie
+      ([[Puntuación]]). En línea ya hay puntos
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual. Ojo: esas partidas
       se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del dado
       ancla. Sirven para validar las reglas de color, no la del dado ancla

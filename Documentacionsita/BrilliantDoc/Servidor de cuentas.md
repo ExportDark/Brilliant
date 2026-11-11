@@ -1,8 +1,11 @@
 # Servidor de cuentas
 
-Un programa aparte de la app, en `Brilliant-servidor/`: guarda las cuentas de los jugadores y les da
-sesiones. La app se registra ahí, inicia sesión, y puede cerrar la sesión y borrar la
-cuenta. Cómo se usa está en `Brilliant-servidor/README.md`; esta nota cuenta las decisiones.
+Un programa aparte de la app, en `Brilliant-servidor/` (una carpeta hermana, con su propio
+repositorio desde el 2026-11-10): guarda las cuentas de los jugadores y les da sesiones, y
+desde el 2026-11-10 también lleva las **salas del multijugador** (`/salas/`, ver
+[[Multijugador]]). La app se registra ahí, inicia sesión, y puede cerrar la sesión y borrar
+la cuenta. Cómo se usa está en `Brilliant-servidor/README.md`; esta nota cuenta las
+decisiones de las cuentas.
 
 Ver también: [[Cuentas en la app]] · [[Arquitectura general]] · [[Cómo trabajar en el proyecto]] · [[Pruebas]]
 
@@ -34,8 +37,9 @@ El código propio de autenticación es mínimo:
 
 ## La API
 
-Solo existen las cinco rutas que usa la app. Se declaran una por una en
-`cuentas/urls.py`, en vez de incluir todas las de djoser:
+Para las cuentas solo existen las cinco rutas que usa la app. Se declaran una por una en
+`cuentas/urls.py`, en vez de incluir todas las de djoser (las de las salas están en el
+README del servidor):
 
 | Método y ruta | Qué hace |
 |---|---|

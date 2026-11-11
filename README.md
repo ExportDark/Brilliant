@@ -30,8 +30,11 @@ Construcción incremental, módulo por módulo:
 - [x] Los 4 mapas oficiales, y una pantalla para elegir uno al abrir la app
 - [x] Cuentas: un servidor aparte (repo `Brilliant-servidor`) y en la app crear la cuenta, iniciar y
       cerrar sesión, y borrarla
-- [x] La app encuentra el servidor sola en la WiFi (mDNS), aunque la PC cambie de red
-- [ ] Puntuación
+- [x] La app encuentra el servidor sola en la WiFi (mDNS), aunque la PC cambie de red; con
+      varios, se elige de la lista en "Iniciar sesión"
+- [x] Multijugador: salas con código de 2 a 6 jugadores, con puntos por zona (jugable, sin
+      diseño todavía)
+- [ ] Puntuación jugando solo
 
 ## Estructura
 
@@ -42,13 +45,16 @@ lib/
   juego/    estado de la partida con BLoC (preparación y turnos) y validación de jugadas
   cuenta/   la sesión del jugador: el cliente del servidor de cuentas, el almacén
             cifrado, el buscador de servidores en la red y el SesionBloc
+  multijugador/ la sala como la manda el servidor, ClienteSalas y SalaBloc
   ui/
-    widgets/    CeldaWidget, TableroWidget, DadoWidget
+    widgets/    CeldaWidget, TableroWidget, DadoWidget, TarjetaDeMapa, ListaDeServidores,
+                ServidorParaEntrar, IndicadorDelServidor
     pantallas/  PuertaDeSesion, PantallaEntrar, DialogoDelServidor, PantallaCrearCuenta,
                 PantallaMiCuenta, PantallaEleccionDeMapa, PantallaPreparacion,
-                PantallaPartida
+                PantallaPartida, y multijugador/ (lobby, partida en línea, resultado)
     tema.dart   colores y estilo de la app
   main.dart
+tool/       exportar_para_el_servidor.dart: los mapas y las jugadas en JSON, para el servidor
 test/       tests, misma estructura que lib/
 (el servidor de cuentas vive en otro repositorio, `Brilliant-servidor`)
 ```
@@ -58,7 +64,6 @@ test/       tests, misma estructura que lib/
 ```
 flutter run -d edge                             # web, en Edge (Chrome sirve igual si está instalado)
 flutter build apk --release --split-per-abi     # Android: genera el APK para instalar en el teléfono
-flutter run -d windows                          # escritorio (necesita Visual Studio con C++)
 ```
 
 El APK para teléfonos Android modernos queda en
@@ -67,8 +72,14 @@ El APK para teléfonos Android modernos queda en
 ## Tests
 
 ```
-flutter test
+flutter test                                    # los 710 de la app
+flutter test --dart-define=CON_SERVIDOR=true test/cuenta/contra_el_servidor_test.dart
+flutter test --dart-define=CON_SERVIDOR=true test/multijugador/contra_el_servidor_test.dart
 ```
+
+Los dos últimos hablan con el servidor de verdad (levantado con
+`Brilliant-servidor\iniciar.bat`): las cuentas, y 14 partidas multijugador con varios
+clientes (unos 3 minutos).
 
 ## Módulo: Posicion (`lib/modelo/posicion.dart`)
 
@@ -371,15 +382,27 @@ aparato y cada 10 segundos mientras no hay. Tocándolo se abre un diálogo con l
 servidores que encuentra en la WiFi, para tocar uno, o para escribir la IP a mano. Lo
 que se elige se recuerda.
 
+Si en la red contestan **varios servidores**, la lista aparece directo en "Iniciar sesión"
+y en "Crear cuenta" (`ServidorParaEntrar`), y los botones **esperan a que haya un servidor
+que conteste**: deshabilitados sin él, y se habilitan solos cuando aparece. "Iniciar
+sesión" **recuerda el último usuario** (nunca la contraseña), y los errores dicen qué hacer:
+"Demasiados intentos… espera N segundos", "el servidor tardó demasiado" o "no se pudo
+conectar".
+
 `BrilliantApp` recibe el cliente, el almacén, el buscador y los avisos de cambio de red,
 para que los tests usen un servidor falso en memoria, un buscador falso y una red falsa.
 
 ## Módulo: multijugador (`lib/multijugador/` y `lib/ui/pantallas/multijugador/`)
 
-Salas en línea con código, hasta 6 jugadores. El servidor tira los dados, valida y calcula
-puntos; la app (`ClienteSalas`, `SalaBloc`) pregunta cada segundo y dibuja. Nadie ve el
-tablero de los demás; un panel de zonas dice cuáles siguen dando puntos. Ver la nota
-"Multijugador" del vault.
+Salas en línea con código, de 2 a 6 jugadores. Se entra desde el ícono de personas de
+"Elige un mapa": crear sala (da un código de 6 caracteres) o unirse con él. En el lobby el
+anfitrión elige el mapa con las mismas tarjetas del inicio y empieza con 2 o más.
+
+El servidor tira los dados, valida y calcula los puntos por zona; la app (`ClienteSalas`,
+`SalaBloc`) pregunta cada segundo y dibuja. Nadie ve el tablero de los demás; un panel de
+zonas dice cuáles siguen dando puntos. Quien pasa 10 s sin hablarle al servidor queda
+fuera ("Reconectando…" a los 3 s); si se va el anfitrión, ganan los demás. Ver las notas
+"Multijugador", "Puntuación" y "Revisión de lógica" del vault.
 
 ## Tests del camino feliz
 

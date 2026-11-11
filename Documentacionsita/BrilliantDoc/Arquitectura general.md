@@ -78,12 +78,17 @@ lib/
   reglas/     ReglaColor + funciones puras + una clase por color
   juego/      PreparacionBloc y PartidaBloc, cada uno con su estado y sus eventos,
               y evaluarJugada / hayJugada (validación de jugadas)
-  puntuacion/ cálculo de puntaje                                        (pendiente)
+  cuenta/     ClienteCuentas, AlmacenDeSesion, BuscadorDeServidores,
+              ServidorCubit y SesionBloc
+  multijugador/ modelos de la sala, ClienteSalas y SalaBloc
   ui/
-    widgets/    CeldaWidget, TableroWidget
-    pantallas/  PantallaPreparacion y PantallaPartida, cada una con su bloc
+    widgets/    CeldaWidget, TableroWidget, DadoWidget, TarjetaDeMapa,
+                ListaDeServidores, IndicadorDelServidor…
+    pantallas/  elegir mapa, preparación y partida (cada una con su bloc),
+                las de cuenta, y multijugador/ (lobby, partida en línea, resultado)
+tool/         exportar_para_el_servidor.dart: los mapas y las jugadas en JSON
 test/         misma estructura que lib/, un test por archivo de lógica
-(el servidor de cuentas es un programa aparte, en Python/Django, en el repo `Brilliant-servidor`)
+(el servidor es un programa aparte, en Python/Django, en el repo `Brilliant-servidor`)
 ```
 
 Las cuentas del lado de la app viven en su propia capa, `lib/cuenta/`: el cliente HTTP
@@ -92,5 +97,10 @@ del servidor, el almacén cifrado de la sesión, el buscador de servidores en la
 y el juego no sabe nada de ellas: solo la raíz de la app decide si se juega o se inicia
 sesión. Ver [[Cuentas en la app]].
 
-El servidor no comparte código con la app: se hablan por HTTPS, con una API JSON. Ver
-[[Servidor de cuentas]].
+El multijugador también tiene su capa, `lib/multijugador/`: no valida jugadas ni calcula
+puntos, solo habla con el servidor (que manda) y guarda la sala como se la devuelve. Ver
+[[Multijugador]].
+
+El servidor no comparte código con la app: se hablan por HTTPS, con una API JSON. Las
+reglas del juego están en los dos (Dart y Python), y una prueba de cada lado exige que den
+lo mismo. Ver [[Servidor de cuentas]].

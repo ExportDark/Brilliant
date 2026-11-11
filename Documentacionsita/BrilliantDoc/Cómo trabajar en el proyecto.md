@@ -29,18 +29,18 @@ Versión del SDK de Dart: 3.13.2 (stable).
 flutter test                                    # correr todos los tests
 flutter test test/ui test/main                  # solo los widget tests
 flutter test --dart-define=CON_SERVIDOR=true test/cuenta/contra_el_servidor_test.dart
+flutter test --dart-define=CON_SERVIDOR=true test/multijugador/contra_el_servidor_test.dart
                                                 # contra el servidor de verdad (levantado)
 dart analyze                                    # análisis estático
 flutter run -d edge                             # correr en web (en Edge)
 flutter build web                               # compilar para web
 flutter build apk --release --split-per-abi     # compilar el APK de Android
-flutter run -d windows                          # correr en escritorio (ver abajo)
 ```
 
-En esta PC no hay Chrome, así que para web se usa Edge (`-d edge`). Para escritorio,
-`flutter doctor` avisa que falta **Visual Studio** con el paquete "Desarrollo para el
-escritorio con C++": sin eso, `flutter run -d windows` no compila. Para Android, ver
-[[Versión Android]].
+En esta PC no hay Chrome, así que para web se usa Edge (`-d edge`). La versión de
+escritorio (`windows/`) se quitó el 2026-11-10: no se usaba, y sin Visual Studio con C++
+no compilaba. Si se quiere de vuelta, `flutter create --platforms=windows .` la regenera.
+Para Android, ver [[Versión Android]].
 
 VS Code tiene instaladas las extensiones `dart-code.dart-code` y `dart-code.flutter`, así
 que los archivos `.dart` se reconocen solos (resaltado, análisis, botón Run/Debug).
