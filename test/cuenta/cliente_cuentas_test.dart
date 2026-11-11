@@ -104,12 +104,29 @@ void main() {
       expect(error.generales, ['No puede iniciar sesión con las credenciales proporcionadas.']);
     });
 
-    test('demasiados intentos (429) también es un ErrorDeCuenta, con el mensaje del servidor', () async {
+    test('demasiados intentos (429) es un ErrorDeCuenta en español, con los segundos que dijo el '
+        'servidor', () async {
+      final (:cuentas, pedidos: _) = _contestando(429, {
+        'detail': 'Solicitud fue regulada (throttled). Se espera que esté disponible en 37 segundos.',
+      });
+
+      final error = await _errorDe(() => cuentas.entrar(usuario: 'ana', contrasena: 'mala'));
+
+      expect(error.generales, ['Demasiados intentos seguidos. Espera 37 segundos e intenta de nuevo.']);
+    });
+
+    test('demasiados intentos (429) sin segundos en el mensaje dice "un momento"', () async {
       final (:cuentas, pedidos: _) = _contestando(429, {'detail': 'Solicitud fue regulada.'});
 
       final error = await _errorDe(() => cuentas.entrar(usuario: 'ana', contrasena: 'mala'));
 
-      expect(error.generales, ['Solicitud fue regulada.']);
+      expect(error.generales, ['Demasiados intentos seguidos. Espera un momento e intenta de nuevo.']);
+    });
+
+    test('probarConexion: un servidor que limita los intentos (429) está ahí', () async {
+      final (:cuentas, pedidos: _) = _contestando(429, {'detail': 'Solicitud fue regulada.'});
+
+      await cuentas.probarConexion();
     });
 
     test('la cuenta activa en otro aparato (409) es un ErrorDeCuenta con el mensaje', () async {
