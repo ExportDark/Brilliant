@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../cuenta/buscador_de_servidores.dart';
 import '../../cuenta/direccion_del_servidor.dart';
 import '../../cuenta/servidor_cubit.dart';
-import '../tema.dart';
+import '../widgets/lista_de_servidores.dart';
 
 /// El diálogo para elegir el servidor de cuentas. Al abrirse busca los que
 /// hay en la red, y basta con tocar uno. Si no aparece (por ejemplo, en la
@@ -169,33 +169,11 @@ class _ServidoresDeLaRed extends StatelessWidget {
           );
         }
 
-        final encontrados = resultado.data ?? const <ServidorEncontrado>[];
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (encontrados.isEmpty)
-              const Text('No se encontró ningún servidor. Revisa que esté encendido y que '
-                  'estés en la misma WiFi.'),
-            for (final servidor in encontrados)
-              ListTile(
-                key: ValueKey('servidor-${textoDeDireccion(servidor.direccion)}'),
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.dns_rounded, color: Paleta.disponible),
-                title: Text(servidor.nombre, overflow: TextOverflow.ellipsis),
-                subtitle: Text('Disponible · ${textoDeDireccion(servidor.direccion)}'),
-                trailing: servidor.direccion == actual ? const Icon(Icons.check_rounded) : null,
-                onTap: () => alElegir(servidor),
-              ),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: TextButton.icon(
-                onPressed: alBuscarDeNuevo,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Buscar de nuevo'),
-              ),
-            ),
-          ],
+        return ListaDeServidores(
+          encontrados: resultado.data ?? const <ServidorEncontrado>[],
+          actual: actual,
+          alElegir: alElegir,
+          alBuscarDeNuevo: alBuscarDeNuevo,
         );
       },
     );

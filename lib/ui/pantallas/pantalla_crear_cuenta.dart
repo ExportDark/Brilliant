@@ -7,7 +7,10 @@ import '../../cuenta/sesion_event.dart';
 import '../../cuenta/sesion_state.dart';
 import '../tema.dart';
 import '../widgets/campo_de_contrasena.dart';
+import '../widgets/indicador_del_servidor.dart';
 import '../widgets/recuadro_de_aviso.dart';
+import '../widgets/servidor_para_entrar.dart';
+import 'dialogo_del_servidor.dart';
 
 /// "Crear cuenta": usuario y contraseña, escrita dos veces. Al crearla se
 /// inicia sesión sola y se pasa a elegir el mapa.
@@ -56,6 +59,8 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
   @override
   Widget build(BuildContext context) {
     final textos = Theme.of(context).textTheme;
+
+    final hayServidor = servidorListo(context);
 
     return PopScope(
       // Al volver a "Iniciar sesión", los errores de aquí ya no aplican.
@@ -143,13 +148,25 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                             ],
                             const SizedBox(height: 24),
                             FilledButton(
-                              onPressed: state.ocupado ? null : _crear,
+                              key: const ValueKey('boton-crear-cuenta'),
+                              onPressed: state.ocupado || !hayServidor ? null : _crear,
                               child: state.ocupado
                                   ? const SizedBox.square(
                                       dimension: 22,
                                       child: CircularProgressIndicator(strokeWidth: 2.5),
                                     )
                                   : const Text('Crear cuenta'),
+                            ),
+                            const SizedBox(height: 16),
+                            const ServidorParaEntrar(),
+                            const SizedBox(height: 12),
+                            IndicadorDelServidor(
+                              alTocar: state.ocupado
+                                  ? null
+                                  : () => showDialog<void>(
+                                        context: context,
+                                        builder: (_) => const DialogoDelServidor(),
+                                      ),
                             ),
                           ],
                         ),

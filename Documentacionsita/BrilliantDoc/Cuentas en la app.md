@@ -299,3 +299,5 @@ particular.
 ## Varios servidores en la red
 
 Si en la red contestan varios servidores, `ServidorCubit` no elige: pasa a `Disponibilidad.variosEncontrados` y guarda la lista en `ServidorState.encontrados`, para que el jugador elija (cada servidor tiene sus cuentas). `buscarEnLaRed()` vuelve a buscar sin revisar antes el servidor de ahora.
+
+En "Iniciar sesión" y "Crear cuenta", `ServidorParaEntrar` muestra la lista de servidores (`ListaDeServidores`, la misma del diálogo) cuando hay varios, y qué hacer cuando no hay ninguno. "Entrar" y "Crear cuenta" solo se habilitan con un servidor que contesta (`servidorListo`), y se habilitan solos cuando aparece.

@@ -9,7 +9,12 @@ void main() {
   testWidgets('Mi cuenta: si el servidor no contesta al cerrar sesión, la app no dice que la '
       'cerró allá, y al volver a entrar con la misma cuenta, entra', (tester) async {
     final servidor = ServidorFalso()..cuentas['ana'] = contrasenaDePrueba;
-    await abrirApp(tester, servidor: servidor, conSesion: false);
+    await abrirApp(
+      tester,
+      servidor: servidor,
+      conSesion: false,
+      revisarCada: const Duration(seconds: 2),
+    );
     await entrarCon(tester, 'ana', contrasenaDePrueba);
     expect(find.text('Elige un mapa'), findsOneWidget);
 
@@ -29,6 +34,7 @@ void main() {
 
     // El servidor vuelve, con la sesión todavía abierta. Antes daba 409.
     servidor.apagado = false;
+    await pasarSegundos(tester, 3);
     expect(servidor.sesiones.values, contains('ana'));
     await entrarCon(tester, 'ana', contrasenaDePrueba);
 

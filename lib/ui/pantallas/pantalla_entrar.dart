@@ -9,6 +9,7 @@ import '../widgets/campo_de_contrasena.dart';
 import '../widgets/indicador_del_servidor.dart';
 import '../widgets/logo_brilliant.dart';
 import '../widgets/recuadro_de_aviso.dart';
+import '../widgets/servidor_para_entrar.dart';
 import 'dialogo_del_servidor.dart';
 import 'pantalla_crear_cuenta.dart';
 
@@ -61,6 +62,8 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
   @override
   Widget build(BuildContext context) {
     final textos = Theme.of(context).textTheme;
+
+    final hayServidor = servidorListo(context);
 
     return BlocBuilder<SesionBloc, SesionState>(
       builder: (context, state) {
@@ -134,7 +137,8 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
                           ],
                           const SizedBox(height: 24),
                           FilledButton(
-                            onPressed: state.ocupado ? null : _entrar,
+                            key: const ValueKey('boton-entrar'),
+                            onPressed: state.ocupado || !hayServidor ? null : _entrar,
                             child: state.ocupado ? const _Esperando() : const Text('Entrar'),
                           ),
                           const SizedBox(height: 8),
@@ -142,7 +146,9 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
                             onPressed: state.ocupado ? null : _irACrearCuenta,
                             child: const Text('¿No tienes cuenta? Crea una'),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 12),
+                          const ServidorParaEntrar(),
+                          const SizedBox(height: 12),
                           IndicadorDelServidor(
                             alTocar: state.ocupado ? null : _cambiarServidor,
                           ),
