@@ -20,3 +20,5 @@ La app pregunta cada segundo (`SalaBloc`). 3 s sin respuesta: "Reconectando…";
 
 ## Pendiente
 Diseño visual; prueba con dos clientes contra el servidor real; prueba de tamaños de pantalla.
+
+En el lobby el mapa se elige con las mismas tarjetas de "Elige un mapa" (`TarjetaDeMapa`, el tablero en miniatura); la elegida lleva el borde de color. Quien no es el anfitrión ve solo la tarjeta del mapa elegido.

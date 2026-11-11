@@ -6,7 +6,9 @@ import '../../../multijugador/modelos.dart';
 import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../../../multijugador/sala_state.dart';
+import '../../../modelo/mapa.dart';
 import '../../tema.dart';
+import '../../widgets/tarjeta_de_mapa.dart';
 import 'lista_de_jugadores.dart';
 
 /// El lobby: el código para invitar, quiénes ya entraron, el mapa y "Empezar" (solo el
@@ -81,25 +83,30 @@ class VistaLobby extends StatelessWidget {
             Text('Mapa', style: textos.titleMedium),
             const SizedBox(height: 6),
             if (sala.soyElAnfitrion)
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final nivel in [1, 2, 3, 4])
-                    ChoiceChip(
-                      key: ValueKey('mapa-$nivel'),
-                      label: Text('Nivel $nivel'),
-                      selected: sala.nivel == nivel,
-                      onSelected: libre
-                          ? (_) => bloc.add(MapaElegido(nivel))
-                          : null,
-                    ),
-                ],
+              TarjetaDeMapa.rejilla(
+                tarjeta: (mapa) => TarjetaDeMapa(
+                  mapa: mapa,
+                  seleccionada: sala.nivel == mapa.nivel,
+                  alElegir: libre ? () => bloc.add(MapaElegido(mapa.nivel)) : null,
+                ),
               )
-            else
+            else ...[
               Text(
-                'Nivel ${sala.nivel}, lo elige el anfitrión.',
+                'Lo elige el anfitrión.',
                 key: const ValueKey('mapa-elegido'),
+                style: textos.bodyMedium?.copyWith(color: Paleta.tintaSuave),
               ),
+              const SizedBox(height: 8),
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 220),
+                  child: TarjetaDeMapa(
+                    mapa: mapas.firstWhere((m) => m.nivel == sala.nivel),
+                    seleccionada: true,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
             if (sala.soyElAnfitrion) ...[
               FilledButton(
