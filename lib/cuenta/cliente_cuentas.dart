@@ -29,7 +29,11 @@ class SesionVencida implements Exception {
 /// No se pudo hablar con el servidor: está apagado, no hay red, o su
 /// certificado no es el de la autoridad de Brilliant.
 class SinConexion implements Exception {
-  const SinConexion();
+  /// Si el servidor sí parecía estar, pero no contestó a tiempo (ocupado, o la red muy
+  /// lenta), en vez de no haber con quién hablar.
+  final bool agotada;
+
+  const SinConexion({this.agotada = false});
 }
 
 /// Habla con el servidor de cuentas por HTTPS. Cada método hace un pedido a
@@ -91,6 +95,9 @@ class ClienteCuentas {
       await _pedir('GET', 'auth/users/me/', en: en, espera: espera);
     } on SesionVencida {
       return;
+    } on ErrorDeCuenta {
+      // Contestó, aunque fuera para limitar los intentos o rechazar el pedido: está ahí.
+      return;
     }
   }
 
@@ -127,6 +134,7 @@ class ClienteCuentas {
     );
     if (estado >= 200 && estado < 300) return datos;
     if (estado == 401) throw const SesionVencida();
+    if (estado == 429) throw _demasiadosIntentos(datos);
     if (estado >= 500) {
       throw const ErrorDeCuenta(generales: ['El servidor tuvo un problema. Intenta de nuevo.']);
     }
@@ -176,10 +184,11 @@ class ClienteCuentas {
         if (!reintentar) rethrow;
         respuesta = await intentar();
       }
-    } on Exception {
-      // Sin red, servidor apagado, certificado ajeno o tiempo agotado: para
-      // el jugador es lo mismo, no hay con quién hablar.
-      throw const SinConexion();
+    } on Exception catch (error) {
+      // Sin red, servidor apagado, certificado ajeno o tiempo agotado: casi todo es lo
+      // mismo para el jugador, no hay con quién hablar; solo se distingue el tiempo
+      // agotado, que pide esperar y no revisar que esté encendido.
+      throw SinConexion(agotada: error is TimeoutException);
     }
 
     return (estado: respuesta.statusCode, datos: _leerJson(respuesta));
@@ -193,6 +202,16 @@ class ClienteCuentas {
     } on FormatException {
       return const {};
     }
+  }
+
+  /// El servidor limita los intentos (5 inicios de sesión por minuto, 10 cuentas por hora).
+  /// Su mensaje trae los segundos que faltan: "...disponible en 60 segundos."
+  static ErrorDeCuenta _demasiadosIntentos(Map<String, dynamic> datos) {
+    final segundos = RegExp(r'(\d+)\s*segundo').firstMatch('${datos['detail']}')?.group(1);
+    final espera = segundos == null ? 'un momento' : '$segundos segundos';
+    return ErrorDeCuenta(
+      generales: ['Demasiados intentos seguidos. Espera $espera e intenta de nuevo.'],
+    );
   }
 
   /// Los errores de DRF vienen como `{"campo": ["mensaje", ...]}`; los que no

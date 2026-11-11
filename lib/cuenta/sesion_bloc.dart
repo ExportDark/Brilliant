@@ -83,11 +83,15 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
   /// Cuando no se puede hablar con el servidor: dice con qué dirección se
   /// intentó, para que se note si es la de otra red.
-  ErrorDeCuenta get _sinConexion => ErrorDeCuenta(
+  ErrorDeCuenta _sinConexion(SinConexion error) => ErrorDeCuenta(
         generales: [
-          'No se pudo conectar con el servidor (${textoDeDireccion(servidor)}). Revisa que '
-              'esté encendido y que estés en la misma red, o cambia la dirección en '
-              '"Servidor".',
+          if (error.agotada)
+            'El servidor (${textoDeDireccion(servidor)}) tardó demasiado en contestar. Puede '
+                'estar ocupado: espera un momento e intenta de nuevo.'
+          else
+            'No se pudo conectar con el servidor (${textoDeDireccion(servidor)}). Revisa que '
+                'esté encendido y que estés en la misma red, o cambia la dirección en '
+                '"Servidor".',
         ],
       );
 
@@ -124,8 +128,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       emit(SesionState.conSesion(event.usuario));
     } on ErrorDeCuenta catch (error) {
       emit(SesionState.sinSesion(error: error));
-    } on SinConexion {
-      emit(SesionState.sinSesion(error: _sinConexion));
+    } on SinConexion catch (error) {
+      emit(SesionState.sinSesion(error: _sinConexion(error)));
     }
   }
 
@@ -139,8 +143,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
           ));
     } on ErrorDeCuenta catch (error) {
       return emit(SesionState.sinSesion(error: error));
-    } on SinConexion {
-      return emit(SesionState.sinSesion(error: _sinConexion));
+    } on SinConexion catch (error) {
+      return emit(SesionState.sinSesion(error: _sinConexion(error)));
     }
 
     try {
@@ -222,8 +226,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       emit(const SesionState.sinSesion(aviso: 'Tu cuenta se borró.'));
     } on ErrorDeCuenta catch (error) {
       emit(SesionState.conSesion(sesion.usuario, error: error));
-    } on SinConexion {
-      emit(SesionState.conSesion(sesion.usuario, error: _sinConexion));
+    } on SinConexion catch (error) {
+      emit(SesionState.conSesion(sesion.usuario, error: _sinConexion(error)));
     } on SesionVencida {
       await _olvidarSesion();
       emit(const SesionState.sinSesion(aviso: 'Tu sesión venció. Vuelve a iniciar sesión.'));

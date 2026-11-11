@@ -107,4 +107,31 @@ void main() {
     },
     skip: _conServidor ? false : _sinServidor,
   );
+
+  test(
+    'El límite de inicios de sesión del servidor (5 por minuto) llega a la app como "demasiados '
+    'intentos", con los segundos que hay que esperar',
+    () async {
+      // Espera a que se libere lo que gastaron las pruebas de antes.
+      await Future<void>.delayed(const Duration(seconds: 61));
+      final cuentas = _cuentas();
+
+      ErrorDeCuenta? limite;
+      for (var intento = 0; intento < 8 && limite == null; intento++) {
+        final error = await _errorDe(
+          cuentas.entrar(usuario: 'nadie_regulado', contrasena: 'contrasena-mala-1'),
+        );
+        if (error.generales.any((m) => m.contains('Demasiados intentos'))) limite = error;
+      }
+
+      expect(limite, isNotNull, reason: 'el servidor tenía que limitar los intentos');
+      expect(limite!.generales.single, matches(RegExp(r'Espera \d+ segundos')));
+      // Y limitado o no, el servidor sigue ahí: revisar que contesta no falla.
+      await cuentas.probarConexion();
+      // Se deja pasar el minuto para no estorbar a las pruebas que siguen.
+      await Future<void>.delayed(const Duration(seconds: 61));
+    },
+    timeout: const Timeout(Duration(minutes: 3)),
+    skip: _conServidor ? false : _sinServidor,
+  );
 }

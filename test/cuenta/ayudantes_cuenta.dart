@@ -1,6 +1,7 @@
 // Ayudantes compartidos por los tests de cuentas. No termina en `_test.dart`,
 // así que `flutter test` no lo corre: solo lo importan los tests.
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -133,6 +134,12 @@ class ServidorFalso {
   /// Si está apagado, ningún pedido llega.
   var apagado = false;
 
+  /// Si está tan ocupado que no contesta a tiempo: el pedido llega, pero se agota la espera.
+  var tardaDemasiado = false;
+
+  /// Si limita los intentos: contesta 429 con los segundos que hay que esperar.
+  int? regulaConSegundos;
+
   var _siguienteToken = 0;
 
   /// Una cuenta [usuario] ya creada, con una sesión iniciada.
@@ -172,6 +179,14 @@ class ServidorFalso {
       throw http.ClientException('Ahí no hay ningún servidor', pedido.url);
     }
     pedidos.add(pedido);
+    if (tardaDemasiado) throw TimeoutException('El servidor no contestó a tiempo');
+    final regulado = regulaConSegundos;
+    if (regulado != null) {
+      return _json(429, {
+        'detail': 'Solicitud fue regulada (throttled). Se espera que esté disponible en '
+            '$regulado segundos.',
+      });
+    }
 
     final datos = pedido.body.isEmpty
         ? const <String, dynamic>{}

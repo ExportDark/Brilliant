@@ -147,7 +147,7 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/pantallas/partida/solo_el_numero_exacto_se_resalta_test.dart` | Solo se resalta el número exacto que sacó el dado ancla |
 | `ui/pantallas/partida/pantalla_coincide_con_la_validacion_test.dart` | La pantalla ilumina exactamente lo que la validación acepta y rechaza |
 | `ui/pantallas/partida/barra_de_progreso_test.dart` | La barra de progreso cuenta las casillas llenas: 6 de 49 al empezar, 7 de 49 tras una jugada |
-| `ui/pantallas/pantalla_eleccion_de_mapa_test.dart` | La elección muestra los 4 mapas con su nombre y su miniatura de 49 casillas; las miniaturas son los mapas de verdad, con sus iniciales; tocar "Nivel 3" abre su preparación (3 casos) |
+| `ui/pantallas/pantalla_eleccion_de_mapa_test.dart` | La elección muestra los 4 mapas con su nombre y su miniatura de 49 casillas; las miniaturas son los mapas de verdad, con sus iniciales; tocar "Nivel 3" abre su preparación (3 casos), y el límite de intentos llega como "demasiados intentos" con sus segundos (4 casos en total) |
 | `ui/pantallas/eleccion/flecha_atras_vuelve_a_elegir_test.dart` | Desde la preparación, la flecha de atrás vuelve a elegir el mapa |
 | `ui/pantallas/partida/jugar_otra_vez_mismo_mapa_test.dart` | Al terminar el Nivel 4, "Jugar otra vez" prepara el Nivel 4 |
 | `ui/pantallas/partida/explicacion_zona_naranja_test.dart` | Un 2 en D1, en la fila naranja "4-6", se explica como "Zona naranja — Solo del 4 al 6. Ya tiene: 4" |

@@ -303,3 +303,12 @@ Si en la red contestan varios servidores, `ServidorCubit` no elige: pasa a `Disp
 En "Iniciar sesión" y "Crear cuenta", `ServidorParaEntrar` muestra la lista de servidores (`ListaDeServidores`, la misma del diálogo) cuando hay varios, y qué hacer cuando no hay ninguno. "Entrar" y "Crear cuenta" solo se habilitan con un servidor que contesta (`servidorListo`), y se habilitan solos cuando aparece.
 
 "Iniciar sesión" recuerda el último usuario que entró (`AlmacenDeSesion.leerUltimoUsuario`, clave `ultimo.usuario`) y deja el cursor en la contraseña. La contraseña nunca se guarda. Al borrar la cuenta, el usuario se olvida.
+
+## Mensajes de error
+
+- **Demasiados intentos** (el servidor responde 429): "Demasiados intentos seguidos. Espera N segundos e intenta de nuevo." (N sale del mensaje del servidor).
+- **El servidor no contestó a tiempo** (`SinConexion.agotada`): dice que está ocupado y que se espere; no que se revise que esté encendido.
+- **No hay con quién hablar**: dice la dirección que se intentó y que se revise que esté encendido y en la misma red.
+- Usuario que no existe y contraseña mala dan el mismo mensaje. Cuenta abierta en otro aparato: ya tenía su mensaje.
+- Un servidor que contesta 429 u otro rechazo **está disponible**: `probarConexion` ya no lo toma por "sin servidor".
+
