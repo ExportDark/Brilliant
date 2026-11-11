@@ -48,3 +48,7 @@ app.*.map.json
 .widget_preview/
 __pycache__/
 .pytest_cache/
+
+# Notas personales y archivos del IDE
+devtools_options.yaml
+Documentacionsita/BrilliantDoc/notas-sueltas/
