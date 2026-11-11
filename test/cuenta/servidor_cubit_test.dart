@@ -102,9 +102,86 @@ void main() {
         return cubitConLaPcEnOtraRed();
       },
       act: (cubit) => cubit.revisar(),
-      expect: () => [estado(deSiempre, Disponibilidad.noDisponible)],
+      expect: () => [
+        ServidorState(
+          direccion: deSiempre,
+          disponibilidad: Disponibilidad.variosEncontrados,
+          encontrados: [
+            anunciado('192.168.137.252'),
+            anunciado('192.168.137.40', pc: 'VEGA'),
+          ],
+        ),
+      ],
       verify: (_) => expect(almacen.servidor, isNull),
     );
+
+    test('con varios en la red, el jugador elige uno de la lista y queda disponible', () async {
+      servidor.otrasDirecciones.add('192.168.137.40');
+      buscador.anunciados.addAll([
+        anunciado('192.168.137.252'),
+        anunciado('192.168.137.40', pc: 'VEGA'),
+      ]);
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+      await cubit.revisar();
+      expect(cubit.state.disponibilidad, Disponibilidad.variosEncontrados);
+
+      final vega = cubit.state.encontrados.last;
+      await cubit.elegir(vega.direccion, nombre: vega.nombre);
+
+      expect(cubit.state.disponibilidad, Disponibilidad.disponible);
+      expect(cubit.state.direccion, vega.direccion);
+      expect(cubit.state.encontrados, isEmpty);
+      expect(almacen.servidor, vega.direccion);
+    });
+
+    test('"Buscar de nuevo" encuentra uno que se encendió después, y se cambia a él', () async {
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+      await cubit.revisar();
+      expect(cubit.state.disponibilidad, Disponibilidad.noDisponible);
+
+      buscador.anunciados.add(anunciado('192.168.137.252'));
+      await cubit.buscarEnLaRed();
+
+      expect(cubit.state.disponibilidad, Disponibilidad.disponible);
+      expect(cubit.state.direccion, nueva);
+    });
+
+    test('si de varios solo queda uno al buscar de nuevo, la lista desaparece', () async {
+      servidor.otrasDirecciones.add('192.168.137.40');
+      buscador.anunciados.addAll([
+        anunciado('192.168.137.252'),
+        anunciado('192.168.137.40', pc: 'VEGA'),
+      ]);
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+      await cubit.revisar();
+      expect(cubit.state.encontrados, hasLength(2));
+
+      servidor.otrasDirecciones.clear();
+      await cubit.buscarEnLaRed();
+
+      expect(cubit.state.encontrados, isEmpty);
+      expect(cubit.state.disponibilidad, Disponibilidad.disponible);
+    });
+
+    test('si de varios ninguno contesta al buscar de nuevo, vuelve a "sin servidor"', () async {
+      servidor.otrasDirecciones.add('192.168.137.40');
+      buscador.anunciados.addAll([
+        anunciado('192.168.137.252'),
+        anunciado('192.168.137.40', pc: 'VEGA'),
+      ]);
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+      await cubit.revisar();
+
+      servidor.apagado = true;
+      await cubit.buscarEnLaRed();
+
+      expect(cubit.state.disponibilidad, Disponibilidad.noDisponible);
+      expect(cubit.state.encontrados, isEmpty);
+    });
 
     blocTest<ServidorCubit, ServidorState>(
       'sin buscador, como en la web, solo revisa la dirección que tiene',

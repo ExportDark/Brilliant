@@ -34,6 +34,10 @@ class IndicadorDelServidor extends StatelessWidget {
               'Sin servidor',
               'No contesta en $direccion. Toca para buscar otro.',
             ),
+          Disponibilidad.variosEncontrados => (
+              'Hay varios servidores',
+              'Elige uno de la lista.',
+            ),
         };
 
         return Material(
@@ -93,6 +97,7 @@ class _Punto extends StatelessWidget {
       Disponibilidad.revisando => null,
       Disponibilidad.disponible => Paleta.disponible,
       Disponibilidad.noDisponible => Paleta.peligro,
+      Disponibilidad.variosEncontrados => Paleta.acento,
     };
     if (color == null) return const CircularProgressIndicator(strokeWidth: 2);
 

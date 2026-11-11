@@ -96,6 +96,14 @@ class ServidorCubit extends Cubit<ServidorState> {
         ));
       });
 
+  /// Busca de nuevo en la red, sin revisar antes el servidor de ahora: para el botón
+  /// "Buscar de nuevo" de la lista de servidores.
+  Future<void> buscarEnLaRed() => _enOrden(() async {
+        await cargar();
+        _emitir(state.con(disponibilidad: Disponibilidad.revisando));
+        await _buscarYCambiar();
+      });
+
   /// La sesión avisa que el servidor contestó un pedido: está disponible.
   void contesto() {
     if (state.disponibilidad != Disponibilidad.disponible) {
@@ -148,8 +156,13 @@ class ServidorCubit extends Cubit<ServidorState> {
       _cambiarA(encontrado.direccion, nombre: encontrado.nombre);
       await _almacen.guardarServidor(encontrado.direccion);
       _emitir(state.con(disponibilidad: Disponibilidad.disponible));
+    } else if (encontrados.length > 1) {
+      _emitir(state.con(
+        disponibilidad: Disponibilidad.variosEncontrados,
+        encontrados: encontrados,
+      ));
     } else {
-      _emitir(state.con(disponibilidad: Disponibilidad.noDisponible));
+      _emitir(state.con(disponibilidad: Disponibilidad.noDisponible, encontrados: const []));
     }
     return encontrados;
   }

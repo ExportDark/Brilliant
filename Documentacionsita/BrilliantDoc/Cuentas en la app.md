@@ -295,3 +295,7 @@ particular.
   prueba en un celular de verdad.
 - **El anuncio**, desde la PC: un `ServiceBrowser` de zeroconf encuentra "Brilliant en
   ORION" en 192.168.137.252, puerto 8443.
+
+## Varios servidores en la red
+
+Si en la red contestan varios servidores, `ServidorCubit` no elige: pasa a `Disponibilidad.variosEncontrados` y guarda la lista en `ServidorState.encontrados`, para que el jugador elija (cada servidor tiene sus cuentas). `buscarEnLaRed()` vuelve a buscar sin revisar antes el servidor de ahora.
