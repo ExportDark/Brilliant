@@ -46,12 +46,5 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
-
-# Servidor de cuentas: el entorno de Python, la clave secreta, la base de
-# datos y los certificados (con sus claves privadas) son de cada PC.
-/servidor/.venv/
-/servidor/.env
-/servidor/db.sqlite3
-/servidor/certificados/
 __pycache__/
 .pytest_cache/

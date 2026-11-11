@@ -371,7 +371,7 @@ Ver [[Cuentas en la app]].
 ## El servidor de cuentas
 
 El servidor tiene sus propios tests, en Python: 86 con pytest, en
-`servidor/cuentas/tests/`. No entran en la cuenta de los tests de la app. Qué prueba cada
+`Brilliant-servidor/cuentas/tests/`. No entran en la cuenta de los tests de la app. Qué prueba cada
 archivo está en [[Servidor de cuentas]].
 
 ## Verificación en la app real

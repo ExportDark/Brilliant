@@ -10,7 +10,7 @@ BuscadorDeServidores crearBuscador() => const BuscadorNsd();
 /// Busca con el descubrimiento de servicios de red del sistema (en Android,
 /// `NsdManager`), a través del paquete nsd.
 class BuscadorNsd implements BuscadorDeServidores {
-  /// El tipo de servicio que anuncia `servidor/servir.py`.
+  /// El tipo de servicio que anuncia `Brilliant-servidor/servir.py`.
   static const tipo = '_brilliant._tcp';
 
   /// Cuánto se escucha la red antes de contestar.

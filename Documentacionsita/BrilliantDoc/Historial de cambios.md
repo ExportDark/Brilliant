@@ -7,6 +7,23 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-10 — El servidor pasa a su propio repositorio
+
+- **El servidor vive ahora en `Brilliant-servidor`**, una carpeta hermana de esta, con su
+  propio repositorio, README, `.venv` y 86 tests. Se separó con `git subtree split`, así
+  que conserva su historial (4 commits). La app y el servidor solo se hablan por HTTPS y
+  no comparten código.
+- **El certificado ya no viaja solo:** `generar_certificados.py` dejó de copiar la
+  autoridad a la app. `certificados/ca.pem` se copia a mano a
+  `assets/certificados/brilliant_ca.pem`, una sola vez (dura 10 años). Se comprobó que la
+  que ya tiene la app es idéntica a la del servidor nuevo: no hace falta recompilar.
+- Tus datos (`db.sqlite3`, `.env`, `certificados/`) se copiaron y se verificaron por hash
+  antes de borrar la carpeta vieja. El `.venv` se creó de nuevo, porque no se puede mover.
+- Se comprobó: los 86 tests del servidor pasan en el repo nuevo, `iniciar.bat` levanta
+  desde ahí y las 3 pruebas de la app contra el servidor de verdad pasan.
+- **Para el multijugador:** compartir las reglas del juego entre la app y el servidor
+  pasa a ser entre dos repos; hay que replantearlo.
+
 ## 2026-11-10 — El cierre de sesión se perdía en silencio
 
 - **Síntoma:** se cerraba sesión en la app ("Cerraste sesión.") y el servidor seguía con

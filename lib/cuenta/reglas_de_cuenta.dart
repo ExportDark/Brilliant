@@ -1,5 +1,5 @@
 /// Las reglas del nombre de usuario y de la contraseña: las mismas que revisa
-/// el servidor (`servidor/cuentas/serializers.py`), con los mismos mensajes.
+/// el servidor (`Brilliant-servidor/cuentas/serializers.py`), con los mismos mensajes.
 /// La app las revisa antes de mandar nada, para avisar al momento.
 ///
 /// Los largos se cuentan en caracteres (runas), como los cuenta Python.

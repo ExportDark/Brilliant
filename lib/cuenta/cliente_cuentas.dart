@@ -33,7 +33,7 @@ class SinConexion implements Exception {
 }
 
 /// Habla con el servidor de cuentas por HTTPS. Cada método hace un pedido a
-/// la API (ver `servidor/README.md`) y convierte la respuesta en un valor o
+/// la API (ver `Brilliant-servidor/README.md`) y convierte la respuesta en un valor o
 /// en uno de los errores de arriba.
 ///
 /// Recibe el [http.Client] para que los tests lo cambien por uno falso; en

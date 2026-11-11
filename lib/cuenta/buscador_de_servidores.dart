@@ -22,7 +22,7 @@ class ServidorEncontrado {
 
 /// Busca en la red local los servidores de cuentas que se anuncian, con
 /// mDNS / DNS-SD (el servicio `_brilliant._tcp`, que anuncia
-/// `servidor/servir.py`). Así la app encuentra el servidor sola, aunque la PC
+/// `Brilliant-servidor/servir.py`). Así la app encuentra el servidor sola, aunque la PC
 /// cambie de red y de IP.
 abstract interface class BuscadorDeServidores {
   /// Si en esta plataforma se puede buscar. En la web no: el navegador no deja.

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-/// El puerto en el que escucha el servidor de cuentas (`servidor\iniciar.bat`).
+/// El puerto en el que escucha el servidor de cuentas (`Brilliant-servidor\iniciar.bat`).
 const puertoDelServidor = 8443;
 
 /// La dirección del servidor si el jugador no eligió otra. Se puede fijar al

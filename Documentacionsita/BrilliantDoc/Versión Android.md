@@ -57,7 +57,7 @@ Sin sesión no se puede jugar, y la sesión se pide al [[Servidor de cuentas]], 
 la PC. El APK de siempre lo busca primero en `10.0.2.2`, que es como el **emulador** ve a
 la PC. **En el celular lo encuentra solo**: si ahí no contesta, lo busca en la WiFi (el
 servidor se anuncia con mDNS) y se cambia a él. Si no aparece, en "Iniciar sesión" >
-Servidor se elige de la lista o se escribe la IP que muestra `servidor\iniciar.bat`. Ver
+Servidor se elige de la lista o se escribe la IP que muestra `Brilliant-servidor\iniciar.bat`. Ver
 [[Cuentas en la app#Encontrar el servidor]].
 
 Se le puede dar una dirección de partida al compilar, para que no tenga que buscar la
@@ -68,7 +68,7 @@ C:\src\flutter\bin\flutter.bat build apk --release --split-per-abi --dart-define
 ```
 
 El celular tiene que estar en la misma WiFi que la PC, con el servidor levantado
-(`servidor\iniciar.bat`), y Windows tiene que dejar entrar conexiones al puerto 8443.
+(`Brilliant-servidor\iniciar.bat`), y Windows tiene que dejar entrar conexiones al puerto 8443.
 Ya no hace falta recompilar si cambia la IP de la PC.
 
 El manifiesto principal pide dos permisos:

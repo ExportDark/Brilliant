@@ -47,17 +47,20 @@ que los archivos `.dart` se reconocen solos (resaltado, análisis, botón Run/De
 
 ## Levantar el servidor de cuentas
 
+El servidor tiene **su propio repositorio**, `Brilliant-servidor` (una carpeta hermana de
+esta, con su propio README, `.venv` y tests). Desde esa carpeta:
+
 ```bat
-servidor\iniciar.bat
+iniciar.bat
 ```
 
 Lo deja en `https://localhost:8443`, muestra la IP de la PC y lo anuncia en la WiFi para
 que la app lo encuentre sola. Si la PC cambia de red, se vuelve a levantar solo. La
-primera vez crea `servidor\.venv` e instala los paquetes (Python 3.12 ya está en la PC).
+primera vez crea su `.venv` e instala los paquetes (Python 3.12 ya está en la PC).
 Sus tests:
 
 ```bat
-cd servidor
+cd ..\Brilliant-servidor
 .venv\Scripts\python.exe -m pytest
 ```
 
@@ -109,7 +112,7 @@ Así se verificó el layout el 2026-09-30. Ver [[Decisiones de extracción del m
 - `devtools_options.yaml`: lo crea Flutter DevTools al correr la app desde VS Code.
 - `.obsidian/workspace.json` y `.obsidian/graph.json`: Obsidian los reescribe solo al
   abrir o cerrar paneles.
-- En `servidor/`: el entorno de Python (`.venv`), la clave secreta (`.env`), la base
+- En el repo `Brilliant-servidor` (no aquí): el entorno de Python (`.venv`), la clave secreta (`.env`), la base
   (`db.sqlite3`) y los certificados con sus claves privadas (`certificados/`). Son de
   cada PC. Sí se sube el certificado público de la autoridad que usa la app
   (`assets/certificados/brilliant_ca.pem`).

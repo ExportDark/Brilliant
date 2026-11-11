@@ -66,7 +66,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Elegir el mapa en la app** (2026-10-24) — la app abre en "Elige un mapa", con
       los 4 niveles en miniatura. "Jugar otra vez" repite el mismo mapa, y salir a mitad
       de partida pide confirmación. Ver [[Mapas]]
-- [x] **Servidor de cuentas** (2026-11-02) — un programa aparte en `servidor/`, con
+- [x] **Servidor de cuentas** (2026-11-02) — un programa aparte en `Brilliant-servidor/`, con
       Django, djoser y knox: crear la cuenta, iniciar y cerrar sesión, y borrarla, por
       HTTPS con una autoridad local. Desde el 2026-11-03 se anuncia en la WiFi (mDNS) y
       se vuelve a levantar solo si la PC cambia de red. Desde el 2026-11-04, con reglas

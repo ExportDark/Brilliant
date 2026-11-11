@@ -83,7 +83,7 @@ lib/
     widgets/    CeldaWidget, TableroWidget
     pantallas/  PantallaPreparacion y PantallaPartida, cada una con su bloc
 test/         misma estructura que lib/, un test por archivo de lógica
-servidor/     el servidor de cuentas: un programa aparte, en Python (Django)
+(el servidor de cuentas es un programa aparte, en Python/Django, en el repo `Brilliant-servidor`)
 ```
 
 Las cuentas del lado de la app viven en su propia capa, `lib/cuenta/`: el cliente HTTP

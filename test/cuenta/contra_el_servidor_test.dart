@@ -8,7 +8,7 @@ import 'package:brilliant/cuenta/reglas_de_cuenta.dart';
 
 /// Estas pruebas hablan con el servidor de cuentas de verdad, por HTTPS. No
 /// corren con el `flutter test` de siempre: hay que levantar el servidor
-/// (`servidor\iniciar.bat`) y pedirlas con
+/// (`Brilliant-servidor\iniciar.bat`) y pedirlas con
 /// `flutter test --dart-define=CON_SERVIDOR=true test/cuenta/contra_el_servidor_test.dart`.
 const _conServidor = bool.fromEnvironment('CON_SERVIDOR');
 const _sinServidor = 'Necesita el servidor de cuentas corriendo y --dart-define=CON_SERVIDOR=true';

@@ -224,7 +224,7 @@ El indicador abre un diálogo con:
   dirección, como "Brilliant en ORION". Solo aparecen los que contestan. Basta con tocar
   uno; el que se usa ahora lleva una palomita. Si no hay ninguno, lo dice y deja
   **buscar de nuevo**;
-- **la dirección a mano**, por si no aparece: la IP que muestra `servidor\iniciar.bat`;
+- **la dirección a mano**, por si no aparece: la IP que muestra `Brilliant-servidor\iniciar.bat`;
 - **Restablecer**, que vuelve a la dirección de partida.
 
 Al elegir o guardar, el `ServidorCubit` lo guarda y revisa que conteste, y el indicador lo

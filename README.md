@@ -28,7 +28,7 @@ Construcción incremental, módulo por módulo:
 - [x] Interfaz suave: tema propio, fichas redondeadas, dados con puntos, sin coordenadas a
       la vista
 - [x] Los 4 mapas oficiales, y una pantalla para elegir uno al abrir la app
-- [x] Cuentas: un servidor aparte (`servidor/`) y en la app crear la cuenta, iniciar y
+- [x] Cuentas: un servidor aparte (repo `Brilliant-servidor`) y en la app crear la cuenta, iniciar y
       cerrar sesión, y borrarla
 - [x] La app encuentra el servidor sola en la WiFi (mDNS), aunque la PC cambie de red
 - [ ] Puntuación
@@ -50,7 +50,7 @@ lib/
     tema.dart   colores y estilo de la app
   main.dart
 test/       tests, misma estructura que lib/
-servidor/   el servidor de cuentas (Python, Django): ver servidor/README.md
+(el servidor de cuentas vive en otro repositorio, `Brilliant-servidor`)
 ```
 
 ## Correr el proyecto
@@ -343,7 +343,7 @@ de persona abre **"Mi cuenta"**: cerrar sesión y borrar la cuenta, que pide la
 contraseña en un diálogo. La sesión se recuerda al cerrar y abrir la app.
 
 - `cliente_cuentas.dart`: `ClienteCuentas` habla con el servidor de cuentas (ver
-  `servidor/README.md`). Convierte las respuestas en `ErrorDeCuenta` (los mensajes del
+  `Brilliant-servidor/README.md`). Convierte las respuestas en `ErrorDeCuenta` (los mensajes del
   servidor por campo), `SesionVencida` o `SinConexion`.
 - `cliente_http.dart`: en Android y Windows, un cliente HTTP que **solo confía en la
   autoridad local** del servidor (`assets/certificados/brilliant_ca.pem`); en la web, el

@@ -80,7 +80,7 @@ ServidorEncontrado anunciado(String ip, {String pc = 'ORION'}) => ServidorEncont
     );
 
 /// El mensaje del servidor cuando la cuenta tiene la sesión activa en otro
-/// aparato (`servidor/cuentas/views.py`).
+/// aparato (`Brilliant-servidor/cuentas/views.py`).
 const sesionEnOtroAparato =
     'Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o espera '
     '5 minutos si ya no la usas.';

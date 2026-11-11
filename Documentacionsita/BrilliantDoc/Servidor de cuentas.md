@@ -1,8 +1,8 @@
 # Servidor de cuentas
 
-Un programa aparte de la app, en `servidor/`: guarda las cuentas de los jugadores y les da
+Un programa aparte de la app, en `Brilliant-servidor/`: guarda las cuentas de los jugadores y les da
 sesiones. La app se registra ahí, inicia sesión, y puede cerrar la sesión y borrar la
-cuenta. Cómo se usa está en `servidor/README.md`; esta nota cuenta las decisiones.
+cuenta. Cómo se usa está en `Brilliant-servidor/README.md`; esta nota cuenta las decisiones.
 
 Ver también: [[Cuentas en la app]] · [[Arquitectura general]] · [[Cómo trabajar en el proyecto]] · [[Pruebas]]
 
@@ -71,7 +71,7 @@ Los errores vienen en español y por campo, como `{"password": [...]}`, o en
 - **Solo JSON:** sin la página navegable de DRF.
 - **CORS solo para la web local** (`localhost` y `127.0.0.1`).
 - **`DEBUG` apagado**, `ALLOWED_HOSTS` solo con las direcciones de la PC, y la
-  `SECRET_KEY` generada en `servidor/.env`, que no se sube.
+  `SECRET_KEY` generada en `Brilliant-servidor/.env`, que no se sube.
 
 ## Las reglas de las cuentas
 
@@ -146,7 +146,7 @@ Como corre en la PC y no tiene un dominio, no hay un certificado público:
    el servidor. Es como fijar el certificado: aunque alguien en la red tuviera un
    certificado válido de otra autoridad, la app no lo aceptaría.
 
-Las claves privadas se quedan en `servidor/certificados/` y no se suben al repo.
+Las claves privadas se quedan en `Brilliant-servidor/certificados/` y no se suben al repo.
 
 Se comprobó con el servidor de verdad:
 
@@ -195,7 +195,7 @@ ORION" en `192.168.137.252`, puerto 8443.
 
 ## Tests
 
-86 tests con pytest en `servidor/cuentas/tests/`, un archivo por tema:
+86 tests con pytest en `Brilliant-servidor/cuentas/tests/`, un archivo por tema:
 
 | Archivo | Qué prueba |
 |---|---|
