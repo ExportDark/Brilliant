@@ -122,6 +122,13 @@ class ServidorFalso {
   /// Usuario → contraseña.
   final cuentas = <String, String>{};
 
+  /// Cómo se llama el servidor en cada dirección (`GET /servidor/`). Sin nombre, "Brilliant
+  /// en ORION".
+  final nombres = <String, String>{};
+
+  /// Si es un servidor de antes de `GET /servidor/`: esa ruta no existe (404).
+  var sinRutaDeNombre = false;
+
   /// Token → usuario.
   final sesiones = <String, String>{};
 
@@ -203,6 +210,11 @@ class ServidorFalso {
     final ruta = '${pedido.method} ${pedido.url.path}';
 
     switch (ruta) {
+      case 'GET /servidor/' when !sinRutaDeNombre:
+        return _json(200, {
+          'nombre': nombres[pedido.url.host] ?? 'Brilliant en ORION',
+          'version': 1,
+        });
       case 'POST /auth/users/':
         return _crearCuenta(datos);
       case 'POST /auth/token/login/':

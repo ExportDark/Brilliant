@@ -110,6 +110,24 @@ class ClienteCuentas {
     }
   }
 
+  /// El nombre con el que se presenta el servidor en [en] ("Brilliant en ORION"), o
+  /// `null` si no contesta o no lo dice (un servidor de antes de `GET /servidor/`). Lo usa
+  /// la búsqueda por la red, que encuentra direcciones sin nombre.
+  Future<String?> nombreDelServidor(Uri en) async {
+    try {
+      final (:estado, :datos) = await enviar(
+        'GET',
+        'servidor/',
+        en: en,
+        espera: const Duration(seconds: 4),
+      );
+      final nombre = datos['nombre'];
+      return estado == 200 && nombre is String && nombre.isNotEmpty ? nombre : null;
+    } on SinConexion {
+      return null;
+    }
+  }
+
   /// Cierra la sesión de [token] en el servidor: el token deja de servir.
   Future<void> salir(String token) async {
     await _pedir('POST', 'auth/token/logout/', token: token);

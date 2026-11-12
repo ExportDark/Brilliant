@@ -316,5 +316,57 @@ void main() {
 
       expect(await cubit.buscarServidores(), isEmpty);
     });
+
+    test('uno encontrado probando direcciones (sin nombre) le pregunta su nombre al servidor',
+        () async {
+      servidor.nombres['192.168.137.252'] = 'Brilliant en VEGA';
+      buscador.anunciados.add(
+        ServidorEncontrado(nombre: '', direccion: Uri.parse('https://192.168.137.252:8443/')),
+      );
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+
+      expect(await cubit.buscarServidores(), [anunciado('192.168.137.252', pc: 'VEGA')]);
+    });
+
+    test('si el servidor no dice su nombre (uno de antes), se llama por su IP', () async {
+      servidor.sinRutaDeNombre = true;
+      buscador.anunciados.add(
+        ServidorEncontrado(nombre: '', direccion: Uri.parse('https://192.168.137.252:8443/')),
+      );
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+
+      final encontrados = await cubit.buscarServidores();
+
+      expect(encontrados.single.nombre, 'Brilliant en 192.168.137.252');
+    });
+
+    test('el mismo servidor encontrado por mDNS y probando direcciones aparece una vez, con '
+        'el nombre del anuncio', () async {
+      buscador.anunciados.addAll([
+        ServidorEncontrado(nombre: '', direccion: Uri.parse('https://192.168.137.252:8443/')),
+        anunciado('192.168.137.252'),
+      ]);
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+
+      expect(await cubit.buscarServidores(), [anunciado('192.168.137.252')]);
+    });
+
+    test('al revisar, si el único que contesta salió de probar direcciones, se cambia a él',
+        () async {
+      buscador.anunciados.add(
+        ServidorEncontrado(nombre: '', direccion: Uri.parse('https://192.168.137.252:8443/')),
+      );
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+
+      await cubit.revisar();
+
+      expect(cubit.state.disponibilidad, Disponibilidad.disponible);
+      expect(cubit.state.direccion, nueva);
+      expect(cubit.state.nombre, 'Brilliant en ORION');
+    });
   });
 }

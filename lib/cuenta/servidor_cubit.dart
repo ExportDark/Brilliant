@@ -112,16 +112,37 @@ class ServidorCubit extends Cubit<ServidorState> {
   }
 
   /// Los servidores de la red que contestan. Si uno se anuncia con varias
-  /// IPs, aparece una vez, con la primera que contesta.
+  /// IPs, aparece una vez, con la primera que contesta. Si se lo encontró en
+  /// las dos búsquedas (mDNS y probando direcciones), también.
+  ///
+  /// Los que se encontraron sin nombre (probando direcciones) se lo preguntan al
+  /// servidor; si no lo dice, se llama por su IP.
   Future<List<ServidorEncontrado>> buscarServidores() async {
-    final anunciados = await _buscador.buscar();
+    // Uno por dirección, quedándose con el que trae nombre.
+    final porDireccion = <Uri, ServidorEncontrado>{};
+    for (final encontrado in await _buscador.buscar()) {
+      porDireccion.update(
+        encontrado.direccion,
+        (antes) => antes.nombre.isEmpty ? encontrado : antes,
+        ifAbsent: () => encontrado,
+      );
+    }
+    final candidatos = [...porDireccion.values];
     final contestan = await Future.wait([
-      for (final anunciado in anunciados) _contesta(anunciado.direccion),
+      for (final candidato in candidatos) _contesta(candidato.direccion),
     ]);
 
     final porNombre = <String, ServidorEncontrado>{};
-    for (final (i, anunciado) in anunciados.indexed) {
-      if (contestan[i]) porNombre.putIfAbsent(anunciado.nombre, () => anunciado);
+    for (final (i, candidato) in candidatos.indexed) {
+      if (!contestan[i]) continue;
+      final conNombre = candidato.nombre.isNotEmpty
+          ? candidato
+          : ServidorEncontrado(
+              nombre: await _cuentas.nombreDelServidor(candidato.direccion) ??
+                  'Brilliant en ${candidato.direccion.host}',
+              direccion: candidato.direccion,
+            );
+      porNombre.putIfAbsent(conNombre.nombre, () => conNombre);
     }
     return [...porNombre.values];
   }

@@ -43,6 +43,27 @@ class SinBuscar implements BuscadorDeServidores {
   Future<List<ServidorEncontrado>> buscar() async => const [];
 }
 
+/// Varios buscadores a la vez: junta lo que encuentran todos. Si uno falla, cuentan los
+/// demás.
+class BuscadorCombinado implements BuscadorDeServidores {
+  final List<BuscadorDeServidores> buscadores;
+
+  const BuscadorCombinado(this.buscadores);
+
+  @override
+  bool get puedeBuscar => buscadores.any((b) => b.puedeBuscar);
+
+  @override
+  Future<List<ServidorEncontrado>> buscar() async {
+    final resultados = await Future.wait([
+      for (final buscador in buscadores)
+        if (buscador.puedeBuscar)
+          buscador.buscar().catchError((Object _) => const <ServidorEncontrado>[]),
+    ]);
+    return [for (final encontrados in resultados) ...encontrados];
+  }
+}
+
 /// El buscador de esta plataforma: en Android, el descubrimiento de servicios
 /// del sistema; en la web, ninguno.
 BuscadorDeServidores crearBuscador() => plataforma.crearBuscador();

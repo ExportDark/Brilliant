@@ -200,10 +200,20 @@ El servidor se anuncia en la WiFi con mDNS / DNS-SD, como un servicio `_brillian
 de la sesión (al abrir con la sesión guardada, al entrar, al crear la cuenta o al
 borrarla), el `ServidorCubit`:
 
-1. busca en la red los servidores que se anuncian, unos 3 segundos;
+1. busca en la red de **dos formas a la vez** (`BuscadorCombinado`), unos 3 segundos:
+   - **mDNS**: los servidores que se anuncian (`BuscadorNsd`);
+   - **probando direcciones** (`BuscadorPorBarrido`, desde el 2026-11-11): toma la IP del
+     celular en la WiFi (por ejemplo 192.168.1.37) y prueba el puerto 8443 en las otras 253
+     de su red, 48 a la vez y con 0,4 s de espera cada una. Sirve cuando el anuncio mDNS
+     no llega, que es lo común: lo bloquean el firewall de Windows (con la red como
+     "Pública"), muchos routers y los hotspots. El puerto 8443 tiene que estar abierto
+     igual para jugar, así que esto funciona donde funcione el juego. Solo recorre redes
+     locales (10.x, 172.16–31.x, 192.168.x), no la de los datos móviles. Las direcciones
+     que encuentra no traen nombre: se le pregunta a cada servidor con `GET /servidor/`
+     ("Brilliant en ORION"), y si es uno de antes que no lo dice, se llama por su IP;
 2. le pregunta a cada dirección si contesta, con el mismo cliente que solo confía en la
-   autoridad de Brilliant. Si un servidor se anuncia con varias IPs, queda la primera que
-   contesta;
+   autoridad de Brilliant: así solo cuentan los servidores de Brilliant. Si un servidor
+   aparece con varias IPs, o por las dos búsquedas, queda una vez;
 3. según cuántos contestan:
    - **uno**: se cambia a él y lo guarda; si era un pedido, el `SesionBloc` lo repite. El
      jugador no nota nada;

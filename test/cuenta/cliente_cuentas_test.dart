@@ -24,6 +24,26 @@ import 'package:brilliant/cuenta/cliente_cuentas.dart';
 }
 
 void main() {
+  group('ClienteCuentas.nombreDelServidor', () {
+    test('pide GET /servidor/ en esa dirección, sin token, y devuelve el nombre', () async {
+      final (:cuentas, :pedidos) = _contestando(200, {'nombre': 'Brilliant en ORION', 'version': 1});
+
+      final nombre = await cuentas.nombreDelServidor(Uri.parse('https://192.168.1.10:8443/'));
+
+      expect(nombre, 'Brilliant en ORION');
+      expect(pedidos.single.url.toString(), 'https://192.168.1.10:8443/servidor/');
+      expect(pedidos.single.headers.containsKey('Authorization'), isFalse);
+    });
+
+    test('un servidor de antes (404) o una respuesta rara dan null', () async {
+      final viejo = _contestando(404, {'detail': 'No encontrado.'});
+      final raro = _contestando(200, {'nombre': 7});
+
+      expect(await viejo.cuentas.nombreDelServidor(Uri.parse('https://x:8443/')), isNull);
+      expect(await raro.cuentas.nombreDelServidor(Uri.parse('https://x:8443/')), isNull);
+    });
+  });
+
   group('ClienteCuentas', () {
     test('crearCuenta manda usuario y contraseña dos veces, en JSON, a /auth/users/', () async {
       final (:cuentas, :pedidos) = _contestando(201, {'username': 'ana', 'id': 1});
