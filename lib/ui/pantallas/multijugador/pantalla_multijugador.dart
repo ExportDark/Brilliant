@@ -14,6 +14,7 @@ import 'vista_partida_en_linea.dart';
 import 'vista_preparacion_en_linea.dart';
 import 'vista_resultado.dart';
 import 'vista_sin_sala.dart';
+import '../../widgets/piezas.dart';
 
 /// El multijugador: crear o unirse a una sala, el lobby, la preparación, la partida y el
 /// resultado, todo en esta pantalla según en qué va la sala (lo decide el servidor).
@@ -156,8 +157,8 @@ class _Cuerpo extends StatelessWidget {
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                       child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 480),
+                        child: Bandeja(
+                          anchoMaximo: 480,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [

@@ -12,6 +12,7 @@ import '../widgets/recuadro_de_aviso.dart';
 import '../widgets/servidor_para_entrar.dart';
 import 'dialogo_del_servidor.dart';
 import 'pantalla_crear_cuenta.dart';
+import '../widgets/piezas.dart';
 
 /// "Iniciar sesión": la pantalla con la que arranca la app si no hay sesión.
 /// Sin sesión no se puede jugar; desde aquí también se crea la cuenta. Abajo
@@ -92,8 +93,8 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
               child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
+                child: Bandeja(
+                  anchoMaximo: 420,
                   child: Form(
                     key: _formulario,
                     child: AutofillGroup(

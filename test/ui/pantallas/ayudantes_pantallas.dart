@@ -113,6 +113,10 @@ Future<void> abrirPartida(
 }
 
 Future<void> tocar(WidgetTester tester, Finder objetivo) async {
+  // Como una persona: si está más abajo, primero se desplaza hasta verlo. Un solo
+  // cuadro, sin dejar pasar tiempo: así no corren los relojes de la pantalla.
+  await tester.ensureVisible(objetivo);
+  await tester.pump();
   await tester.tap(objetivo);
   await tester.pumpAndSettle();
 }

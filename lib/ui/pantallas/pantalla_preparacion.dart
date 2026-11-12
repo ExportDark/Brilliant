@@ -11,6 +11,7 @@ import '../tema.dart';
 import '../widgets/hoja_de_reglas.dart';
 import '../widgets/tablero_widget.dart';
 import 'pantalla_partida.dart';
+import '../widgets/piezas.dart';
 
 /// La pantalla donde el jugador reparte los números del 1 al 6 entre las
 /// casillas iniciales de [mapa], antes de tirar el primer dado.
@@ -188,8 +189,8 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
               child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
+                child: Bandeja(
+                  anchoMaximo: 480,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

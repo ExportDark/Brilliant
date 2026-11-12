@@ -6,6 +6,7 @@ import '../widgets/tarjeta_de_mapa.dart';
 import 'multijugador/pantalla_multijugador.dart';
 import 'pantalla_mi_cuenta.dart';
 import 'pantalla_preparacion.dart';
+import '../widgets/piezas.dart';
 
 /// La pantalla con la que arranca el juego, con la sesión iniciada: los 4
 /// mapas oficiales en tarjetas,
@@ -54,8 +55,8 @@ class PantallaEleccionDeMapa extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
           child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
+            child: Bandeja(
+              anchoMaximo: 480,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

@@ -11,6 +11,7 @@ import '../widgets/indicador_del_servidor.dart';
 import '../widgets/recuadro_de_aviso.dart';
 import '../widgets/servidor_para_entrar.dart';
 import 'dialogo_del_servidor.dart';
+import '../widgets/piezas.dart';
 
 /// "Crear cuenta": usuario y contraseña, escrita dos veces. Al crearla se
 /// inicia sesión sola y se pasa a elegir el mapa.
@@ -77,8 +78,8 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                 child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
+                  child: Bandeja(
+                    anchoMaximo: 420,
                     child: Form(
                       key: _formulario,
                       child: AutofillGroup(

@@ -15,6 +15,7 @@ import '../widgets/explicacion_de_jugada.dart';
 import '../widgets/hoja_de_reglas.dart';
 import '../widgets/tablero_widget.dart';
 import 'pantalla_preparacion.dart';
+import '../widgets/piezas.dart';
 
 /// La pantalla donde se juega la partida, turno por turno.
 ///
@@ -164,8 +165,8 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
                 child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 480),
+                  child: Bandeja(
+                    anchoMaximo: 480,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

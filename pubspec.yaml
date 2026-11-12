@@ -69,6 +69,23 @@ flutter:
   assets:
     - assets/certificados/brilliant_ca.pem
 
+  # Archivo y Archivo Black, de Google Fonts (licencia OFL: assets/fuentes/OFL*.txt).
+  # Van dentro de la app, para que se vean igual sin internet.
+  fonts:
+    - family: Archivo
+      fonts:
+        - asset: assets/fuentes/Archivo-400.ttf
+          weight: 400
+        - asset: assets/fuentes/Archivo-600.ttf
+          weight: 600
+        - asset: assets/fuentes/Archivo-700.ttf
+          weight: 700
+        - asset: assets/fuentes/Archivo-800.ttf
+          weight: 800
+    - family: ArchivoBlack
+      fonts:
+        - asset: assets/fuentes/ArchivoBlack-Regular.ttf
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

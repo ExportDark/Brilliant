@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../tema.dart';
 
 /// Un aviso suave, con un ícono y el texto: por qué no se puede anotar en una
-/// casilla, o qué pasó con la cuenta. Es color arena, no rojo de error.
+/// casilla, o qué pasó con la cuenta. Es una tarjeta amarilla con borde de tinta, no rojo
+/// de error.
 class RecuadroDeAviso extends StatelessWidget {
   final String texto;
   final IconData icono;
@@ -18,7 +19,8 @@ class RecuadroDeAviso extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: Paleta.aviso,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Paleta.tinta, width: 2),
         ),
         child: Row(
           children: [

@@ -7,6 +7,7 @@ import '../../cuenta/sesion_state.dart';
 import '../tema.dart';
 import '../widgets/campo_de_contrasena.dart';
 import '../widgets/recuadro_de_aviso.dart';
+import '../widgets/piezas.dart';
 
 /// "Mi cuenta": el usuario de la sesión, cerrar sesión y borrar la cuenta.
 /// Se abre desde el ícono de persona de "Elige un mapa".
@@ -39,8 +40,8 @@ class PantallaMiCuenta extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
               child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
+                child: Bandeja(
+                  anchoMaximo: 420,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
