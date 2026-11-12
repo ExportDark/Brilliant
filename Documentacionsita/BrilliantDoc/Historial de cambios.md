@@ -7,6 +7,28 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-11 — Más agujeros de lógica, explicación sutil, marcador y búsqueda por la red
+
+- **Lógica** (app `5c55685`, servidor `e6b86a6`): si el anfitrión cerraba el lobby, los
+  demás veían "Nadie ganó / ganan los demás" de una partida que no se jugó (ahora "El
+  anfitrión cerró la sala"); salir del lobby vuelve directo; el tiempo ya no depende de la
+  hora del teléfono; crear o unirse con doble toque no manda nada; "Entrar" ya no se
+  queda esperando con una respuesta rara; se recuerdan varios cierres de sesión pendientes;
+  los códigos de sala salen de `secrets`. Y pruebas de todos los relojes en sus bordes,
+  en el servidor y en la app. Ver [[Revisión de lógica]].
+- **Por qué no se puede anotar, sutil y en los dos modos** (`41e0056`, `642a2bb`): en la
+  línea de arriba del tablero, con un punto del color de la zona, sin recuadro, y un aro
+  suave en la casilla tocada; se va sola a los 4 s. En la partida en línea también se
+  apagan un poco las casillas que la regla bloquea. Ver [[Interfaz del tablero]].
+- **Marcador y panel de zonas** (`4dfde0e`, servidor `57a1bd3`): tarjetas blancas; el
+  marcador ordenado, con el puesto, los puntos grandes y un punto por zona llena; cada
+  zona con sus tres premios. Ver [[Multijugador#El marcador y el panel de zonas]].
+- **Encontrar el servidor sin escribir la IP aunque mDNS no llegue** (`dcd19e4`, servidor
+  `b4ea067`): la app prueba el puerto 8443 en las direcciones de su red, a la vez que
+  busca el anuncio, y le pregunta su nombre con `GET /servidor/`. Verificado en el
+  emulador: el registro del servidor muestra la consulta del nombre. Ver
+  [[Cuentas en la app#Si no contesta, se busca en la red]].
+
 ## 2026-11-11 — Revisión de lógica
 
 - Se revisaron la app y el servidor buscando errores de lógica; los que salieron se

@@ -28,12 +28,12 @@ Ver también: [[Multijugador]] · [[Cuentas en la app]] · [[Servidor de cuentas
 | **Una jugada tras un silencio se sacaba a sí misma** | Preguntar (`GET`) anotaba el contacto antes de mirar desconexiones, pero jugar (`POST`) no: con todos callados, quien volvía jugando quedaba fuera y no ganaba nadie | Todo pedido anota el contacto primero, igual que preguntar | servidor `09928ab` |
 | **Salirse del lobby respondía 403** | El que salía ya no estaba en la sala y la vista de respuesta lo rechazaba | Responde 204 | servidor `ea9679d` |
 | **Un código de sala que no era texto daba 500** | Un JSON con una lista o un objeto como código o como mapa rompía el servidor | Se rechaza con su error | servidor `30317f8` |
-| **Cerrar el lobby decía que ganaban los demás** | Si el anfitrión cerraba la sala antes de empezar, los demás veían un resultado con "Nadie ganó" y "El anfitrión se fue: ganan los demás", de una partida que no se jugó; el anfitrión también | Motivo aparte, `sala_cerrada`: los demás ven "El anfitrión cerró la sala." y el anfitrión sale directo (204) | servidor `e6b86a6`, app (bloque 1) |
-| **Salir del lobby pedía otro toque** | Tras "Salir" aparecía "Ya no estás en la sala" y había que tocar "Volver" | Salir por cuenta propia vuelve directo a "Elige un mapa" | app (bloque 1) |
-| **El tiempo dependía de la hora del teléfono** | Si el teléfono ajustaba su reloj, la cuenta regresiva saltaba y podía aparecer "se perdió la conexión" | Un cronómetro (`relojMonotono`) | app (bloque 1) |
-| **Crear o unirse con un doble toque** | Estando ya en una sala, el segundo pedido llegaba al servidor y mostraba "Ya estás en otra sala." | Se ignora | app (bloque 1) |
-| **"Entrar" podía quedarse esperando** | Un 401, o un "sí" sin token al iniciar sesión, rompían el bloc | Se avisa "El servidor no aceptó el pedido" / "contestó algo inesperado" | app (bloque 1) |
-| **Solo se recordaba un cierre de sesión pendiente** | Un segundo cierre sin servidor pisaba al primero, que quedaba abierto hasta vencer | Una lista (`porcerrar.lista`), sin perder la que se guardó con la versión anterior | app (bloque 1) |
+| **Cerrar el lobby decía que ganaban los demás** | Si el anfitrión cerraba la sala antes de empezar, los demás veían un resultado con "Nadie ganó" y "El anfitrión se fue: ganan los demás", de una partida que no se jugó; el anfitrión también | Motivo aparte, `sala_cerrada`: los demás ven "El anfitrión cerró la sala." y el anfitrión sale directo (204) | servidor `e6b86a6`, app `5c55685` |
+| **Salir del lobby pedía otro toque** | Tras "Salir" aparecía "Ya no estás en la sala" y había que tocar "Volver" | Salir por cuenta propia vuelve directo a "Elige un mapa" | app `5c55685` |
+| **El tiempo dependía de la hora del teléfono** | Si el teléfono ajustaba su reloj, la cuenta regresiva saltaba y podía aparecer "se perdió la conexión" | Un cronómetro (`relojMonotono`) | app `5c55685` |
+| **Crear o unirse con un doble toque** | Estando ya en una sala, el segundo pedido llegaba al servidor y mostraba "Ya estás en otra sala." | Se ignora | app `5c55685` |
+| **"Entrar" podía quedarse esperando** | Un 401, o un "sí" sin token al iniciar sesión, rompían el bloc | Se avisa "El servidor no aceptó el pedido" / "contestó algo inesperado" | app `5c55685` |
+| **Solo se recordaba un cierre de sesión pendiente** | Un segundo cierre sin servidor pisaba al primero, que quedaba abierto hasta vencer | Una lista (`porcerrar.lista`), sin perder la que se guardó con la versión anterior | app `5c55685` |
 | **Desbordes en el celular chico** | El código de la sala y la fila de puntos del resultado no cabían en 320 px | El código se achica; los "primeros" van debajo de los puntos | `9fe363a` |
 
 ## Riesgos conocidos, sin arreglar
@@ -54,7 +54,7 @@ Son de bajo impacto o de diseño; quedan anotados para decidir después.
 
 ## Cómo se comprobó
 
-- `dart analyze` sin avisos; 710 tests de la app y 1029 del servidor pasando.
+- `dart analyze` sin avisos; 752 tests de la app y 1043 del servidor pasando (2026-11-11).
 - 18 pruebas contra el servidor real (`--dart-define=CON_SERVIDOR=true`): 4 de cuentas y 14
   de partidas con varios jugadores. Ver [[Pruebas]].
 - Cada arreglo se deshizo a propósito y su prueba falló; después se restauró.

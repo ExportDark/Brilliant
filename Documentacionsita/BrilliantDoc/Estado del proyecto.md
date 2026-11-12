@@ -104,12 +104,21 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       cuando hay varios, "Entrar" espera al servidor, se recuerda el último usuario, y
       mensajes claros para el límite de intentos y el servidor lento. Ver
       [[Cuentas en la app]]
-- [x] **Revisión de lógica** (2026-11-11) — 8 errores arreglados con su prueba, y los
+- [x] **Revisión de lógica** (2026-11-11) — 14 errores arreglados con su prueba, y los
       riesgos que quedan anotados. Ver [[Revisión de lógica]]
+- [x] **Encontrar el servidor sin escribir la IP, aunque mDNS no llegue** (2026-11-11) —
+      la app prueba el puerto del servidor en las direcciones de su red WiFi, a la vez que
+      busca el anuncio mDNS. Verificado en el emulador. Ver
+      [[Cuentas en la app#Si no contesta, se busca en la red]]
+- [x] **Por qué no se puede anotar, sutil** (2026-11-11) — en los dos modos, en la línea de
+      arriba del tablero, con un punto del color de la zona y un aro en la casilla. Ver
+      [[Interfaz del tablero]]
+- [x] **Marcador y zonas rediseñados** (2026-11-11) — en la partida en línea. Ver
+      [[Multijugador#El marcador y el panel de zonas]]
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 710 tests de la app y 1029 del servidor, todos pasando, más 18 que
+puntos por zona. 752 tests de la app y 1043 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta
@@ -117,7 +126,8 @@ juegan contra el servidor de verdad.
 - [ ] **Probar en un celular de verdad que encuentra el servidor solo.** En el emulador
       la búsqueda corre, pero no puede encontrar el de la PC: su red (NAT) no deja pasar
       el multicast
-- [ ] **El diseño del multijugador y del login.** Por ahora son pantallas funcionales
+- [ ] **El diseño de toda la app** (siguiente fase). Antes, elegir las skills de diseño
+      que se van a usar
 - [ ] **Probar el multijugador con varios celulares** de verdad en la misma WiFi
 - [ ] **Decidir cómo se puntúa jugando solo.** Con las reglas actuales el tablero
       **siempre** termina lleno, así que contar casillas no distingue a nadie
