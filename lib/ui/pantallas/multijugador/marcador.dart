@@ -29,22 +29,11 @@ class TarjetaDeSeccion extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(titulo, style: textos.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                const Spacer(),
-                if (nota != null)
-                  Flexible(
-                    child: Text(
-                      nota,
-                      textAlign: TextAlign.end,
-                      style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
-                    ),
-                  ),
-              ],
-            ),
+            Text(titulo, style: textos.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            // La nota va debajo y a todo lo ancho: a la derecha del título no cabía en un
+            // celular y se partía en tres renglones.
+            if (nota != null)
+              Text(nota, style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave)),
             const SizedBox(height: 8),
             child,
           ],
@@ -265,7 +254,7 @@ class Marcador extends StatelessWidget {
     return TarjetaDeSeccion(
       key: const ValueKey('marcador'),
       titulo: 'Marcador',
-      nota: 'Cada punto de color es una zona llena',
+      nota: 'Cada punto de color es una zona que llenó.',
       child: Column(
         children: [
           for (final (i, jugador) in ordenados.indexed)
@@ -293,9 +282,10 @@ class Marcador extends StatelessWidget {
   }
 
   String _nombre(JugadorEnSala jugador) {
+    // En la partida, ser el anfitrión ya no importa: solo "tú" y si se fue. Así el nombre
+    // no se corta en un celular.
     final etiquetas = [
       if (jugador.usuario == yo) 'tú',
-      if (jugador.anfitrion) 'anfitrión',
       if (!jugador.activo) estadoDeSalida(jugador.estado),
     ];
     return etiquetas.isEmpty ? jugador.usuario : '${jugador.usuario} (${etiquetas.join(', ')})';

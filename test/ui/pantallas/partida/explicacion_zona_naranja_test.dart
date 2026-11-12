@@ -16,7 +16,7 @@ void main() {
 
     await tocar(tester, casillaTocable('D1'));
 
-    expect(find.text('Zona naranja — Solo del 4 al 6. Ya tiene: 4'), findsOneWidget);
+    expect(find.textContaining('Zona naranja — Solo del 4 al 6. Ya tiene: 4'), findsOneWidget);
     expect(celdaEn(tester, 'D1').celda.valor, isNull);
   });
 }

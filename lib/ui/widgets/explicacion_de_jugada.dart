@@ -88,31 +88,31 @@ class LineaDeIndicacion extends StatelessWidget {
               textAlign: TextAlign.center,
               style: base?.copyWith(color: Paleta.tintaSuave),
             )
-          : Row(
+          // El punto va pegado al principio del texto, aunque el texto ocupe dos líneas.
+          : Text.rich(
               key: const ValueKey('explicacion'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (color != null) ...[
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: coloresDeZona[color],
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Paleta.tinta.withValues(alpha: 0.25)),
+              TextSpan(
+                children: [
+                  if (color != null) ...[
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: coloresDeZona[color],
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Paleta.tinta.withValues(alpha: 0.25)),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
+                    const TextSpan(text: '  '),
+                  ],
+                  TextSpan(text: explicacion.texto),
                 ],
-                Flexible(
-                  child: Text(
-                    explicacion.texto,
-                    textAlign: TextAlign.center,
-                    style: base?.copyWith(color: Paleta.tinta),
-                  ),
-                ),
-              ],
+              ),
+              textAlign: TextAlign.center,
+              style: base?.copyWith(color: Paleta.tinta),
             ),
     );
   }

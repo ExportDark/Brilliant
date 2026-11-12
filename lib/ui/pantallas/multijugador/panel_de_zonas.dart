@@ -18,7 +18,7 @@ class PanelDeZonas extends StatelessWidget {
   Widget build(BuildContext context) {
     return TarjetaDeSeccion(
       titulo: 'Zonas',
-      nota: 'Quien llena una zona primero se lleva más',
+      nota: 'Quien llena una zona primero se lleva más.',
       child: Column(
         children: [
           for (final (i, zona) in zonas.indexed) ...[

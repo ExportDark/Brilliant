@@ -23,7 +23,7 @@ void main() {
 
     await tocar(tester, casillaTocable('C1'));
 
-    expect(find.text('Zona naranja — Solo del 4 al 6.'), findsOneWidget);
+    expect(find.textContaining('Zona naranja — Solo del 4 al 6.'), findsOneWidget);
     expect(find.textContaining('Ya tiene'), findsNothing);
   });
 }
