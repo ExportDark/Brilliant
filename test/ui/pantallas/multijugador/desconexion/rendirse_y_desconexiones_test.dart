@@ -73,7 +73,9 @@ void main() {
       expect(find.text('Quedaste fuera de la partida.'), findsOneWidget);
     });
 
-    testWidgets('salir del lobby manda rendirse y dice que ya no está en la sala', (tester) async {
+    testWidgets('salir del lobby manda rendirse y vuelve directo a "Elige un mapa"', (
+      tester,
+    ) async {
       final salas = SalasFalsas();
       await abrirMultijugador(tester, salas);
       await crearSala(tester, salas, vistaDePrueba());
@@ -82,8 +84,8 @@ void main() {
       await tocar(tester, find.byKey(const ValueKey('boton-salir')));
 
       expect(salas.llamadas, contains('rendirse'));
-      expect(find.byKey(const ValueKey('fin-de-la-sala')), findsOneWidget);
-      expect(find.text('Ya no estás en la sala.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('fin-de-la-sala')), findsNothing);
+      expect(find.text('Elige un mapa'), findsOneWidget);
     });
   });
 

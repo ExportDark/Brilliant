@@ -53,6 +53,11 @@ class ClienteCuentas {
 
   ClienteCuentas(this._http, this.servidor);
 
+  /// Cuando el servidor contesta algo que la app no espera.
+  static const _respuestaRara = ErrorDeCuenta(
+    generales: ['El servidor contestó algo inesperado. Intenta de nuevo.'],
+  );
+
   /// Crea la cuenta. La contraseña va dos veces: [repetida] es la que el
   /// jugador escribió para confirmarla.
   Future<void> crearCuenta({
@@ -73,7 +78,11 @@ class ClienteCuentas {
       'username': usuario,
       'password': contrasena,
     });
-    return respuesta['token'] as String;
+    final token = respuesta['token'];
+    // Sin token no hay sesión: antes esto rompía con un error de tipos y la pantalla se
+    // quedaba esperando.
+    if (token is! String || token.isEmpty) throw _respuestaRara;
+    return token;
   }
 
   /// El nombre de usuario de la sesión de [token]. Sirve para saber si un

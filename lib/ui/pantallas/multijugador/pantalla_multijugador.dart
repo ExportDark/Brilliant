@@ -59,7 +59,14 @@ class _Cuerpo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SalaBloc, SalaState>(
+    return BlocConsumer<SalaBloc, SalaState>(
+      // Quien se va por su cuenta vuelve directo a "Elige un mapa". Se espera a que se
+      // redibuje, para que la pantalla ya deje salir.
+      listenWhen: (antes, ahora) =>
+          antes.fin != FinDeSala.teFuiste && ahora.fin == FinDeSala.teFuiste,
+      listener: (context, _) => WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) Navigator.of(context).maybePop();
+      }),
       builder: (context, state) {
         return PopScope(
           canPop:
@@ -230,9 +237,12 @@ class _FinDeSala extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         Text(
-          fin == FinDeSala.desaparecio
-              ? 'La sala ya no existe: el servidor se reinició o la cerró.'
-              : 'Ya no estás en la sala.',
+          switch (fin) {
+            FinDeSala.desaparecio => 'La sala ya no existe: el servidor se reinició o la cerró.',
+            FinDeSala.cerrada => 'El anfitrión cerró la sala.',
+            FinDeSala.teFuiste => 'Saliste de la sala.',
+            _ => 'Ya no estás en la sala.',
+          },
           key: const ValueKey('fin-de-la-sala'),
           textAlign: TextAlign.center,
           style: textos.titleMedium,

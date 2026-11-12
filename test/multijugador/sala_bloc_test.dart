@@ -182,14 +182,42 @@ void main() {
       expect(bloc.state.vista!.estado, EstadoDeSala.esperando);
     });
 
-    test('salir del lobby (el servidor contesta 204) deja de estar en la sala', () async {
+    test('salir del lobby (el servidor contesta 204) deja de estar en la sala, por su cuenta',
+        () async {
       await entrar();
       salas.alRendirse = null;
 
       await mandar(const Rendirse());
 
-      expect(bloc.state.fin, FinDeSala.saliste);
+      expect(bloc.state.fin, FinDeSala.teFuiste);
       expect(bloc.state.enSala, isFalse);
+    });
+
+    test('si el anfitrión cerró la sala, se ve como sala cerrada, no como resultado', () async {
+      await entrar(vistaDePrueba(yo: 'beto', anfitrion: 'ana'));
+      salas.vista = vistaDePrueba(
+        yo: 'beto',
+        anfitrion: 'ana',
+        version: 4,
+        estado: 'terminada',
+        resultado: {'motivo': 'sala_cerrada', 'ganadores': [], 'ranking': []},
+      );
+
+      await mandar(const Preguntar());
+
+      expect(bloc.state.fin, FinDeSala.cerrada);
+      expect(bloc.state.enSala, isFalse);
+    });
+
+    test('crear o unirse estando ya en una sala (un doble toque) no manda nada', () async {
+      await entrar();
+      final antes = salas.llamadas.length;
+
+      await mandar(const SalaCreada());
+      await mandar(const UnirseConCodigo('K7M4QX'));
+
+      expect(salas.llamadas.length, antes);
+      expect(bloc.state.error, isNull);
     });
   });
 
@@ -420,7 +448,7 @@ void main() {
 
       await mandar(const Rendirse());
 
-      expect(bloc.state.fin, FinDeSala.saliste);
+      expect(bloc.state.fin, FinDeSala.teFuiste);
       expect(bloc.state.ocupado, isFalse);
     });
   });

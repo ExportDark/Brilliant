@@ -18,6 +18,7 @@ String motivoDelFin(String motivo) => switch (motivo) {
   'tablero_lleno' => 'Todos llenaron su tablero.',
   'sin_jugadas' => 'Ya nadie puede jugar.',
   'anfitrion_se_fue' => 'El anfitrión se fue: ganan los demás.',
+  'sala_cerrada' => 'El anfitrión cerró la sala.',
   'ultimo_jugador' => 'Los demás salieron: gana el último que quedó.',
   'todos_se_fueron' => 'Todos salieron: nadie gana.',
   _ => motivo,

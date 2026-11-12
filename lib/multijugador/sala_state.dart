@@ -21,8 +21,15 @@ enum FinDeSala {
   /// El servidor ya no tiene esa sala (se reinició, o se cerró hace rato).
   desaparecio,
 
-  /// El servidor dice que ya no estamos en ella (salimos del lobby, o nos sacó).
+  /// El servidor dice que ya no estamos en ella (nos sacó, o la sesión venció).
   saliste,
+
+  /// El jugador se fue por su cuenta (salió del lobby, o se rindió sin conexión): la
+  /// pantalla se cierra sola, sin un aviso que haya que cerrar.
+  teFuiste,
+
+  /// El anfitrión cerró la sala antes de empezar: no hubo partida.
+  cerrada,
 }
 
 /// El estado del multijugador: la sala en la que se está, si hay un pedido en curso, el

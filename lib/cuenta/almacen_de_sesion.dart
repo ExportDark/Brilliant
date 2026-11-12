@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Una sesión iniciada: el usuario y el token que la identifica ante el
@@ -16,12 +18,12 @@ abstract interface class AlmacenDeSesion {
   Future<void> guardar(Sesion sesion);
   Future<void> borrar();
 
-  /// La sesión que se cerró en este aparato pero que el servidor todavía no
-  /// sabe que se cerró (el cierre de sesión no llegó), o `null` si no hay.
-  Future<Sesion?> leerPorCerrar();
+  /// Las sesiones que se cerraron en este aparato pero que el servidor todavía no
+  /// sabe que se cerraron (el cierre de sesión no llegó). Vacía si no hay.
+  Future<List<Sesion>> leerPorCerrar();
 
-  /// Guarda la sesión por cerrar en el servidor; con `null`, ya no hay ninguna.
-  Future<void> guardarPorCerrar(Sesion? sesion);
+  /// Guarda las sesiones por cerrar en el servidor; vacía, ya no hay ninguna.
+  Future<void> guardarPorCerrar(List<Sesion> sesiones);
 
   /// La dirección del servidor que eligió el jugador, o `null` si usa la de
   /// siempre.
@@ -43,8 +45,11 @@ abstract interface class AlmacenDeSesion {
 class AlmacenSeguro implements AlmacenDeSesion {
   static const _usuario = 'sesion.usuario';
   static const _token = 'sesion.token';
+  // Antes se guardaba una sola sesión por cerrar, en estas dos claves; se leen una vez
+  // para no perderla y pasan a la lista.
   static const _usuarioPorCerrar = 'porcerrar.usuario';
   static const _tokenPorCerrar = 'porcerrar.token';
+  static const _listaPorCerrar = 'porcerrar.lista';
   static const _servidor = 'servidor.direccion';
   static const _ultimoUsuario = 'ultimo.usuario';
 
@@ -73,22 +78,36 @@ class AlmacenSeguro implements AlmacenDeSesion {
   }
 
   @override
-  Future<Sesion?> leerPorCerrar() async {
+  Future<List<Sesion>> leerPorCerrar() async {
+    final sesiones = <Sesion>[];
+    final guardada = await _almacen.read(key: _listaPorCerrar);
+    if (guardada != null) {
+      try {
+        for (final s in jsonDecode(guardada) as List<dynamic>) {
+          final datos = s as Map<String, dynamic>;
+          sesiones.add(Sesion(usuario: datos['usuario'] as String, token: datos['token'] as String));
+        }
+      } on Object {
+        // Si se dañó, no hay nada que rescatar: esas sesiones vencen solas.
+      }
+    }
     final usuario = await _almacen.read(key: _usuarioPorCerrar);
     final token = await _almacen.read(key: _tokenPorCerrar);
-    if (usuario == null || token == null) return null;
-    return Sesion(usuario: usuario, token: token);
+    if (usuario != null && token != null) sesiones.add(Sesion(usuario: usuario, token: token));
+    return sesiones;
   }
 
   @override
-  Future<void> guardarPorCerrar(Sesion? sesion) async {
-    if (sesion == null) {
-      await _almacen.delete(key: _usuarioPorCerrar);
-      await _almacen.delete(key: _tokenPorCerrar);
-      return;
-    }
-    await _almacen.write(key: _usuarioPorCerrar, value: sesion.usuario);
-    await _almacen.write(key: _tokenPorCerrar, value: sesion.token);
+  Future<void> guardarPorCerrar(List<Sesion> sesiones) async {
+    await _almacen.delete(key: _usuarioPorCerrar);
+    await _almacen.delete(key: _tokenPorCerrar);
+    if (sesiones.isEmpty) return _almacen.delete(key: _listaPorCerrar);
+    await _almacen.write(
+      key: _listaPorCerrar,
+      value: jsonEncode([
+        for (final s in sesiones) {'usuario': s.usuario, 'token': s.token},
+      ]),
+    );
   }
 
   @override

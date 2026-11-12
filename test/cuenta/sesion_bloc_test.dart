@@ -220,7 +220,7 @@ void main() {
         // No dice "Cerraste sesión." a secas: en el servidor sigue abierta.
         expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.cierreSinServidor}');
         expect(almacen.sesion, isNull);
-        expect(almacen.porCerrar?.token, sesion.token, reason: 'queda anotada para avisarle');
+        expect(almacen.porCerrar.single.token, sesion.token, reason: 'queda anotada para avisarle');
       },
     );
 
@@ -562,7 +562,7 @@ void main() {
       },
       verify: (bloc) {
         expect(_resumen(bloc.state), 'conSesion · ana');
-        expect(almacen.porCerrar, isNull);
+        expect(almacen.porCerrar, isEmpty);
         expect(servidor.sesiones.values.where((usuario) => usuario == 'ana'), hasLength(1));
       },
     );
@@ -575,7 +575,7 @@ void main() {
         bloc.add(const SesionRevisada());
       },
       verify: (bloc) {
-        expect(almacen.porCerrar, isNull);
+        expect(almacen.porCerrar, isEmpty);
         expect(servidor.sesiones, isEmpty);
       },
     );
@@ -588,12 +588,12 @@ void main() {
         servidor.apagado = true;
         bloc.add(const SesionLatido());
         await Future<void>.delayed(const Duration(milliseconds: 50));
-        expect(almacen.porCerrar, isNotNull, reason: 'sin servidor, sigue anotado');
+        expect(almacen.porCerrar, isNotEmpty, reason: 'sin servidor, sigue anotado');
         servidor.apagado = false;
         bloc.add(const SesionLatido());
       },
       verify: (bloc) {
-        expect(almacen.porCerrar, isNull);
+        expect(almacen.porCerrar, isEmpty);
         expect(servidor.sesiones, isEmpty);
       },
     );
@@ -606,7 +606,7 @@ void main() {
         servidor.sesiones.clear();
         bloc.add(const SesionLatido());
       },
-      verify: (bloc) => expect(almacen.porCerrar, isNull),
+      verify: (bloc) => expect(almacen.porCerrar, isEmpty),
     );
   });
 

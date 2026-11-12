@@ -130,8 +130,16 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       emit(SesionState.sinSesion(error: error));
     } on SinConexion catch (error) {
       emit(SesionState.sinSesion(error: _sinConexion(error)));
+    } on SesionVencida {
+      // Iniciar sesión no lleva token: el servidor no debería decir esto nunca. Si lo
+      // dice, "Entrar" no se queda esperando.
+      emit(const SesionState.sinSesion(error: _rechazoInesperado));
     }
   }
+
+  static const _rechazoInesperado = ErrorDeCuenta(
+    generales: ['El servidor no aceptó el pedido. Intenta de nuevo.'],
+  );
 
   Future<void> _alCrearCuenta(CuentaPedida event, Emitter<SesionState> emit) async {
     emit(state.esperando());
@@ -145,6 +153,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       return emit(SesionState.sinSesion(error: error));
     } on SinConexion catch (error) {
       return emit(SesionState.sinSesion(error: _sinConexion(error)));
+    } on SesionVencida {
+      return emit(const SesionState.sinSesion(error: _rechazoInesperado));
     }
 
     try {
@@ -187,7 +197,9 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     // igual: el token se olvida. Si el servidor no se enteró, queda anotado para
     // volver a avisarle, y si no, la sesión vence sola.
     await _olvidarSesion();
-    if (!llego) await _almacen.guardarPorCerrar(sesion);
+    if (!llego) {
+      await _almacen.guardarPorCerrar([...await _almacen.leerPorCerrar(), sesion]);
+    }
     emit(SesionState.sinSesion(aviso: llego ? 'Cerraste sesión.' : cierreSinServidor));
   }
 
@@ -204,12 +216,16 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  /// Si quedó una sesión que se cerró aquí sin que el servidor se enterara,
-  /// intenta cerrarla ahora. Si tampoco llega, sigue anotada.
+  /// Si quedaron sesiones que se cerraron aquí sin que el servidor se enterara,
+  /// intenta cerrarlas ahora. Las que tampoco llegan siguen anotadas.
   Future<void> _cerrarPendiente() async {
-    final pendiente = await _almacen.leerPorCerrar();
-    if (pendiente == null) return;
-    if (await _cerrarEnElServidor(pendiente)) await _almacen.guardarPorCerrar(null);
+    final pendientes = await _almacen.leerPorCerrar();
+    if (pendientes.isEmpty) return;
+    final siguen = [
+      for (final sesion in pendientes)
+        if (!await _cerrarEnElServidor(sesion)) sesion,
+    ];
+    await _almacen.guardarPorCerrar(siguen);
   }
 
   Future<void> _alBorrar(BorradoPedido event, Emitter<SesionState> emit) async {

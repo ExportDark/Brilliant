@@ -21,8 +21,8 @@ class AlmacenEnMemoria implements AlmacenDeSesion {
   /// La dirección del servidor que eligió el jugador, si eligió una.
   Uri? servidor;
 
-  /// La sesión cerrada aquí que el servidor todavía no sabe que se cerró.
-  Sesion? porCerrar;
+  /// Las sesiones cerradas aquí que el servidor todavía no sabe que se cerraron.
+  List<Sesion> porCerrar = [];
 
   AlmacenEnMemoria([this.sesion]);
 
@@ -36,10 +36,10 @@ class AlmacenEnMemoria implements AlmacenDeSesion {
   Future<void> borrar() async => sesion = null;
 
   @override
-  Future<Sesion?> leerPorCerrar() async => porCerrar;
+  Future<List<Sesion>> leerPorCerrar() async => [...porCerrar];
 
   @override
-  Future<void> guardarPorCerrar(Sesion? sesion) async => porCerrar = sesion;
+  Future<void> guardarPorCerrar(List<Sesion> sesiones) async => porCerrar = [...sesiones];
 
   @override
   Future<Uri?> leerServidor() async => servidor;

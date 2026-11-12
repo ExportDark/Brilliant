@@ -28,7 +28,9 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
    con estrella, hasta 6) y el mapa. **El mapa se elige con las mismas tarjetas de "Elige
    un mapa"**, con su tablero en miniatura (`TarjetaDeMapa`); la elegida lleva un borde de
    color. Quien no es el anfitrión ve solo la tarjeta del mapa elegido. "Empezar" se
-   habilita con 2 o más.
+   habilita con 2 o más. **Salir del lobby** (o la flecha de atrás) vuelve directo a
+   "Elige un mapa". Si el anfitrión cierra la sala, los demás ven "El anfitrión cerró la
+   sala." (no un resultado: no hubo partida).
 3. **La preparación.** La misma pantalla del modo de un jugador (`PantallaPreparacion`, con
    `alConfirmar` y `titulo`), a pantalla completa, con la cuenta regresiva en el título
    ("Reparte tus números · 60 s"). Al tocar "Inicio" el reparto va al servidor y se espera
@@ -61,7 +63,10 @@ sin ver los tableros de nadie. Los puntos de cada puesto están en [[Puntuación
   Si no vuelve, quedas fuera de la partida." Mientras tanto se sigue viendo el tablero.
 - **El servidor saca a quien pasa más de 10 s sin hablarle.** Un corte más corto no cuenta.
 - La cuenta regresiva de la ronda se descuenta en la app (`SalaState.segundosQueQuedan`):
-  el 304 no trae los segundos nuevos, y sin esto el tiempo se quedaba congelado.
+  el 304 no trae los segundos nuevos, y sin esto el tiempo se quedaba congelado. Nunca baja
+  de "0 s".
+- El tiempo se mide con un cronómetro (`relojMonotono`), no con la hora del teléfono: si
+  el teléfono ajusta su reloj a mitad de partida, la cuenta no salta.
 - Si el servidor se reinició, la sala ya no existe: la app lo dice y deja volver.
 - ⚠️ Si el celular pasa a segundo plano más de 10 s, queda fuera.
 

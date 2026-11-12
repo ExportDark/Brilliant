@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import '../cuenta/cliente_cuentas.dart';
 import 'cliente_salas.dart';
 import 'modelos.dart';
+import 'reloj.dart';
 import 'sala_event.dart';
 import 'sala_state.dart';
 
@@ -37,13 +38,13 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
     this._cliente, {
     this._intervalo = const Duration(seconds: 1),
     DateTime Function()? ahora,
-  })  : _ahora = ahora ?? DateTime.now,
+  })  : _ahora = ahora ?? relojMonotono(),
         super(const SalaState()) {
     // Un solo manejador, de a uno: un toque mientras llega la respuesta del anterior no
     // se cruza con él.
     on<SalaEvent>(
       (event, emit) => switch (event) {
-        SalaCreada() => _accion(emit, _cliente.crear),
+        SalaCreada() => _alCrear(emit),
         UnirseConCodigo() => _alUnirse(event, emit),
         MapaElegido() => _enSala(emit, (sala) => _cliente.elegirMapa(sala.codigo, event.nivel)),
         PartidaEmpezada() => _enSala(emit, (sala) => _cliente.empezar(sala.codigo)),
@@ -76,7 +77,14 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
 
   // ------------------------------------------------------------------ pedidos
 
+  /// Crear una sala estando ya en una (un doble toque) no hace nada.
+  Future<void> _alCrear(Emitter<SalaState> emit) async {
+    if (state.enSala) return;
+    await _accion(emit, _cliente.crear);
+  }
+
   Future<void> _alUnirse(UnirseConCodigo event, Emitter<SalaState> emit) async {
+    if (state.enSala) return;
     final codigo = event.codigo.trim().toUpperCase();
     if (codigo.isEmpty) {
       return emit(state.copiaCon(error: () => 'Escribe el código de la sala.'));
@@ -121,9 +129,9 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
     try {
       final vista = await _cliente.rendirse(state.vista!.codigo);
       if (vista == null) {
-        // Salió del lobby: ya no está en la sala.
+        // Salió del lobby: ya no está en la sala, y la pantalla se cierra sola.
         _pararDePreguntar();
-        emit(state.copiaCon(ocupado: false, fin: FinDeSala.saliste));
+        emit(state.copiaCon(ocupado: false, fin: FinDeSala.teFuiste));
       } else {
         _recibir(vista, emit);
       }
@@ -133,7 +141,7 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
       // Sin servidor no se puede avisar. Se deja de preguntar: en unos segundos el
       // servidor lo da por desconectado, que es lo mismo que rendirse.
       _pararDePreguntar();
-      emit(state.copiaCon(ocupado: false, fin: FinDeSala.saliste));
+      emit(state.copiaCon(ocupado: false, fin: FinDeSala.teFuiste));
     } on SesionVencida {
       _pararDePreguntar();
       emit(state.copiaCon(ocupado: false, fin: FinDeSala.saliste));
@@ -194,6 +202,9 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
         recibida: nueva == null ? null : ahora,
         ahora: ahora,
       ));
+      if (nueva != null && _cerrada(nueva)) {
+        emit(state.copiaCon(fin: FinDeSala.cerrada));
+      }
       if (nueva?.estado == EstadoDeSala.terminada) _pararDePreguntar();
     } on SinConexion {
       final ahora = _ahora();
@@ -227,12 +238,17 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
       recibida: ahora,
       ahora: ahora,
     ));
+    if (_cerrada(vista)) emit(state.copiaCon(fin: FinDeSala.cerrada));
     if (vista.estado == EstadoDeSala.terminada) {
       _pararDePreguntar();
     } else if (primera) {
       _empezarAPreguntar();
     }
   }
+
+  /// El anfitrión cerró la sala antes de empezar: no hubo partida ni resultado que ver.
+  static bool _cerrada(VistaDeSala vista) =>
+      vista.estado == EstadoDeSala.terminada && vista.resultado?.motivo == 'sala_cerrada';
 
   void _empezarAPreguntar() {
     final intervalo = _intervalo;
