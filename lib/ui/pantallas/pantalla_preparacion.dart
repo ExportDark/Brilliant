@@ -274,7 +274,7 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      FilledButton(
+                      PiezaPresionable(child: FilledButton(
                         // Sin todas las casillas llenas no se puede empezar. El bloc
                         // tampoco confirmaría, pero así el jugador lo ve de entrada.
                         onPressed: state.completa
@@ -285,11 +285,9 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('Inicio'),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward_rounded),
                           ],
                         ),
-                      ),
+                      )),
                     ],
                   ),
                 ),
@@ -324,7 +322,15 @@ class _FichaDeNumero extends StatelessWidget {
         // defecto: si no, en un celular angosto las 6 fichas no caben en fila.
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: EdgeInsets.zero,
-        textStyle: TextStyle(fontSize: tamano * 0.4, fontWeight: FontWeight.w700),
+        backgroundColor: Paleta.cartonClaro,
+        foregroundColor: Paleta.tinta,
+        disabledBackgroundColor: Paleta.baseTablero,
+        disabledForegroundColor: Paleta.tintaSuave,
+        side: BorderSide(
+          color: alElegir == null ? Paleta.tintaSuave.withValues(alpha: 0.4) : Paleta.tinta,
+          width: grosorDeTinta,
+        ),
+        textStyle: TextStyle(fontFamily: familiaDeTitulos, fontSize: tamano * 0.4),
       ),
       child: Text('$valor'),
     );

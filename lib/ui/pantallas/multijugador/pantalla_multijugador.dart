@@ -224,11 +224,11 @@ class _Cuerpo extends StatelessWidget {
                 children: [
                   VistaResultado(sala: sala),
                   const SizedBox(height: 16),
-                  FilledButton(
+                  PiezaPresionable(child: FilledButton(
                     key: const ValueKey('boton-volver'),
                     onPressed: () => Navigator.of(context).maybePop(),
                     child: const Text('Salir'),
-                  ),
+                  )),
                 ],
               ),
     };
@@ -261,11 +261,11 @@ class _FinDeSala extends StatelessWidget {
           style: textos.titleMedium,
         ),
         const SizedBox(height: 24),
-        FilledButton(
+        PiezaPresionable(child: FilledButton(
           key: const ValueKey('boton-volver'),
           onPressed: () => Navigator.of(context).maybePop(),
           child: const Text('Volver'),
-        ),
+        )),
       ],
     );
   }

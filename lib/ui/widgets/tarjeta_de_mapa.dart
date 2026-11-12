@@ -10,7 +10,7 @@ import 'tablero_widget.dart';
 /// multijugador.
 ///
 /// Con [alElegir] `null` no responde al toque (cuando solo se muestra cuál se eligió).
-/// [seleccionada] le pone el borde de color.
+/// [seleccionada] la pinta del amarillo de ficha.
 class TarjetaDeMapa extends StatelessWidget {
   final Mapa mapa;
   final VoidCallback? alElegir;
@@ -36,7 +36,8 @@ class TarjetaDeMapa extends StatelessWidget {
           spacing: separacion,
           runSpacing: separacion,
           children: [
-            for (final mapa in mapas) SizedBox(width: ancho, child: tarjeta(mapa)),
+            for (final mapa in mapas)
+              SizedBox(width: ancho, child: tarjeta(mapa)),
           ],
         );
       },
@@ -48,39 +49,42 @@ class TarjetaDeMapa extends StatelessWidget {
     final textos = Theme.of(context).textTheme;
     final forma = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(20),
-      side: seleccionada
-          ? const BorderSide(color: Paleta.acento, width: 3)
-          : BorderSide.none,
+      side: const BorderSide(color: Paleta.tinta, width: grosorDeTinta),
     );
 
-    return Material(
-      color: Colors.white,
-      shape: forma,
-      elevation: 1.5,
-      shadowColor: Colors.black26,
-      child: InkWell(
-        key: ValueKey('mapa-${mapa.nivel}'),
-        customBorder: forma,
-        onTap: alElegir,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
-          child: Column(
-            children: [
-              // Sin alTocar: el toque lo recibe la tarjeta entera.
-              TableroWidget(tablero: Tablero.desdeMapa(mapa)),
-              const SizedBox(height: 10),
-              Text(
-                mapa.nombre,
-                style: textos.titleMedium?.copyWith(
-                  color: Paleta.tinta,
-                  fontWeight: FontWeight.w700,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: sombraDura(4),
+      ),
+      child: Material(
+        color: seleccionada ? Paleta.ficha : Paleta.cartonClaro,
+        shape: forma,
+        child: InkWell(
+          key: ValueKey('mapa-${mapa.nivel}'),
+          customBorder: forma,
+          onTap: alElegir,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+            child: Column(
+              children: [
+                // Sin alTocar: el toque lo recibe la tarjeta entera.
+                TableroWidget(tablero: Tablero.desdeMapa(mapa)),
+                const SizedBox(height: 10),
+                Text(
+                  mapa.nombre,
+                  style: textos.titleMedium?.copyWith(
+                    color: Paleta.tinta,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              Text(
-                '${mapa.zonas.length} zonas',
-                style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
-              ),
-            ],
+                Text(
+                  '${mapa.zonas.length} zonas',
+                  style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -10,6 +10,7 @@ import '../../../modelo/mapa.dart';
 import '../../tema.dart';
 import '../../widgets/tarjeta_de_mapa.dart';
 import 'lista_de_jugadores.dart';
+import '../../widgets/piezas.dart';
 
 /// El lobby: el código para invitar, quiénes ya entraron, el mapa y "Empezar" (solo el
 /// anfitrión, con 2 o más jugadores).
@@ -109,13 +110,13 @@ class VistaLobby extends StatelessWidget {
             ],
             const SizedBox(height: 24),
             if (sala.soyElAnfitrion) ...[
-              FilledButton(
+              PiezaPresionable(child: FilledButton(
                 key: const ValueKey('boton-empezar'),
                 onPressed: libre && suficientes
                     ? () => bloc.add(const PartidaEmpezada())
                     : null,
                 child: const Text('Empezar'),
-              ),
+              )),
               if (!suficientes)
                 Padding(
                   padding: const EdgeInsets.only(top: 6),

@@ -155,11 +155,11 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
                             ),
                           ],
                           const SizedBox(height: 24),
-                          FilledButton(
+                          PiezaPresionable(child: FilledButton(
                             key: const ValueKey('boton-entrar'),
                             onPressed: state.ocupado || !hayServidor ? null : _entrar,
                             child: state.ocupado ? const _Esperando() : const Text('Entrar'),
-                          ),
+                          )),
                           const SizedBox(height: 8),
                           TextButton(
                             onPressed: state.ocupado ? null : _irACrearCuenta,

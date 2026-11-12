@@ -12,31 +12,52 @@ class TarjetaDeSeccion extends StatelessWidget {
   final String? nota;
   final Widget child;
 
-  const TarjetaDeSeccion({super.key, required this.titulo, this.nota, required this.child});
+  const TarjetaDeSeccion({
+    super.key,
+    required this.titulo,
+    this.nota,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
     final textos = Theme.of(context).textTheme;
     final nota = this.nota;
 
-    return Material(
-      color: Colors.white,
-      elevation: 1.5,
-      shadowColor: Colors.black26,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(titulo, style: textos.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-            // La nota va debajo y a todo lo ancho: a la derecha del título no cabía en un
-            // celular y se partía en tres renglones.
-            if (nota != null)
-              Text(nota, style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave)),
-            const SizedBox(height: 8),
-            child,
-          ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: sombraDura(4),
+      ),
+      child: Material(
+        color: Paleta.cartonClaro,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: Paleta.tinta, width: grosorDeTinta),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                titulo,
+                style: textos.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              // La nota va debajo y a todo lo ancho: a la derecha del título no cabía en un
+              // celular y se partía en tres renglones.
+              if (nota != null)
+                Text(
+                  nota,
+                  style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
+                ),
+              const SizedBox(height: 8),
+              child,
+            ],
+          ),
         ),
       ),
     );
@@ -97,7 +118,7 @@ class FilaDePuntos extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 2),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: mia ? Paleta.acento.withValues(alpha: 0.08) : null,
+        color: mia ? Paleta.ficha.withValues(alpha: 0.3) : null,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -114,7 +135,9 @@ class FilaDePuntos extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: textos.bodyLarge?.copyWith(
                     color: tinta,
-                    fontWeight: mia || lider ? FontWeight.w700 : FontWeight.w500,
+                    fontWeight: mia || lider
+                        ? FontWeight.w700
+                        : FontWeight.w500,
                     decoration: fuera ? TextDecoration.lineThrough : null,
                   ),
                 ),
@@ -194,7 +217,8 @@ class _Puesto extends StatelessWidget {
       height: 28,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: lider ? Paleta.acento : Paleta.baseTablero,
+        color: lider ? Paleta.ficha : Paleta.baseTablero,
+        border: lider ? Border.all(color: Paleta.tinta, width: 2) : null,
         shape: BoxShape.circle,
       ),
       child: Text(
@@ -202,7 +226,7 @@ class _Puesto extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w800,
-          color: lider ? Colors.white : Paleta.tinta,
+          color: Paleta.tinta,
         ),
       ),
     );
@@ -232,7 +256,12 @@ class Marcador extends StatelessWidget {
   final String yo;
   final List<ZonaEnSala> zonas;
 
-  const Marcador({super.key, required this.jugadores, required this.yo, required this.zonas});
+  const Marcador({
+    super.key,
+    required this.jugadores,
+    required this.yo,
+    required this.zonas,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -269,10 +298,14 @@ class Marcador extends StatelessWidget {
               zonas: [for (final id in jugador.zonas) ?colorPorZona[id]],
               estado: jugador.activo
                   ? Icon(
-                      jugador.listo ? Icons.check_circle_rounded : Icons.hourglass_empty_rounded,
+                      jugador.listo
+                          ? Icons.check_circle_rounded
+                          : Icons.hourglass_empty_rounded,
                       key: ValueKey('listo-${jugador.usuario}'),
                       size: 18,
-                      color: jugador.listo ? Paleta.disponible : Paleta.tintaSuave,
+                      color: jugador.listo
+                          ? Paleta.disponible
+                          : Paleta.tintaSuave,
                     )
                   : null,
             ),
@@ -288,6 +321,8 @@ class Marcador extends StatelessWidget {
       if (jugador.usuario == yo) 'tú',
       if (!jugador.activo) estadoDeSalida(jugador.estado),
     ];
-    return etiquetas.isEmpty ? jugador.usuario : '${jugador.usuario} (${etiquetas.join(', ')})';
+    return etiquetas.isEmpty
+        ? jugador.usuario
+        : '${jugador.usuario} (${etiquetas.join(', ')})';
   }
 }

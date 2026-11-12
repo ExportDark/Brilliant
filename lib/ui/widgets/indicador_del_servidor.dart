@@ -41,10 +41,10 @@ class IndicadorDelServidor extends StatelessWidget {
         };
 
         return Material(
-          color: Colors.white,
+          color: Paleta.cartonClaro,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Paleta.baseTablero),
+            borderRadius: BorderRadius.circular(14),
+            side: const BorderSide(color: Paleta.tinta, width: 2),
           ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(

@@ -148,7 +148,7 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                               ),
                             ],
                             const SizedBox(height: 24),
-                            FilledButton(
+                            PiezaPresionable(child: FilledButton(
                               key: const ValueKey('boton-crear-cuenta'),
                               onPressed: state.ocupado || !hayServidor ? null : _crear,
                               child: state.ocupado
@@ -157,7 +157,7 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                                       child: CircularProgressIndicator(strokeWidth: 2.5),
                                     )
                                   : const Text('Crear cuenta'),
-                            ),
+                            )),
                             const SizedBox(height: 16),
                             const ServidorParaEntrar(),
                             const SizedBox(height: 12),

@@ -71,13 +71,7 @@ class TableroWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: Paleta.tinta,
             borderRadius: BorderRadius.circular(tamano * 0.3),
-            boxShadow: [
-              BoxShadow(
-                color: Paleta.tinta.withValues(alpha: 0.35),
-                offset: const Offset(0, 5),
-                blurRadius: 0,
-              ),
-            ],
+            boxShadow: sombraDura(5),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

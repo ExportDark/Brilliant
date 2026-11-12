@@ -15,6 +15,10 @@ abstract final class Paleta {
   /// El cartón de las bandejas, donde va casi todo el contenido.
   static const carton = Color(0xFFF6EEDC);
 
+  /// Un cartón más claro, para las piezas que van encima de una bandeja: las tarjetas de
+  /// los mapas, el marcador, las fichas de número.
+  static const cartonClaro = Color(0xFFFFFCF4);
+
   /// El fondo de las pantallas: la mesa.
   static const fondo = mesa;
 

@@ -221,18 +221,18 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
                           // salvo para pasar el turno cuando no hay jugada.
                           if (state.sinJugada) ...[
                             const SizedBox(height: 20),
-                            FilledButton.tonal(
+                            PiezaPresionable(child: FilledButton.tonal(
                               onPressed: () => _enviar(const TurnoPasado()),
                               style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
                               child: const _TextoConIcono(Icons.skip_next_rounded, 'Pasar turno'),
-                            ),
+                            )),
                           ] else if (dados == null) ...[
                             const SizedBox(height: 20),
-                            FilledButton(
+                            PiezaPresionable(child: FilledButton(
                               onPressed: () => _enviar(const DadosTirados()),
                               style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
                               child: const _TextoConIcono(Icons.casino_rounded, 'Tirar dados'),
-                            ),
+                            )),
                           ],
                         ],
                       ],
@@ -329,10 +329,10 @@ class _FinDePartida extends StatelessWidget {
             style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
           ),
           const SizedBox(height: 18),
-          FilledButton(
+          PiezaPresionable(child: FilledButton(
             onPressed: alJugarOtraVez,
             child: const _TextoConIcono(Icons.replay_rounded, 'Jugar otra vez'),
-          ),
+          )),
         ],
       ),
     );

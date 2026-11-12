@@ -84,14 +84,20 @@ class _PiezaPresionableState extends State<PiezaPresionable> {
   var _hundida = false;
 
   void _hundir(bool hundida) {
-    if (widget.activa && hundida != _hundida) {
+    if (_activa && hundida != _hundida) {
       setState(() => _hundida = hundida);
     }
   }
 
+  /// Si se ve como pieza: no si se la apagó, ni si el botón que envuelve está deshabilitado.
+  bool get _activa {
+    final hijo = widget.child;
+    return widget.activa && (hijo is! ButtonStyleButton || hijo.enabled);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final alto = !widget.activa ? 0.0 : (_hundida ? 1.0 : widget.alto);
+    final alto = !_activa ? 0.0 : (_hundida ? 1.0 : widget.alto);
     // Sin animaciones si el sistema pide reducirlas.
     final sinMovimiento = MediaQuery.disableAnimationsOf(context);
 

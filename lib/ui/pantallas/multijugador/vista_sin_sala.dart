@@ -6,6 +6,7 @@ import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../../../multijugador/sala_state.dart';
 import '../../tema.dart';
+import '../../widgets/piezas.dart';
 
 /// Antes de estar en una sala: crear una, o unirse con el código que dictó quien la creó.
 class VistaSinSala extends StatefulWidget {
@@ -52,13 +53,13 @@ class _VistaSinSalaState extends State<VistaSinSala> {
               style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
             ),
             const SizedBox(height: 24),
-            FilledButton(
+            PiezaPresionable(child: FilledButton(
               key: const ValueKey('boton-crear-sala'),
               onPressed: libre
                   ? () => context.read<SalaBloc>().add(const SalaCreada())
                   : null,
               child: const Text('Crear sala'),
-            ),
+            )),
             const SizedBox(height: 28),
             TextField(
               key: const ValueKey('campo-codigo'),

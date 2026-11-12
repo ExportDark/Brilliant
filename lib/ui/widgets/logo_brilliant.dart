@@ -23,15 +23,17 @@ class LogoBrilliant extends StatelessWidget {
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: 6,
+          spacing: 8,
           children: [
             for (final color in _colores)
               Container(
-                width: 26,
-                height: 26,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
                   color: coloresDeZona[color],
                   borderRadius: BorderRadius.circular(7),
+                  border: Border.all(color: Paleta.tinta, width: grosorDeTinta),
+                  boxShadow: sombraDura(3),
                 ),
               ),
           ],
@@ -39,10 +41,7 @@ class LogoBrilliant extends StatelessWidget {
         const SizedBox(height: 14),
         Text(
           'Brilliant',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Paleta.tinta,
-                fontWeight: FontWeight.w800,
-              ),
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Paleta.tinta),
         ),
       ],
     );
