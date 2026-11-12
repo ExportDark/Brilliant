@@ -141,6 +141,15 @@ Ver [[Turnos y jugadas]].
 > Hasta el 2026-11-11 iba en un recuadro color arena debajo del tablero; se cambió para que
 > fuera más sutil y no moviera nada.
 
+## Las reglas, a mano
+
+En la preparación, en la partida y en la partida en línea, el botón **Reglas** (un libro,
+arriba a la derecha) abre una hoja desde abajo sin salir de la partida
+(`hoja_de_reglas.dart`): cómo se anota con el dado ancla y la regla de **cada color de
+zona de ese mapa**, una vez cada uno, con una ficha de su color (en el Nivel 4, las dos
+naranjas con su rango). En línea agrega cómo se ganan los puntos. Se cierra tocando fuera
+o deslizando hacia abajo, y la partida sigue igual.
+
 ## Cómo se decidió
 
 - **2026-10-04, primera versión:** las jugadas válidas se marcaban con borde blanco y las

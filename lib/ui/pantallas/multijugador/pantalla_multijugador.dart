@@ -6,6 +6,8 @@ import '../../../multijugador/modelos.dart';
 import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../../../multijugador/sala_state.dart';
+import '../../../modelo/mapa.dart';
+import '../../widgets/hoja_de_reglas.dart';
 import '../../widgets/recuadro_de_aviso.dart';
 import 'vista_lobby.dart';
 import 'vista_partida_en_linea.dart';
@@ -139,7 +141,17 @@ class _Cuerpo extends StatelessWidget {
                   ],
                 )
               : Scaffold(
-                  appBar: AppBar(title: const Text('Multijugador')),
+                  appBar: AppBar(
+                    title: const Text('Multijugador'),
+                    actions: [
+                      // En la partida, las reglas del mapa que se está jugando.
+                      if (state.enSala && state.vista!.estado == EstadoDeSala.jugando)
+                        BotonDeReglas(
+                          mapa: mapas.firstWhere((m) => m.nivel == state.vista!.nivel),
+                          enLinea: true,
+                        ),
+                    ],
+                  ),
                   body: SafeArea(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),

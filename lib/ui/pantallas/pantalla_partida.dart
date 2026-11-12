@@ -12,6 +12,7 @@ import '../tema.dart';
 import '../widgets/celda_widget.dart';
 import '../widgets/dado_widget.dart';
 import '../widgets/explicacion_de_jugada.dart';
+import '../widgets/hoja_de_reglas.dart';
 import '../widgets/tablero_widget.dart';
 import 'pantalla_preparacion.dart';
 
@@ -153,7 +154,10 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
             if (await _confirmarSalida()) navegador.pop();
           },
           child: Scaffold(
-            appBar: AppBar(title: Text(widget.mapa.nombre)),
+            appBar: AppBar(
+              title: Text(widget.mapa.nombre),
+              actions: [BotonDeReglas(mapa: widget.mapa)],
+            ),
             body: SafeArea(
               // Arriba y no centrado en vertical: así el tablero no se mueve
               // cuando aparecen los dados o la explicación.

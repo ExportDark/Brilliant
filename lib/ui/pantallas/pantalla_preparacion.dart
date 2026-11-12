@@ -8,6 +8,7 @@ import '../../modelo/mapa.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
+import '../widgets/hoja_de_reglas.dart';
 import '../widgets/tablero_widget.dart';
 import 'pantalla_partida.dart';
 
@@ -178,7 +179,11 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
         final textos = Theme.of(context).textTheme;
 
         return Scaffold(
-          appBar: AppBar(title: Text(widget.titulo ?? widget.mapa.nombre)),
+          appBar: AppBar(
+            title: Text(widget.titulo ?? widget.mapa.nombre),
+            // En línea, la preparación es la misma pantalla con `alConfirmar`.
+            actions: [BotonDeReglas(mapa: widget.mapa, enLinea: widget.alConfirmar != null)],
+          ),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
