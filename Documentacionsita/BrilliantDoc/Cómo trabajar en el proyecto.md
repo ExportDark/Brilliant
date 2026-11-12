@@ -180,3 +180,17 @@ y Gradle los encuentra bloqueados. Qué hacer:
 - **Todo cambio queda en el vault**: se actualiza la nota del tema y se agrega una entrada
   en [[Historial de cambios]], con la fecha, el porqué y el commit. Ver también
   [[Pruebas]] para cómo están organizados los tests
+
+## Skills de diseño (Claude Code)
+
+Desde el 2026-11-12, el proyecto trae en `.claude/skills/` tres skills que Claude Code usa
+al trabajar en el diseño. Se copiaron a mano de sus repositorios oficiales, sin instalador,
+después de leerlas (son solo guías de texto, sin scripts):
+
+| Skill | De dónde | Para qué |
+|---|---|---|
+| `frontend-design` | Anthropic, `github.com/anthropics/skills` (Apache 2.0) | Dirección visual con criterio: paleta, tipografía, composición, y evitar lo genérico |
+| `flutter-build-responsive-layout` | El equipo de Flutter, `github.com/flutter/agent-plugins` (BSD) | Pantallas que se adaptan al ancho disponible |
+| `flutter-fix-layout-issues` | El equipo de Flutter, `github.com/flutter/agent-plugins` (BSD) | Arreglar desbordes y restricciones sin límite |
+
+Cada carpeta lleva su licencia. Para actualizarlas, se vuelven a copiar de esos repositorios.
