@@ -166,6 +166,9 @@ class ZonaEnSala {
   /// Lo que daría llenarla ahora; 0 si está agotada.
   final int puntosSiguiente;
 
+  /// Lo que paga cada puesto (1.º, 2.º, 3.º). Vacío si el servidor no lo manda.
+  final List<int> puntosPorPuesto;
+
   const ZonaEnSala({
     required this.id,
     required this.tipo,
@@ -174,6 +177,7 @@ class ZonaEnSala {
     required this.puestos,
     required this.agotada,
     required this.puntosSiguiente,
+    this.puntosPorPuesto = const [],
   });
 
   factory ZonaEnSala.desdeJson(Map<String, dynamic> json) => ZonaEnSala(
@@ -187,6 +191,9 @@ class ZonaEnSala {
         ],
         agotada: json['agotada'] as bool,
         puntosSiguiente: json['puntos_siguiente'] as int,
+        puntosPorPuesto: [
+          for (final p in json['puntos_por_puesto'] as List<dynamic>? ?? const []) p as int,
+        ],
       );
 }
 

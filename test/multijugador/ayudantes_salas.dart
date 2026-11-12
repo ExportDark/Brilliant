@@ -80,6 +80,7 @@ Map<String, dynamic> zonaJson({
   List<Map<String, dynamic>> puestos = const [],
   bool agotada = false,
   int puntosSiguiente = 3,
+  List<int>? puntosPorPuesto,
 }) {
   return {
     'id': id,
@@ -89,6 +90,7 @@ Map<String, dynamic> zonaJson({
     'puestos': puestos,
     'agotada': agotada,
     'puntos_siguiente': puntosSiguiente,
+    'puntos_por_puesto': ?puntosPorPuesto,
   };
 }
 

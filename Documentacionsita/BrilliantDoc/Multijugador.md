@@ -51,12 +51,25 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
 "Rendirse" pide confirmación; salir de la pantalla a mitad de partida es rendirse. Quien
 se rinde o se desconecta conserva sus puntos, pero no puede ganar.
 
-## El panel de zonas
+## El marcador y el panel de zonas
 
-Una fila por zona del mapa: su color y cuántas casillas tiene, los puestos que ya se
-tomaron (quién y en qué ronda) y cuántos puntos da el siguiente puesto libre, o
-"Agotada" si ya se tomaron los tres que pagan. Así se sabe qué zonas siguen dando puntos
-sin ver los tableros de nadie. Los puntos de cada puesto están en [[Puntuación]].
+Debajo del tablero, dos tarjetas blancas como las de "Elige un mapa" (rediseñadas el
+2026-11-11):
+
+- **Marcador** (`marcador.dart`). Los jugadores ordenados por puntos (si empatan, por
+  primeros puestos; los empatados en todo comparten puesto) y los que se fueron al
+  final, tachados. Cada fila: el puesto en un círculo (lleno para el que va primero,
+  cuando ya hay puntos), el nombre, debajo **un punto del color de cada zona que llenó**,
+  si ya jugó la ronda y los **puntos grandes**, que cambian con un fundido suave. Mi fila
+  va con un fondo lavanda suave. El resultado final usa las mismas filas (`FilaDePuntos`).
+- **Zonas** (`panel_de_zonas.dart`). Una fila por zona: una franja de su color, "Azul · 4
+  casillas", sus **tres puestos** —los tomados con quién ("1.º ana") y los libres con lo
+  que pagan ("2.º · 5"), el próximo con borde más marcado— y a la derecha lo que da ahora
+  ("Da 5") o "Agotada" (la fila se apaga). Al dejar el dedo encima se ve en qué ronda la
+  llenó cada uno. Para esto el servidor manda `puntos_por_puesto` en cada zona.
+
+Así se sabe quién va ganando y qué zonas siguen dando puntos sin ver los tableros de
+nadie. Los puntos de cada puesto están en [[Puntuación]].
 
 ## Desconexiones
 

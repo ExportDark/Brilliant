@@ -56,8 +56,12 @@ void main() {
     final fila = find.byKey(const ValueKey('jugador-beto'));
     expect(find.descendant(of: fila, matching: find.text('beto')), findsOneWidget);
     expect(find.descendant(of: fila, matching: find.text('6 pts')), findsOneWidget);
-    // Ninguna casilla ni número de beto: en su fila solo hay texto y dos íconos.
-    expect(find.descendant(of: fila, matching: find.byType(Icon)), findsNWidgets(2));
+    // Ninguna casilla ni número de beto: en su fila no hay ninguna celda, ningún tablero
+    // ni ninguna coordenada; solo su nombre, sus puntos, un punto por zona llena y si ya
+    // jugó (un ícono).
+    expect(find.descendant(of: fila, matching: find.byType(CeldaWidget)), findsNothing);
+    expect(find.descendant(of: fila, matching: find.byType(TableroWidget)), findsNothing);
+    expect(find.descendant(of: fila, matching: find.byType(Icon)), findsOneWidget);
     expect(find.descendant(of: fila, matching: find.textContaining('E1')), findsNothing);
   });
 

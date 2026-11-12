@@ -13,7 +13,7 @@ import '../../widgets/celda_widget.dart';
 import '../../widgets/dado_widget.dart';
 import '../../widgets/explicacion_de_jugada.dart';
 import '../../widgets/tablero_widget.dart';
-import 'lista_de_jugadores.dart';
+import 'marcador.dart';
 import 'panel_de_zonas.dart';
 
 /// La partida en línea: **mi** tablero, los dos dados de la ronda (iguales para todos), la
@@ -202,15 +202,8 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
             ),
           ),
         const SizedBox(height: 20),
-        Text('Jugadores', style: textos.titleMedium),
-        const SizedBox(height: 6),
-        ListaDeJugadores(
-          jugadores: sala.jugadores,
-          yo: yo.usuario,
-          conPuntos: true,
-          conListo: true,
-        ),
-        const SizedBox(height: 20),
+        Marcador(jugadores: sala.jugadores, yo: yo.usuario, zonas: sala.zonas),
+        const SizedBox(height: 14),
         PanelDeZonas(zonas: sala.zonas),
         if (yo.activo) ...[
           const SizedBox(height: 12),

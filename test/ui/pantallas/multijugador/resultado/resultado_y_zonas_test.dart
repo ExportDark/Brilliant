@@ -15,6 +15,7 @@ final zonasConPuestos = [
       {'usuario': 'beto', 'puesto': 2, 'ronda': 15},
     ],
     puntosSiguiente: 3,
+    puntosPorPuesto: [7, 5, 3],
   ),
   zonaJson(
     id: 5,
@@ -23,6 +24,7 @@ final zonasConPuestos = [
     casillas: ['G5', 'G6', 'F6', 'F7'],
     puestos: [],
     puntosSiguiente: 7,
+    puntosPorPuesto: [7, 5, 3],
   ),
   zonaJson(
     id: 10,
@@ -36,6 +38,7 @@ final zonasConPuestos = [
     ],
     agotada: true,
     puntosSiguiente: 0,
+    puntosPorPuesto: [3, 2, 1],
   ),
 ];
 
@@ -59,14 +62,24 @@ void main() {
       ),
     );
 
-    // Una azul ya tiene sus dos primeros puestos; la otra sigue dando 7; la gris se agotó.
-    expect(find.descendant(of: find.byKey(const ValueKey('zona-4')), matching: find.text('1.º ana (ronda 12), 2.º beto (ronda 15)')), findsOneWidget);
+    // Una azul ya tiene sus dos primeros puestos (con quién) y el tercero libre, que paga
+    // 3; la otra sigue con sus tres puestos libres; la gris se agotó.
+    Finder enZona(int id, String texto) =>
+        find.descendant(of: find.byKey(ValueKey('zona-$id')), matching: find.text(texto));
+    expect(enZona(4, '1.º ana'), findsOneWidget);
+    expect(enZona(4, '2.º beto'), findsOneWidget);
+    expect(enZona(4, '3.º · 3'), findsOneWidget);
+    expect(enZona(5, '1.º · 7'), findsOneWidget);
+    expect(enZona(5, '2.º · 5'), findsOneWidget);
+    expect(enZona(5, '3.º · 3'), findsOneWidget);
     expect(find.byKey(const ValueKey('puntos-zona-4')), findsOneWidget);
     expect(tester.widget<Text>(find.byKey(const ValueKey('puntos-zona-4'))).data, 'Da 3');
     expect(tester.widget<Text>(find.byKey(const ValueKey('puntos-zona-5'))).data, 'Da 7');
     expect(tester.widget<Text>(find.byKey(const ValueKey('puntos-zona-10'))).data, 'Agotada');
     // Dos primeros: el siguiente fue el tercero.
-    expect(find.text('1.º ana (ronda 3), 1.º beto (ronda 3), 3.º carla (ronda 6)'), findsOneWidget);
+    expect(enZona(10, '1.º ana'), findsOneWidget);
+    expect(enZona(10, '1.º beto'), findsOneWidget);
+    expect(enZona(10, '3.º carla'), findsOneWidget);
   });
 
   testWidgets('Cada zona se identifica por su color y cuántas casillas tiene', (tester) async {
@@ -84,8 +97,8 @@ void main() {
       ),
     );
 
-    expect(find.text('Azul, 4 casillas'), findsNWidgets(2));
-    expect(find.text('Gris, 2 casillas'), findsOneWidget);
+    expect(find.text('Azul · 4 casillas'), findsNWidgets(2));
+    expect(find.text('Gris · 2 casillas'), findsOneWidget);
   });
 
   testWidgets('Los puntos de cada jugador se ven en la partida', (tester) async {
