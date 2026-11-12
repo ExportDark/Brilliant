@@ -41,6 +41,9 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
    regresiva, los jugadores con sus puntos y quién ya jugó, y el **panel de zonas**. Se
    toca un dado (el ancla) y una casilla iluminada; las casillas legales las calcula el
    servidor. Quien no tiene jugada con la tirada pasa solo; quien no juega en 60 s, pasa.
+   Las casillas que la regla de su zona bloquea se ven un poco apagadas y, al tocar una
+   casilla que no vale, la línea de arriba explica por qué, igual que jugando solo (con
+   las reglas de la app; la jugada nunca se manda).
 5. **El resultado.** Quién ganó y por qué ("Todos llenaron su tablero", "Ya nadie puede
    jugar", "El anfitrión se fue: ganan los demás"…), el ranking con puntos y primeros
    puestos, y cómo quedaron las zonas.

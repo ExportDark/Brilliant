@@ -24,6 +24,9 @@ class TableroWidget extends StatelessWidget {
   final bool Function(Posicion)? esTocable;
   final Iluminacion Function(Posicion)? iluminacionDe;
   final bool Function(Posicion)? numeroResaltadoEn;
+
+  /// La casilla que lleva el aro de "aquí no se puede" (ver `CeldaWidget.marcada`).
+  final Posicion? marcada;
   final double tamanoMaximoCelda;
 
   const TableroWidget({
@@ -34,6 +37,7 @@ class TableroWidget extends StatelessWidget {
     this.esTocable,
     this.iluminacionDe,
     this.numeroResaltadoEn,
+    this.marcada,
     this.tamanoMaximoCelda = 48,
   });
 
@@ -93,6 +97,7 @@ class TableroWidget extends StatelessWidget {
       seleccionada: posicion == seleccionada,
       iluminacion: iluminacionDe?.call(posicion) ?? Iluminacion.normal,
       numeroResaltado: numeroResaltadoEn?.call(posicion) ?? false,
+      marcada: posicion == marcada,
     );
 
     final tocable = alTocar != null && (esTocable?.call(posicion) ?? true);

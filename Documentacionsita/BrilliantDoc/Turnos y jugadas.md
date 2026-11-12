@@ -142,10 +142,12 @@ dice el nivel. De arriba abajo:
 
   **En el tablero no aparece ninguna ⚓ ni ninguna coordenada.** Ver
   [[Interfaz del tablero]].
-- **La explicación.** Al tocar una casilla vacía donde no se puede, aparece debajo del
-  tablero, en un recuadro suave con ícono de información, por qué: no está junto a
-  ninguna casilla con el número, o la regla de la zona lo impide. Al tocar una iluminada
-  se anota el número.
+- **La explicación.** Al tocar una casilla vacía donde no se puede, la línea de arriba del
+  tablero dice por qué durante 4 segundos (un punto del color de la zona y el texto, sin
+  recuadro), y la casilla lleva un aro suave: no está junto a ninguna casilla con el
+  número, o la regla de la zona lo impide. Al tocar una iluminada se anota el número. En
+  la partida en línea pasa lo mismo, con las reglas de la app (iguales a las del
+  servidor).
 - **Los dos dados**, dibujados con sus puntos (`DadoWidget`). Se toca uno para hacerlo
   dado ancla: lleva aro lavanda y debajo ⚓ "ancla". Es el único lugar donde aparece el
   ancla.

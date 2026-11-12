@@ -36,12 +36,16 @@ enum Iluminacion {
 /// Con [numeroResaltado], el número de la casilla se ilumina: va sobre un
 /// círculo claro. Se usa para las casillas que tienen el número que sacó el
 /// dado ancla.
+///
+/// Con [marcada], lleva un aro suave en un tono oscuro de su zona: es la casilla que se
+/// tocó y no se pudo usar, mientras se explica por qué.
 class CeldaWidget extends StatelessWidget {
   final Celda celda;
   final double tamano;
   final bool seleccionada;
   final Iluminacion iluminacion;
   final bool numeroResaltado;
+  final bool marcada;
 
   const CeldaWidget({
     super.key,
@@ -50,6 +54,7 @@ class CeldaWidget extends StatelessWidget {
     this.seleccionada = false,
     this.iluminacion = Iluminacion.normal,
     this.numeroResaltado = false,
+    this.marcada = false,
   });
 
   double get _aclarado {
@@ -93,6 +98,8 @@ class CeldaWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(tamano * 0.24),
         border: encendida
             ? Border.all(color: Colors.white, width: 3)
+            : marcada
+            ? Border.all(color: Color.lerp(colorZona, Colors.black, 0.45)!, width: 2.5)
             : celda.esInicial
                 ? Border.all(
                     color: Color.lerp(colorZona, Colors.black, _oscurecidoDelAro)!,

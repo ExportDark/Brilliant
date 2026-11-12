@@ -129,11 +129,17 @@ de 3×3.
 
 ## La explicación
 
-Al tocar una casilla vacía donde no se puede jugar, aparece debajo del tablero un
-**recuadro suave color arena** (`Paleta.aviso`, no rojo de error) con un ícono de
-información y el motivo, sin coordenadas. Puede ser que no está junto a ninguna casilla
-con el número buscado, o la regla de la zona con lo que la zona ya tiene. Ver
-[[Turnos y jugadas]].
+Al tocar una casilla vacía donde no se puede jugar, el motivo aparece **en la misma línea
+de la indicación, arriba del tablero**, sin recuadro: un punto del color de la zona y el
+texto, con un fundido (`LineaDeIndicacion`). La casilla tocada lleva un **aro suave** en un
+tono oscuro de su zona (`CeldaWidget.marcada`). A los 4 segundos, o con lo siguiente que
+haga el jugador, vuelve la indicación de siempre. Puede ser que no está junto a ninguna
+casilla con el número buscado, o la regla de la zona con lo que la zona ya tiene. Es lo
+mismo en la partida de un jugador y en la partida en línea (`explicacion_de_jugada.dart`).
+Ver [[Turnos y jugadas]].
+
+> Hasta el 2026-11-11 iba en un recuadro color arena debajo del tablero; se cambió para que
+> fuera más sutil y no moviera nada.
 
 ## Cómo se decidió
 

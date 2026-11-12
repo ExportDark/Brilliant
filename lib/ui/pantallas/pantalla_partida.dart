@@ -5,14 +5,13 @@ import '../../juego/partida_bloc.dart';
 import '../../juego/partida_event.dart';
 import '../../juego/partida_state.dart';
 import '../../juego/validacion_jugada.dart';
-import '../../modelo/color_zona.dart';
 import '../../modelo/mapa.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
 import '../widgets/celda_widget.dart';
 import '../widgets/dado_widget.dart';
-import '../widgets/recuadro_de_aviso.dart';
+import '../widgets/explicacion_de_jugada.dart';
 import '../widgets/tablero_widget.dart';
 import 'pantalla_preparacion.dart';
 
@@ -67,46 +66,25 @@ class _VistaPartida extends StatefulWidget {
   State<_VistaPartida> createState() => _VistaPartidaState();
 }
 
-class _VistaPartidaState extends State<_VistaPartida> {
-  /// Por qué no se puede anotar en la última casilla vacía que se tocó sin
-  /// jugada. Es estado de la pantalla: al bloc no le importa qué se mira.
-  String? _explicacion;
+class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
+  // Por qué no se puede anotar en la última casilla vacía que se tocó sin jugada
+  // (`explicacion`, de ExplicacionPasajera). Es estado de la pantalla: al bloc no le
+  // importa qué se mira.
 
   PartidaBloc get _bloc => context.read<PartidaBloc>();
 
   /// Manda [event] y borra la explicación, que ya no aplica a lo que sigue.
   void _enviar(PartidaEvent event) {
-    setState(() => _explicacion = null);
+    borrarExplicacion();
     _bloc.add(event);
   }
 
   void _tocarCasilla(PartidaState state, Posicion posicion) {
-    switch (state.evaluar(posicion)) {
-      case JugadaValida():
-        _enviar(ValorColocado(posicion));
-      case final ReglaRota rota:
-        setState(() => _explicacion = _explicarRegla(posicion, rota));
-      case SinVecinoConNumero(:final numero):
-        setState(() => _explicacion = _explicarVecino(posicion, numero, state.valorAColocar!));
-      case CasillaOcupada():
-      case null:
-        break;
-    }
-  }
-
-  String _explicarRegla(Posicion posicion, ReglaRota rota) {
-    final tipo = rota.region.tipo;
-    // Una zona naranja rechaza números de fuera de su rango aunque esté vacía:
-    // ahí no hay nada que decir de lo que ya tiene.
-    final yaTiene = rota.valoresEnZona.isEmpty
-        ? ''
-        : ' Ya tiene: ${rota.valoresEnZona.join(', ')}';
-    return 'Zona ${_nombreZona(tipo.color)} — ${tipo.regla.descripcion}.$yaTiene';
-  }
-
-  String _explicarVecino(Posicion posicion, int numero, int valor) {
-    return 'Esa casilla no está junto a ningún$_espacioFijo$numero: el $valor va arriba, '
-        'abajo o a un lado de un$_espacioFijo$numero.';
+    final resultado = state.evaluar(posicion);
+    if (resultado == null) return;
+    if (resultado is JugadaValida) return _enviar(ValorColocado(posicion));
+    final porQue = explicarJugada(resultado, valor: state.valorAColocar!);
+    if (porQue != null) explicar(porQue, posicion);
   }
 
   Iluminacion _iluminacion(PartidaState state, Posicion posicion) {
@@ -126,7 +104,7 @@ class _VistaPartidaState extends State<_VistaPartida> {
     if (buscado == null || valor == null) {
       return 'Toca un dado para usarlo de ancla: el otro va junto a una casilla con ese número.';
     }
-    return 'Pon el $valor en una casilla iluminada, junto a un$_espacioFijo$buscado.';
+    return 'Pon el $valor en una casilla iluminada, junto a un$espacioFijo$buscado.';
   }
 
   /// Pregunta si de verdad quiere dejar la partida. Devuelve si dijo que sí.
@@ -164,7 +142,6 @@ class _VistaPartidaState extends State<_VistaPartida> {
     return BlocBuilder<PartidaBloc, PartidaState>(
       builder: (context, state) {
         final dados = state.dados;
-        final explicacion = _explicacion;
         final textos = Theme.of(context).textTheme;
 
         return PopScope(
@@ -194,10 +171,10 @@ class _VistaPartidaState extends State<_VistaPartida> {
                         ),
                         if (!state.terminada) ...[
                           const SizedBox(height: 10),
-                          Text(
-                            _indicacion(state),
-                            textAlign: TextAlign.center,
-                            style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
+                          LineaDeIndicacion(
+                            indicacion: _indicacion(state),
+                            explicacion: explicacion,
+                            estilo: textos.bodyLarge,
                           ),
                         ],
                         const SizedBox(height: 14),
@@ -209,11 +186,8 @@ class _VistaPartidaState extends State<_VistaPartida> {
                               state.valorAncla != null &&
                               state.tablero.celdaEn(posicion)!.estaVacia,
                           alTocar: (posicion) => _tocarCasilla(state, posicion),
+                          marcada: explicada,
                         ),
-                        if (explicacion != null) ...[
-                          const SizedBox(height: 12),
-                          RecuadroDeAviso(explicacion, key: const ValueKey('explicacion')),
-                        ],
                         if (state.terminada) ...[
                           const SizedBox(height: 20),
                           _FinDePartida(
@@ -376,18 +350,3 @@ class _TextoConIcono extends StatelessWidget {
   }
 }
 
-/// Un espacio que no se corta: así un número nunca queda solo en la línea
-/// de abajo ("junto a un" / "4.").
-const _espacioFijo = '\u00A0';
-
-String _nombreZona(ColorZona color) {
-  return switch (color) {
-    ColorZona.amarillo => 'amarilla',
-    ColorZona.verde => 'verde',
-    ColorZona.morado => 'morada',
-    ColorZona.azul => 'azul',
-    ColorZona.rojo => 'roja',
-    ColorZona.gris => 'gris',
-    ColorZona.naranja => 'naranja',
-  };
-}

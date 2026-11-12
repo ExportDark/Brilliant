@@ -88,13 +88,17 @@ void main() {
     expect(celdaEn(tester, 'D1').celda.valor, 3);
   });
 
-  testWidgets('Una casilla que no está iluminada no responde al toque', (tester) async {
+  testWidgets('Una casilla que no está iluminada no manda ninguna jugada: explica por qué', (
+    tester,
+  ) async {
     final salas = await _enPartida(tester);
     await tocar(tester, dado0);
 
-    expect(casillaTocable('G7'), findsNothing);
-    expect(casillaTocable('D1'), findsOneWidget);
+    await tocar(tester, casillaTocable('G7'));
+
     expect(salas.llamadas.where((l) => l.startsWith('jugar')), isEmpty);
+    expect(find.byKey(const ValueKey('explicacion')), findsOneWidget);
+    expect(find.textContaining('no está junto a ningún 1'), findsOneWidget);
   });
 
   testWidgets('Si solo hay un dado con jugadas, ya viene elegido', (tester) async {

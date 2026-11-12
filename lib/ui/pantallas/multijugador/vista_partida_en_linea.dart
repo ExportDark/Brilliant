@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../juego/validacion_jugada.dart';
 import '../../../modelo/mapa.dart';
 import '../../../modelo/posicion.dart';
 import '../../../modelo/tablero.dart';
@@ -10,6 +11,7 @@ import '../../../multijugador/sala_event.dart';
 import '../../tema.dart';
 import '../../widgets/celda_widget.dart';
 import '../../widgets/dado_widget.dart';
+import '../../widgets/explicacion_de_jugada.dart';
 import '../../widgets/tablero_widget.dart';
 import 'lista_de_jugadores.dart';
 import 'panel_de_zonas.dart';
@@ -18,7 +20,9 @@ import 'panel_de_zonas.dart';
 /// cuenta regresiva, los puntos de cada jugador y el panel de zonas.
 ///
 /// El servidor dice dónde se puede anotar con cada dado ancla; aquí solo se ilumina eso.
-/// Nadie ve el tablero de otro jugador.
+/// Para explicar por qué no se puede en otra casilla, y para apagar un poco las que la
+/// regla de su zona bloquea, se usan las reglas de la app, que son las mismas del servidor
+/// (una prueba de cada lado lo exige). Nadie ve el tablero de otro jugador.
 class VistaPartidaEnLinea extends StatefulWidget {
   final VistaDeSala sala;
 
@@ -28,7 +32,7 @@ class VistaPartidaEnLinea extends StatefulWidget {
   State<VistaPartidaEnLinea> createState() => _VistaPartidaEnLineaState();
 }
 
-class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> {
+class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with ExplicacionPasajera {
   /// El número del dado ancla que eligió el jugador, o `null` si no ha elegido.
   int? _ancla;
 
@@ -53,7 +57,15 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> {
     return _opciones.length == 1 ? _opciones.single : null;
   }
 
+  @override
+  void didUpdateWidget(VistaPartidaEnLinea anterior) {
+    super.didUpdateWidget(anterior);
+    // Con la ronda nueva, la explicación de la anterior ya no aplica.
+    if (anterior.sala.ronda != widget.sala.ronda) olvidarExplicacion();
+  }
+
   void _elegirAncla(int numero) {
+    olvidarExplicacion();
     setState(() {
       _ancla = numero;
       _rondaDelAncla = _sala.ronda;
@@ -131,31 +143,52 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> {
           ],
         ),
         const SizedBox(height: 8),
-        Text(
-          _indicacion(yo, jugada, puedeJugar),
-          key: const ValueKey('indicacion'),
-          textAlign: TextAlign.center,
-          style: textos.bodyMedium?.copyWith(color: Paleta.tintaSuave),
+        LineaDeIndicacion(
+          indicacion: _indicacion(yo, jugada, puedeJugar),
+          explicacion: explicacion,
+          estilo: textos.bodyMedium,
         ),
         const SizedBox(height: 12),
         TableroWidget(
           tablero: tablero,
-          esTocable: (posicion) => legales.contains(posicion.notacion),
-          iluminacionDe: (posicion) => legales.contains(posicion.notacion)
-              ? Iluminacion.posible
-              : Iluminacion.normal,
+          // Con un ancla elegida, se puede tocar cualquier casilla vacía: las legales
+          // anotan; las demás explican por qué no.
+          esTocable: (posicion) =>
+              puedeJugar && jugada != null && tablero.celdaEn(posicion)!.estaVacia,
+          iluminacionDe: (posicion) {
+            if (legales.contains(posicion.notacion)) return Iluminacion.posible;
+            if (!puedeJugar || jugada == null) return Iluminacion.normal;
+            final resultado = evaluarJugada(
+              tablero,
+              posicion,
+              ancla: jugada.ancla,
+              valor: jugada.valor,
+            );
+            return resultado is ReglaRota ? Iluminacion.bloqueada : Iluminacion.normal;
+          },
           numeroResaltadoEn: (posicion) =>
               jugada != null &&
               tablero.celdaEn(posicion)?.valor == jugada.ancla,
+          marcada: explicada,
           alTocar: (posicion) {
             final elegida = jugada;
             if (elegida == null) return;
-            context.read<SalaBloc>().add(
-              JugadaEnviada(
-                dadoAncla: elegida.ancla,
-                casilla: posicion.notacion,
-              ),
+            if (legales.contains(posicion.notacion)) {
+              borrarExplicacion();
+              context.read<SalaBloc>().add(
+                JugadaEnviada(
+                  dadoAncla: elegida.ancla,
+                  casilla: posicion.notacion,
+                ),
+              );
+              return;
+            }
+            // El servidor dice que ahí no: se explica por qué con las reglas de la app.
+            final porQue = explicarJugada(
+              evaluarJugada(tablero, posicion, ancla: elegida.ancla, valor: elegida.valor),
+              valor: elegida.valor,
             );
+            if (porQue != null) explicar(porQue, posicion);
           },
         ),
         if (yo.puedePasar && yo.activo && yo.accion == 'pendiente')
