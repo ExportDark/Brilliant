@@ -69,7 +69,8 @@ void main() {
       expect(seleccionada, posible);
     });
 
-    testWidgets('las encendidas llevan aro blanco y brillo; la bloqueada y la normal no', (
+    testWidgets('las encendidas llevan aro de cartón y borde de ficha; la bloqueada y la '
+        'normal no', (
       tester,
     ) async {
       for (final encendida in [
@@ -77,7 +78,7 @@ void main() {
         const CeldaWidget(celda: _celda, seleccionada: true),
       ]) {
         final decoracion = await _decoracion(tester, encendida);
-        expect((decoracion.border! as Border).top.color, Colors.white);
+        expect((decoracion.border! as Border).top.color, Paleta.carton);
         expect(decoracion.boxShadow, isNotEmpty);
       }
 

@@ -6,9 +6,10 @@ import '../tema.dart';
 import 'celda_widget.dart';
 
 /// Dibuja el tablero completo de un [Tablero]: las 49 fichas con el color de
-/// su región y el número que tengan anotado, separadas entre sí y apoyadas
-/// sobre una base redondeada. No muestra coordenadas: las letras y números
-/// del manual solo existen en el código.
+/// su región y el número que tengan anotado, sobre una base de tinta que se ve
+/// entre ellas como la cuadrícula impresa de un tablero, con una sombra dura
+/// debajo. No muestra coordenadas: las letras y números del manual solo existen
+/// en el código.
 ///
 /// Las celdas para las que [esTocable] devuelve verdadero responden al toque
 /// llamando a [alTocar] con su posición. [iluminacionDe] decide cómo se
@@ -65,9 +66,18 @@ class TableroWidget extends StatelessWidget {
 
         return Container(
           padding: const EdgeInsets.all(relleno),
+          // Deja ver la sombra dura bajo el tablero.
+          margin: const EdgeInsets.only(bottom: 5),
           decoration: BoxDecoration(
-            color: Paleta.baseTablero,
-            borderRadius: BorderRadius.circular(tamano * 0.35),
+            color: Paleta.tinta,
+            borderRadius: BorderRadius.circular(tamano * 0.3),
+            boxShadow: [
+              BoxShadow(
+                color: Paleta.tinta.withValues(alpha: 0.35),
+                offset: const Offset(0, 5),
+                blurRadius: 0,
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

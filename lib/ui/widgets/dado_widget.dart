@@ -13,12 +13,12 @@ const _puntosPorCara = {
   6: [(0, 0), (1, 0), (2, 0), (0, 2), (1, 2), (2, 2)],
 };
 
-/// Un dado de la tirada, dibujado como un dado de verdad: un cuadro blanco
-/// redondeado con sus puntos.
+/// Un dado de la tirada, dibujado como una pieza: un cubo claro con borde de
+/// tinta, sus puntos y una sombra dura.
 ///
-/// Con [anclado], el dado es el dado ancla: lleva un aro del color de acento,
-/// y debajo un ancla con la palabra "ancla". Es el único lugar de la app
-/// donde aparece el ancla.
+/// Con [anclado], el dado es el dado ancla: se hunde, se pinta del amarillo de
+/// ficha y debajo lleva un ancla con la palabra "ancla". Es el único lugar de
+/// la app donde aparece el ancla.
 class DadoWidget extends StatelessWidget {
   final int valor;
   final bool anclado;
@@ -36,11 +36,14 @@ class DadoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final forma = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(tamano * 0.26),
-      side: anclado
-          ? const BorderSide(color: Paleta.acento, width: 3)
-          : const BorderSide(color: Color(0xFFE3DCD1), width: 1.5),
+      borderRadius: BorderRadius.circular(tamano * 0.22),
+      side: BorderSide(color: Paleta.tinta, width: anclado ? 3.5 : grosorDeTinta),
     );
+    // El dado es una pieza: con sombra dura. El ancla se hunde (casi sin sombra y un
+    // poco más abajo) y se pinta del amarillo de ficha.
+    const alto = 5.0;
+    final altoAhora = anclado ? 1.0 : alto;
+    final sinMovimiento = MediaQuery.disableAnimationsOf(context);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -50,19 +53,27 @@ class DadoWidget extends StatelessWidget {
           selected: anclado,
           label: 'Dado: $valor',
           excludeSemantics: true,
-          child: Material(
-            color: anclado ? const Color(0xFFF2EFFC) : Colors.white,
-            shape: forma,
-            elevation: anclado ? 3 : 1.5,
-            shadowColor: Colors.black26,
-            child: InkWell(
-              customBorder: forma,
-              onTap: alTocar,
-              child: SizedBox.square(
-                dimension: tamano,
-                child: Padding(
-                  padding: EdgeInsets.all(tamano * 0.2),
-                  child: _Puntos(valor: valor, tamanoPunto: tamano * 0.15),
+          child: AnimatedContainer(
+            duration: sinMovimiento ? Duration.zero : const Duration(milliseconds: 90),
+            curve: Curves.easeOut,
+            transform: Matrix4.translationValues(0, alto - altoAhora, 0),
+            margin: const EdgeInsets.only(bottom: alto),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(tamano * 0.22),
+              boxShadow: sombraDura(altoAhora),
+            ),
+            child: Material(
+              color: anclado ? Paleta.ficha : const Color(0xFFFFFCF4),
+              shape: forma,
+              child: InkWell(
+                customBorder: forma,
+                onTap: alTocar,
+                child: SizedBox.square(
+                  dimension: tamano,
+                  child: Padding(
+                    padding: EdgeInsets.all(tamano * 0.2),
+                    child: _Puntos(valor: valor, tamanoPunto: tamano * 0.16),
+                  ),
                 ),
               ),
             ),
@@ -75,11 +86,11 @@ class DadoWidget extends StatelessWidget {
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.anchor, size: 16, color: Paleta.acento),
+              Icon(Icons.anchor, size: 16, color: Paleta.tinta),
               SizedBox(width: 4),
               Text(
                 'ancla',
-                style: TextStyle(color: Paleta.acento, fontWeight: FontWeight.w700),
+                style: TextStyle(color: Paleta.tinta, fontWeight: FontWeight.w800),
               ),
             ],
           ),

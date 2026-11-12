@@ -29,9 +29,9 @@ enum Iluminacion {
 ///
 /// Para resaltar una casilla se ilumina: [seleccionada] (la casilla donde va
 /// a caer el próximo número) e [Iluminacion.posible] se aclaran y además
-/// llevan un aro blanco con un brillo suave, para que se vean encendidas y no
-/// desteñidas; [Iluminacion.bloqueada] solo se aclara un poco. El cambio es
-/// una transición suave.
+/// llevan un aro de cartón con un borde amarillo de ficha por fuera, para que
+/// se vean como una pieza marcada; [Iluminacion.bloqueada] solo se aclara un
+/// poco. El cambio es una transición corta.
 ///
 /// Con [numeroResaltado], el número de la casilla se ilumina: va sobre un
 /// círculo claro. Se usa para las casillas que tienen el número que sacó el
@@ -71,8 +71,8 @@ class CeldaWidget extends StatelessWidget {
     final numero = Text(
       celda.valor?.toString() ?? '',
       style: TextStyle(
-        fontSize: tamano * 0.42,
-        fontWeight: FontWeight.w700,
+        fontFamily: familiaDeTitulos,
+        fontSize: tamano * 0.44,
         // Sobre el círculo del número resaltado va siempre oscuro; si no,
         // depende de qué tan claro sea el fondo.
         color: numeroResaltado ? Paleta.tinta : tintaSobre(fondo),
@@ -95,25 +95,22 @@ class CeldaWidget extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: fondo,
-        borderRadius: BorderRadius.circular(tamano * 0.24),
+        borderRadius: BorderRadius.circular(tamano * 0.18),
         border: encendida
-            ? Border.all(color: Colors.white, width: 3)
+            ? Border.all(color: Paleta.carton, width: 3)
             : marcada
-            ? Border.all(color: Color.lerp(colorZona, Colors.black, 0.45)!, width: 2.5)
+            // "Aquí no se puede": un aro rojo, que se ve sobre cualquier zona.
+            ? Border.all(color: Paleta.peligro, width: 3)
             : celda.esInicial
                 ? Border.all(
                     color: Color.lerp(colorZona, Colors.black, _oscurecidoDelAro)!,
                     width: 2,
                   )
                 : null,
+        // La encendida lleva un borde amarillo de ficha por fuera del aro, sin
+        // difuminar: se ve aunque la base del tablero sea oscura.
         boxShadow: encendida
-            ? [
-                BoxShadow(
-                  color: Paleta.acento.withValues(alpha: 0.45),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                ),
-              ]
+            ? const [BoxShadow(color: Paleta.ficha, spreadRadius: 2.5, blurRadius: 0)]
             : null,
       ),
       child: numeroResaltado ? _NumeroResaltado(tamano: tamano * 0.68, child: numero) : numero,
@@ -121,8 +118,8 @@ class CeldaWidget extends StatelessWidget {
   }
 }
 
-/// El círculo claro detrás del número resaltado, para que se vea iluminado en
-/// cualquier color de zona.
+/// El círculo de cartón detrás del número resaltado, para que se vea en cualquier
+/// color de zona.
 class _NumeroResaltado extends StatelessWidget {
   final double tamano;
   final Widget child;
@@ -135,7 +132,11 @@ class _NumeroResaltado extends StatelessWidget {
       width: tamano,
       height: tamano,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: Paleta.carton,
+        shape: BoxShape.circle,
+        border: Border.all(color: Paleta.tinta, width: 1.5),
+      ),
       child: child,
     );
   }
