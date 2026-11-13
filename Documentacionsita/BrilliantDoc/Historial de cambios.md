@@ -7,6 +7,23 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-12 — Botón de reglas y diseño de piezas de mesa
+
+- **Skills de diseño** (`b14e8b3`): `frontend-design` (de Anthropic) y dos de Flutter
+  (`flutter-build-responsive-layout`, `flutter-fix-layout-issues`), en `.claude/skills/`.
+  Ver [[Cómo trabajar en el proyecto]].
+- **Botón "Reglas"** (`cfd80b5`): en la barra de arriba de la preparación y la partida,
+  sola y en línea; abre una hoja con cómo se anota y la regla de cada color del mapa, una
+  vez cada uno. En línea, también cómo se ganan los puntos.
+- **Diseño de piezas de mesa** (`fa3e904`, `cdf6774`, `a6e6ea7`, `b7af1d7`, `3184d19`):
+  se eligió entre tres direcciones. Fieltro de fondo, bandejas de cartón con borde de
+  tinta, sombras duras, colores de zona planos, letra Archivo; el tablero sobre tinta, los
+  dados como piezas, los botones principales amarillos que se hunden, la ronda con una
+  ficha de tiempo que se pone roja en los últimos 10 s, y sin separadores de punto medio
+  en los textos. En el emulador salieron la hoja de reglas verde con letra oscura, el
+  título cortado al repartir en línea y la fila de la ronda desbordada en 320 px; los tres
+  se arreglaron con su prueba. Ver [[Interfaz del tablero]].
+
 ## 2026-11-11 — Más agujeros de lógica, explicación sutil, marcador y búsqueda por la red
 
 - **Lógica** (app `5c55685`, servidor `e6b86a6`): si el anfitrión cerraba el lobby, los

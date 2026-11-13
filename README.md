@@ -25,8 +25,11 @@ Construcción incremental, módulo por módulo:
       jugadas
 - [x] Pantalla de partida: dados, números buscados iluminados, jugadas iluminadas y la regla
       explicada
-- [x] Interfaz suave: tema propio, fichas redondeadas, dados con puntos, sin coordenadas a
+- [x] Interfaz de piezas de mesa: fondo de fieltro, bandejas de cartón con borde de tinta,
+      fichas planas con sombra dura, dados como piezas y letra Archivo, sin coordenadas a
       la vista
+- [x] Botón "Reglas" en la preparación y la partida (sola y en línea): las reglas de cada
+      color del mapa en una hoja que sube desde abajo
 - [x] Los 4 mapas oficiales, y una pantalla para elegir uno al abrir la app
 - [x] Cuentas: un servidor aparte (repo `Brilliant-servidor`) y en la app crear la cuenta, iniciar y
       cerrar sesión, y borrarla
@@ -48,11 +51,13 @@ lib/
   multijugador/ la sala como la manda el servidor, ClienteSalas y SalaBloc
   ui/
     widgets/    CeldaWidget, TableroWidget, DadoWidget, TarjetaDeMapa, ListaDeServidores,
-                ServidorParaEntrar, IndicadorDelServidor
+                ServidorParaEntrar, IndicadorDelServidor, HojaDeReglas, y las piezas
+                (Bandeja, PiezaPresionable)
     pantallas/  PuertaDeSesion, PantallaEntrar, DialogoDelServidor, PantallaCrearCuenta,
                 PantallaMiCuenta, PantallaEleccionDeMapa, PantallaPreparacion,
                 PantallaPartida, y multijugador/ (lobby, partida en línea, resultado)
-    tema.dart   colores y estilo de la app
+    tema.dart   colores, letra y estilo de la app
+assets/fuentes/ Archivo y Archivo Black (licencia OFL)
   main.dart
 tool/       exportar_para_el_servidor.dart: los mapas y las jugadas en JSON, para el servidor
 test/       tests, misma estructura que lib/
@@ -178,7 +183,7 @@ Para anotar: `conValor(posicion, valor)`, `conValores({posicion: valor, ...})` y
 ## Módulo: TableroWidget (`lib/ui/widgets/tablero_widget.dart`)
 
 Dibuja un `Tablero` completo: las 49 fichas con el color de su región y el número que
-tengan anotado, separadas entre sí sobre una base redondeada. **No muestra coordenadas**:
+tengan anotado, separadas entre sí sobre una base de tinta. **No muestra coordenadas**:
 la notación del manual (C1, F2…) solo existe en el código.
 
 Como se dibuja siempre a partir de un `Tablero`, para mostrar lo que el jugador va
@@ -193,13 +198,19 @@ caber, por ejemplo a 42 px en un celular de 360 px.
 
 ## Módulo: tema y dados (`lib/ui/`)
 
-- `tema.dart`: `temaBrilliant()`, el tema de la app (fondo crema, acento lavanda,
-  botones redondeados); `Paleta`, sus colores; `coloresDeZona`, los colores suaves de
-  las 5 zonas; y `tintaSobre(fondo)`, que elige tinta oscura o blanco para que el número
-  siempre se lea.
-- `widgets/dado_widget.dart`: `DadoWidget`, un dado blanco redondeado con los puntos de su
-  cara. Con `anclado` lleva un aro de acento y debajo ⚓ "ancla": es el único lugar
-  donde aparece el ancla. Para lectores de pantalla es un botón "Dado: 4".
+- `tema.dart`: `temaBrilliant()`, el tema de la app (la mesa de fieltro, el cartón, la
+  tinta y el amarillo de ficha, con letra Archivo); `Paleta`, sus colores; `sombraDura()`
+  y `grosorDeTinta`, la sombra sin difuminar y el borde de las piezas; `coloresDeZona`,
+  los colores planos de las 7 zonas; y `tintaSobre(fondo)`, que elige tinta o cartón por
+  contraste para que el número siempre se lea.
+- `widgets/piezas.dart`: `Bandeja`, la bandeja de cartón donde va el contenido de cada
+  pantalla, y `PiezaPresionable`, que hace que un botón se hunda al tocarlo.
+- `widgets/dado_widget.dart`: `DadoWidget`, un dado como pieza, con borde de tinta, sombra
+  dura y los puntos de su cara. Con `anclado` se hunde, se pinta de amarillo y debajo
+  lleva ⚓ "ancla": es el único lugar donde aparece el ancla. Para lectores de pantalla
+  es un botón "Dado: 4".
+- `widgets/hoja_de_reglas.dart`: `BotonDeReglas` y `HojaDeReglas`, cómo se anota con el
+  dado ancla y la regla de cada color que tiene el mapa, sin repetir.
 
 ## Módulo: preparación de la partida (`lib/juego/`)
 

@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-11 · Repos: https://github.com/ExportDark/Brilliant (la app)
+Última actualización: 2026-11-12 · Repos: https://github.com/ExportDark/Brilliant (la app)
 y https://github.com/ExportDark/Brilliant-Servidor (el servidor, en la carpeta hermana
 `Brilliant-servidor`)
 
@@ -115,10 +115,16 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       [[Interfaz del tablero]]
 - [x] **Marcador y zonas rediseñados** (2026-11-11) — en la partida en línea. Ver
       [[Multijugador#El marcador y el panel de zonas]]
+- [x] **Botón "Reglas"** (2026-11-12) — en la preparación y la partida, sola y en línea:
+      las reglas de cada color del mapa en una hoja que sube desde abajo, sin dejar la
+      partida. Ver [[Interfaz del tablero#Las reglas, a mano]]
+- [x] **Diseño de piezas de mesa** (2026-11-12) — toda la app: fieltro, bandejas de
+      cartón, borde de tinta, sombra dura, letra Archivo; botones y dado ancla que se
+      hunden. Revisado pantalla por pantalla en el emulador. Ver [[Interfaz del tablero]]
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 752 tests de la app y 1043 del servidor, todos pasando, más 18 que
+puntos por zona. 762 tests de la app y 1043 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta
@@ -126,8 +132,8 @@ juegan contra el servidor de verdad.
 - [ ] **Probar en un celular de verdad que encuentra el servidor solo.** En el emulador
       la búsqueda corre, pero no puede encontrar el de la PC: su red (NAT) no deja pasar
       el multicast
-- [ ] **El diseño de toda la app** (siguiente fase). Antes, elegir las skills de diseño
-      que se van a usar
+- [ ] **Terminar de pulir el diseño** en lo que no se revisó a fondo en el emulador:
+      crear cuenta, los diálogos (servidor, rendirse) y el resultado en línea
 - [ ] **Probar el multijugador con varios celulares** de verdad en la misma WiFi
 - [ ] **Decidir cómo se puntúa jugando solo.** Con las reglas actuales el tablero
       **siempre** termina lleno, así que contar casillas no distingue a nadie

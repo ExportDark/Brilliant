@@ -1,8 +1,8 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 752 tests, todos pasando, más 18 que hablan con el
-servidor de verdad y solo corren si se piden (2026-11-11). El servidor tiene los suyos
+las pruebas y qué se aprendió de ellas. 762 tests, todos pasando, más 18 que hablan con el
+servidor de verdad y solo corren si se piden (2026-11-12). El servidor tiene los suyos
 (1043, ver abajo).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
@@ -133,7 +133,7 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | Archivo | Qué prueba |
 |---|---|
 | `ui/widgets/celda/aro_solo_en_iniciales_test.dart` | Solo las casillas iniciales llevan el aro tenue de 2 px, y no es negro |
-| `ui/widgets/celda/numero_legible_sobre_cada_color_test.dart` | `tintaSobre`: el número va oscuro sobre los 7 colores suaves y blanco sobre un fondo oscuro |
+| `ui/widgets/celda/numero_legible_sobre_cada_color_test.dart` | `tintaSobre`: el número va en tinta sobre los 7 colores de zona y en cartón sobre un fondo oscuro |
 | `ui/widgets/tablero/sin_coordenadas_test.dart` | El tablero no muestra las letras A–G ni los números 1–7 |
 | `ui/widgets/dado/puntos_segun_el_valor_test.dart` | Del 1 al 6, el dado tiene tantos puntos como su valor y se anuncia como "Dado: N" (6 casos) |
 | `ui/pantallas/preparacion/seleccion_salta_a_la_siguiente_test.dart` | Al poner un número, la selección salta a la siguiente casilla vacía |
@@ -160,6 +160,10 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/pantallas/partida/fin_de_partida_y_jugar_otra_vez_test.dart` | Con el tablero lleno sale "¡Tablero completo!", y "Jugar otra vez" vuelve a la preparación |
 | `main/arranca_en_eleccion_de_mapa_test.dart` | La app arranca en la pantalla para elegir el mapa (hasta el 2026-10-24, `arranca_en_preparacion_test`) |
 | `ui/widgets/tablero/se_adapta_al_ancho_test.dart` | Las fichas miden 48 si caben y se achican si no: 42 con 336 px, 36 con 296 px |
+| `ui/pantallas/reglas/boton_de_reglas_en_la_partida_test.dart` | En la partida, "Reglas" abre las reglas de cada color del mapa, y al cerrarlas la partida sigue igual |
+| `ui/pantallas/reglas/boton_de_reglas_en_preparacion_y_en_linea_test.dart` | La preparación también tiene "Reglas"; en línea aparece en la partida, con el mapa de la sala, y no en el lobby (2 casos) |
+| `ui/pantallas/reglas/cada_mapa_muestra_sus_colores_test.dart` | En cada mapa, cada color de zona sale una sola vez; en el Nivel 4, las dos naranjas con su rango; en línea, también cómo se ganan los puntos (6 casos) |
+| `ui/pantallas/reglas/la_hoja_de_reglas_es_de_carton_test.dart` | La hoja de reglas es de cartón y no del verde de la mesa, para que la letra oscura se lea |
 
 ### Tamaños de pantalla
 

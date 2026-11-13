@@ -6,68 +6,83 @@ el tema de `lib/ui/tema.dart`, y lo usan las tres pantallas.
 
 Ver también: [[Turnos y jugadas]] · [[Preparación de la partida]] · [[Tablero y regiones]]
 
-> [!note] Diseño actual
-> Lo de esta nota es el rediseño del 2026-10-18: un estilo suave, sin tanto detalle,
-> pensado para que sea lo más amigable posible. **Al jugador nunca se le muestran
-> coordenadas.** Las letras y números del manual (C1, F2…) siguen existiendo en el código
-> (`Posicion.notacion`, las keys de los tests), pero no se ven en pantalla.
+> [!note] Diseño actual: piezas de mesa (2026-11-12)
+> Como un juego de mesa físico: la **mesa de fieltro verde** de fondo, encima **bandejas de
+> cartón con borde de tinta**, y fichas de **colores planos** con una **sombra dura** (sin
+> difuminar), como piezas que se pueden tocar. Lo memorable es esa sensación de pieza: los
+> botones principales y el dado ancla **se hunden** al tocarlos. Lo demás es sobrio: sin
+> degradados, sin sombras borrosas, sin rótulos en mayúsculas. Se eligió entre tres
+> direcciones (hoja cuadriculada, gemas y piezas de mesa) con la skill `frontend-design`.
+> **Al jugador nunca se le muestran coordenadas.** Las letras y números del manual (C1,
+> F2…) siguen existiendo en el código (`Posicion.notacion`, las keys de los tests), pero no
+> se ven en pantalla.
 
 ## El tema
 
-Todo sale de `lib/ui/tema.dart`, que se aplica en `main.dart` con `theme: temaBrilliant()`.
+Todo sale de `lib/ui/tema.dart` (`temaBrilliant()`), y las piezas de
+`lib/ui/widgets/piezas.dart`.
 
-- **Fondo crema** (`Paleta.fondo`, `#FAF7F2`) y barra superior lisa del mismo tono, con
-  el título al centro: "Brilliant" en la elección de mapa, y el nivel ("Nivel 2") en la
-  preparación y en la partida.
-- Textos en tinta oscura (`Paleta.tinta`) y suave (`Paleta.tintaSuave`) para las
-  indicaciones.
-- Un color de **acento lavanda** (`Paleta.acento`, `#6A5FB0`) para lo que importa: el
-  dado ancla, el brillo de las casillas iluminadas, la cuenta de lo que falta.
-- **Botones redondeados**: el principal (Inicio, Tirar dados, Jugar otra vez) es una
-  píldora de 52 px de alto como mínimo; las acciones secundarias son botones de texto con
-  ícono.
+| Token | Color | Para qué |
+|---|---|---|
+| `Paleta.mesa` | fieltro `#2F5D50` | el fondo de todas las pantallas y la barra de arriba |
+| `Paleta.carton` | cartón `#F6EEDC` | las bandejas, la hoja de reglas, los diálogos |
+| `Paleta.cartonClaro` | `#FFFCF4` | las piezas sobre una bandeja: tarjetas de mapa, marcador, fichas de número |
+| `Paleta.tinta` | tinta `#1F1A17` | el texto, los bordes y las sombras duras; también el acento |
+| `Paleta.ficha` | amarillo `#F2B705` | los botones principales, el dado ancla, lo elegido y el que va primero |
+| `Paleta.baseTablero` | cartón oscuro `#E2D2B2` | divisores, lo apagado |
+
+- **Letra:** Archivo para todo y Archivo Black para títulos, números del tablero y la
+  barra de arriba, incluidas en la app (`assets/fuentes/`, licencia OFL), con una escala
+  de 13, 15, 17, 19, 22, 26 y 34 puntos.
+- **Bandeja** (`Bandeja`): el contenido de cada pantalla va en una bandeja de cartón con
+  borde de tinta de 2,5 px y una sombra dura de 6 px, centrada y de 480 px como máximo.
+  Es un `Material`, para que los toques de las listas se vean.
+- **Botones:** el principal es una ficha amarilla con borde de tinta; envuelto en
+  `PiezaPresionable`, lleva sombra dura y **se hunde** al tocarlo (sin animación si el
+  sistema pide reducirlas; sin sombra si está deshabilitado). Los secundarios son de
+  cartón con borde, y los de texto, subrayados.
+- **Campos de texto:** fondo claro con borde de tinta; los avisos, tarjeta amarilla con
+  borde.
 
 ### Los colores de las zonas
 
-Colores suaves en vez de los colores puros:
+Planos y saturados, como fichas impresas:
 
 | Zona | Color |
 |---|---|
-| rojo | coral `#F28B82` |
-| morado | lavanda `#B79CED` |
-| azul | celeste `#7FB7F0` |
-| verde | salvia `#8FCB9B` |
-| amarillo | mantequilla `#F6D365` |
-| gris | gris cálido `#C9C2B8` |
-| naranja | naranja suave `#F5A65B` |
+| rojo | `#E9573F` |
+| morado | `#9B78DB` |
+| azul | `#4A93E0` |
+| verde | `#55B67C` |
+| amarillo | `#F7C531` |
+| gris | `#B3ACA2` |
+| naranja | `#F28A2E` |
 
-El gris y el naranja solo aparecen en algunos mapas (ver [[Mapas]]). El naranja está
-entre el coral y la mantequilla, para no confundirse con ninguno de los dos. El gris es
-más oscuro que la base del tablero, para que sus casillas no se pierdan sobre ella.
+El gris y el naranja solo aparecen en algunos mapas (ver [[Mapas]]).
 
-Están en `coloresDeZona`. El color del número (tinta oscura o blanco) **se elige según el
-fondo** con `tintaSobre()`, que usa `ThemeData.estimateBrightnessForColor`, para que
-siempre se lea. Con esta paleta, sobre todas las zonas va la tinta oscura.
+El color del número **se elige por contraste** con `tintaSobre()`: la tinta o el cartón,
+el que más contraste tenga con el fondo. Sobre todos los colores de zona gana la tinta.
 
 ## La elección de mapa
 
-`PantallaEleccionDeMapa` es la pantalla con la que arranca la app: "Elige un mapa" y
-las 4 tarjetas, siempre en dos columnas. Cada tarjeta es blanca, redondeada y con una
-sombra suave, y lleva:
+`PantallaEleccionDeMapa` es la pantalla con la que arranca la app: "Elige un mapa" y las 4
+tarjetas, siempre en dos columnas (`TarjetaDeMapa`, la misma del lobby). Cada tarjeta es
+una pieza de cartón claro con borde de tinta y sombra dura (en el lobby, la elegida es
+amarilla), y lleva:
 
 - **la miniatura del mapa:** el mismo `TableroWidget` de la partida, vacío y sin toque,
   con las casillas iniciales marcadas con su aro;
 - **el nombre** ("Nivel 3") y cuántas zonas tiene.
 
-Como `TableroWidget` se adapta al ancho, las miniaturas se achican solas: en la PC las
-fichas miden unos 24 px, y en un celular de 360 px, unos 14. Al tocar una tarjeta se
-pasa a la preparación de ese mapa. Ver [[Mapas]].
+Como `TableroWidget` se adapta al ancho, las miniaturas se achican solas. Al tocar una
+tarjeta se pasa a la preparación de ese mapa. Ver [[Mapas]].
 
 ## El tablero
 
-- **Sin cuadrícula y sin coordenadas.** Las 49 casillas son fichas redondeadas, separadas
-  4 px entre sí, apoyadas sobre una base redondeada de tono arena (`Paleta.baseTablero`)
-  con 6 px de borde.
+- **Un tablero impreso y sin coordenadas.** Las 49 casillas son fichas de color plano,
+  separadas 4 px entre sí sobre una **base de tinta**: lo que se ve entre ellas es la
+  cuadrícula oscura de un tablero impreso. La base lleva una sombra dura debajo, como
+  pieza.
 - **Se adapta al ancho de la pantalla.** Cada ficha mide lo que cabe: el ancho disponible
   menos el borde de la base, entre 7, menos la separación, redondeado hacia abajo y con
   48 px como máximo.
@@ -85,16 +100,17 @@ pasa a la preparación de ese mapa. Ver [[Mapas]].
 - Cada casilla es una **ficha con esquinas redondeadas** del color de su zona, sin borde.
 - Las 6 casillas iniciales llevan un **aro tenue** de 2 px, en un tono más oscuro de su
   propio color. En la preparación, "las casillas con aro" son las que se llenan.
-- El número va al centro, en negrita, a un 42 % del tamaño de la ficha.
+- El número va al centro, en Archivo Black, a un 44 % del tamaño de la ficha.
 
 ### Cómo se resalta una casilla
 
 Para resaltar una casilla se **ilumina**: se aclara hacia el blanco sin perder el color de
-su zona. Las que se pueden usar, además, quedan **encendidas**: llevan un aro blanco de
-3 px y un brillo lavanda alrededor. Sin ese aro y ese brillo, una casilla aclarada con
-colores suaves parecía apagada en vez de iluminada.
+su zona. Las que se pueden usar, además, quedan **encendidas**: llevan un aro de cartón de
+3 px y, por fuera, un borde amarillo de ficha, sin difuminar, que se ve aunque la base
+del tablero sea oscura. La casilla que se tocó y no se pudo usar lleva un **aro rojo**
+mientras se explica por qué (`marcada`).
 
-| Caso | Cuánto se aclara | Aro y brillo | Dónde se usa |
+| Caso | Cuánto se aclara | Aro y borde amarillo | Dónde se usa |
 |---|---|---|---|
 | Normal | nada | no | — |
 | `Iluminacion.posible` | mucho (`_aclaradoFuerte = 0.4`) | sí | Partida: ahí se puede anotar el dado |
@@ -110,20 +126,20 @@ Las constantes están al principio de `lib/ui/widgets/celda_widget.dart`.
 ### El número iluminado
 
 En la partida, las casillas que tienen el número que sacó el dado ancla **iluminan su
-número**: va en tinta oscura sobre un círculo blanco, al centro de la casilla. Así se ve
+número**: va en tinta sobre un círculo de cartón con borde de tinta, al centro de la
+casilla. Así se ve
 rápido junto a qué casillas se puede jugar. Es `numeroResaltado` en `CeldaWidget`.
 
 **En el tablero no hay ninguna ⚓**: el ancla es solo un dado. Ver [[Turnos y jugadas]].
 
 ## Los dados
 
-`DadoWidget` dibuja cada dado **como un dado de verdad**: un cuadro blanco redondeado de
-68 px, con sombra suave y **los puntos** de su cara (de 1 a 6), repartidos en una grilla
-de 3×3.
+`DadoWidget` dibuja cada dado **como una pieza**: un cubo claro de 68 px con borde de tinta,
+sombra dura y **los puntos** de su cara (de 1 a 6), repartidos en una grilla de 3×3.
 
-- **El dado ancla** lleva un aro lavanda de 3 px, fondo lavanda muy claro, un poco más de
-  sombra y, debajo, ⚓ con la palabra **"ancla"**, que aparece con un fundido. Es el único
-  lugar de la app donde aparece el ancla.
+- **El dado ancla se hunde** (casi sin sombra y un poco más abajo), se pinta del amarillo
+  de ficha y, debajo, lleva ⚓ con la palabra **"ancla"**, que aparece con un fundido. Es
+  el único lugar de la app donde aparece el ancla.
 - Para lectores de pantalla (y para los tests), cada dado es un botón con la etiqueta
   "Dado: 4".
 
@@ -151,6 +167,14 @@ naranjas con su rango). En línea agrega cómo se ganan los puntos. Se cierra to
 o deslizando hacia abajo, y la partida sigue igual.
 
 ## Cómo se decidió
+
+- **2026-11-12, piezas de mesa:** con la skill `frontend-design` se propusieron tres
+  direcciones (hoja cuadriculada, gemas, piezas de mesa) y se eligió la de piezas de mesa.
+  El tema anterior (crema con acento lavanda y tarjetas blancas con sombra suave) era
+  justo lo que la skill señala como genérico. Se revisó cada pantalla en el emulador:
+  salieron y se arreglaron la hoja de reglas verde con letra oscura, el título cortado de
+  la preparación en línea ("Quedan 57 s") y la fila de la ronda que no cabía en 320 px.
+  Las pruebas de tamaños y la de la hoja de reglas lo vigilan.
 
 - **2026-10-04, primera versión:** las jugadas válidas se marcaban con borde blanco y las
   bloqueadas se oscurecían, y la casilla seleccionada en la preparación llevaba borde
