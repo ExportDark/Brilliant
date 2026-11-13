@@ -4,8 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../../multijugador/ayudantes_salas.dart';
 import '../../ayudantes_pantallas.dart';
 
-String tiempoEnPantalla(WidgetTester tester) =>
-    tester.widget<Text>(find.byKey(const ValueKey('ronda-y-tiempo'))).data!;
+String tiempoEnPantalla(WidgetTester tester) => rondaYTiempo(tester);
 
 void main() {
   testWidgets('La cuenta regresiva de la ronda baja cada segundo aunque el servidor conteste '

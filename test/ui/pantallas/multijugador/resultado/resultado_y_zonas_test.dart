@@ -68,10 +68,10 @@ void main() {
         find.descendant(of: find.byKey(ValueKey('zona-$id')), matching: find.text(texto));
     expect(enZona(4, '1.º ana'), findsOneWidget);
     expect(enZona(4, '2.º beto'), findsOneWidget);
-    expect(enZona(4, '3.º · 3'), findsOneWidget);
-    expect(enZona(5, '1.º · 7'), findsOneWidget);
-    expect(enZona(5, '2.º · 5'), findsOneWidget);
-    expect(enZona(5, '3.º · 3'), findsOneWidget);
+    expect(enZona(4, '3.º: 3'), findsOneWidget);
+    expect(enZona(5, '1.º: 7'), findsOneWidget);
+    expect(enZona(5, '2.º: 5'), findsOneWidget);
+    expect(enZona(5, '3.º: 3'), findsOneWidget);
     expect(find.byKey(const ValueKey('puntos-zona-4')), findsOneWidget);
     expect(tester.widget<Text>(find.byKey(const ValueKey('puntos-zona-4'))).data, 'Da 3');
     expect(tester.widget<Text>(find.byKey(const ValueKey('puntos-zona-5'))).data, 'Da 7');
@@ -97,8 +97,8 @@ void main() {
       ),
     );
 
-    expect(find.text('Azul · 4 casillas'), findsNWidgets(2));
-    expect(find.text('Gris · 2 casillas'), findsOneWidget);
+    expect(find.text('Azul, 4 casillas'), findsNWidgets(2));
+    expect(find.text('Gris, 2 casillas'), findsOneWidget);
   });
 
   testWidgets('Los puntos de cada jugador se ven en la partida', (tester) async {

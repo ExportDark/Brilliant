@@ -46,7 +46,7 @@ void main() {
     final salas = SalasFalsas();
     await abrirMultijugador(tester, salas);
     await crearSala(tester, salas, partidaEnJuego());
-    expect(find.text('Ronda 1 · 60 s'), findsOneWidget);
+    expect(rondaYTiempo(tester), 'Ronda 1 · 60 s');
 
     salas.vista = vistaDePrueba(
       version: 7,
@@ -57,7 +57,7 @@ void main() {
     );
     await pasarSegundos(tester, 1);
 
-    expect(find.text('Ronda 1 · 42 s'), findsOneWidget);
+    expect(rondaYTiempo(tester), 'Ronda 1 · 42 s');
   });
 
   testWidgets('Si no tengo dónde anotar el servidor me pasa solo, y se ve', (tester) async {

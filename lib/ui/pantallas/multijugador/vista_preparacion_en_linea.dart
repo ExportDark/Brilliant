@@ -23,8 +23,8 @@ class PreparacionEnLinea extends StatelessWidget {
 
     return PantallaPreparacion(
       mapa: mapa,
-      titulo:
-          'Reparte tus números${tiempo == null ? '' : ' · ${tiempo.ceil()} s'}',
+      // Corto, para que la cuenta quepa en la barra de arriba.
+      titulo: tiempo == null ? 'Reparte tus números' : 'Quedan ${tiempo.ceil()} s',
       alConfirmar: (valores) => context.read<SalaBloc>().add(
         PreparacionEnviada({
           for (final MapEntry(:key, :value) in valores.entries)
@@ -45,14 +45,14 @@ class VistaPreparacionEnLinea extends StatelessWidget {
   Widget build(BuildContext context) {
     final textos = Theme.of(context).textTheme;
     final tiempo = context.select((SalaBloc bloc) => bloc.state.segundosQueQuedan);
-    final cuenta = tiempo == null ? '' : ' · ${tiempo.ceil()} s';
+    final cuenta = tiempo == null ? '' : ' (${tiempo.ceil()} s)';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           sala.yo.activo
-              ? 'Listo. Esperando a los demás…$cuenta'
+              ? 'Listo. Esperando a los demás$cuenta.'
               : 'Quedaste fuera de la partida.',
           key: const ValueKey('esperando-la-preparacion'),
           textAlign: TextAlign.center,

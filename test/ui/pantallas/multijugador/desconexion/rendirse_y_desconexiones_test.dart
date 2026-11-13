@@ -108,7 +108,7 @@ void main() {
       await pasarSegundos(tester, 1);
 
       expect(find.text('beto (se desconectó)'), findsOneWidget);
-      expect(find.text('Ronda 2 · 55 s'), findsOneWidget);
+      expect(rondaYTiempo(tester), 'Ronda 2 · 55 s');
       expect(find.byKey(const ValueKey('resultado')), findsNothing);
     });
 

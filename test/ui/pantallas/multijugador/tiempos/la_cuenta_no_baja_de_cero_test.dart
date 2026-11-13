@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../multijugador/ayudantes_salas.dart';
+import '../../ayudantes_pantallas.dart';
 import 'ayudantes_tiempos.dart';
 
 void main() {
@@ -11,10 +11,9 @@ void main() {
       tester,
       vistaDePrueba(estado: 'jugando', ronda: 3, dados: const [1, 3], segundosRestantes: 2),
     );
-    final tiempo = find.byKey(const ValueKey('ronda-y-tiempo'));
 
     await pasar(5);
-    expect(textoDe(tester, tiempo), 'Ronda 3 · 0 s');
+    expect(rondaYTiempo(tester), 'Ronda 3 · 0 s');
 
     salas.vista = vistaDePrueba(
       version: 7,
@@ -25,6 +24,6 @@ void main() {
       accion: 'paso',
     );
     await pasar(1);
-    expect(textoDe(tester, tiempo), 'Ronda 4 · 60 s');
+    expect(rondaYTiempo(tester), 'Ronda 4 · 60 s');
   });
 }

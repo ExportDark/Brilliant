@@ -112,6 +112,18 @@ Future<void> abrirPartida(
   );
 }
 
+/// La ronda y su tiempo en la partida en línea, juntos: "Ronda 2 · 55 s" (o "Ronda 2" sin
+/// tiempo). En la pantalla van separados: el número y una ficha con los segundos.
+String rondaYTiempo(WidgetTester tester) => tester
+    .widgetList<Text>(
+      find.descendant(
+        of: find.byKey(const ValueKey('ronda-y-tiempo')),
+        matching: find.byType(Text),
+      ),
+    )
+    .map((texto) => texto.data)
+    .join(' · ');
+
 Future<void> tocar(WidgetTester tester, Finder objetivo) async {
   // Como una persona: si está más abajo, primero se desplaza hasta verlo. Un solo
   // cuadro, sin dejar pasar tiempo: así no corren los relojes de la pantalla.

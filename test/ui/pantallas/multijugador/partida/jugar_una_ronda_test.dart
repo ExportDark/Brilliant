@@ -26,7 +26,7 @@ void main() {
   testWidgets('La partida muestra la ronda, los dos dados y mi tablero', (tester) async {
     await _enPartida(tester);
 
-    expect(find.text('Ronda 1 · 60 s'), findsOneWidget);
+    expect(rondaYTiempo(tester), 'Ronda 1 · 60 s');
     expect(tester.widget<DadoWidget>(dado0).valor, 1);
     expect(tester.widget<DadoWidget>(dado1).valor, 3);
     // Mi tablero, con mis 6 números iniciales y nada más.
@@ -178,7 +178,7 @@ void main() {
     );
     await pasarSegundos(tester, 1);
 
-    expect(find.text('Ronda 2 · 60 s'), findsOneWidget);
+    expect(rondaYTiempo(tester), 'Ronda 2 · 60 s');
     expect(find.text('Toca un dado: es el ancla, el número que se busca en tu tablero.'), findsOneWidget);
     expect(celdasDibujadasDonde(tester, (c) => c.iluminacion == Iluminacion.posible), isEmpty);
   });

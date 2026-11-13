@@ -12,7 +12,7 @@ void main() {
     final salas = SalasFalsas();
     await abrirMultijugador(tester, salas);
     await crearSala(tester, salas, vistaDePrueba(estado: 'preparando', segundosRestantes: 60));
-    expect(find.text('Reparte tus números · 60 s'), findsOneWidget);
+    expect(find.text('Quedan 60 s'), findsOneWidget);
 
     await tocar(tester, find.text('Aleatorio'));
     salas.vista = vistaDePrueba(estado: 'preparando', version: 3, preparado: true, segundosRestantes: 55);
@@ -49,7 +49,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Listo. Esperando a los demás… · 41 s'), findsOneWidget);
+    expect(find.text('Listo. Esperando a los demás (41 s).'), findsOneWidget);
     expect(tester.widget<Icon>(find.byKey(const ValueKey('listo-ana'))).icon, Icons.check_circle_rounded);
     expect(tester.widget<Icon>(find.byKey(const ValueKey('listo-beto'))).icon, Icons.hourglass_empty_rounded);
   });

@@ -119,12 +119,7 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Ronda ${sala.ronda}${tiempo == null ? '' : ' · ${tiempo.ceil()} s'}',
-          key: const ValueKey('ronda-y-tiempo'),
-          textAlign: TextAlign.center,
-          style: textos.titleMedium,
-        ),
+        _RondaYTiempo(ronda: sala.ronda, segundos: tiempo?.ceil()),
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -229,5 +224,69 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
       return 'Toca un dado: es el ancla, el número que se busca en tu tablero.';
     }
     return 'Anota el ${jugada.valor} en una casilla iluminada.';
+  }
+}
+
+/// "Ronda 4" y, al lado, una ficha con los segundos que le quedan; en los últimos 10 se
+/// pone roja.
+class _RondaYTiempo extends StatelessWidget {
+  final int ronda;
+  final int? segundos;
+
+  const _RondaYTiempo({required this.ronda, required this.segundos});
+
+  @override
+  Widget build(BuildContext context) {
+    final textos = Theme.of(context).textTheme;
+    final segundos = this.segundos;
+    final apurado = segundos != null && segundos <= 10;
+
+    return Row(
+      key: const ValueKey('ronda-y-tiempo'),
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // En un celular angosto, el número de ronda se achica antes que desbordarse.
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              'Ronda $ronda',
+              key: const ValueKey('numero-de-ronda'),
+              style: textos.titleLarge,
+            ),
+          ),
+        ),
+        if (segundos != null) ...[
+          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: apurado ? Paleta.peligro : Paleta.cartonClaro,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: Paleta.tinta, width: 2),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.timer_outlined,
+                  size: 16,
+                  color: apurado ? Paleta.carton : Paleta.tinta,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '$segundos s',
+                  key: const ValueKey('tiempo-de-la-ronda'),
+                  style: textos.titleSmall?.copyWith(
+                    color: apurado ? Paleta.carton : Paleta.tinta,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }

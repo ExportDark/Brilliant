@@ -66,7 +66,7 @@ class _FilaDeZona extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${nombreDeColor(zona.color)} · ${zona.casillas.length} casillas',
+                      '${nombreDeColor(zona.color)}, ${zona.casillas.length} casillas',
                       style: textos.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
@@ -115,7 +115,7 @@ class _FilaDeZona extends StatelessWidget {
     final libres = [
       for (var puesto = zona.puestos.length + 1; puesto <= pagan.length; puesto++)
         _Puesto(
-          texto: '${ordinal(puesto)} · ${pagan[puesto - 1]}',
+          texto: '${ordinal(puesto)}: ${pagan[puesto - 1]}',
           borde: puesto == zona.puestos.length + 1
               ? Color.lerp(colorFuerte, Colors.black, 0.25)!
               : Paleta.baseTablero,
