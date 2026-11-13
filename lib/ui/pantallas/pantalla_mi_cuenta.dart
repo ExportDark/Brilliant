@@ -46,15 +46,22 @@ class PantallaMiCuenta extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Center(
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Paleta.acento,
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Paleta.ficha,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Paleta.tinta, width: grosorDeTinta),
+                            boxShadow: sombraDura(4),
+                          ),
                           child: Text(
                             usuario.isEmpty ? '?' : usuario.characters.first.toUpperCase(),
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700,
+                              fontFamily: familiaDeTitulos,
+                              color: Paleta.tinta,
+                              fontSize: 34,
                             ),
                           ),
                         ),
@@ -64,10 +71,7 @@ class PantallaMiCuenta extends StatelessWidget {
                         usuario,
                         key: const ValueKey('usuario-de-la-sesion'),
                         textAlign: TextAlign.center,
-                        style: textos.headlineSmall?.copyWith(
-                          color: Paleta.tinta,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: textos.headlineSmall?.copyWith(color: Paleta.tinta),
                       ),
                       Text(
                         'Tienes la sesión iniciada en este aparato.',

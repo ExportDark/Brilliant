@@ -310,18 +310,15 @@ class _FinDePartida extends StatelessWidget {
       key: const ValueKey('fin-de-partida'),
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 16, offset: Offset(0, 4))],
-      ),
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: decoracionDePieza(color: Paleta.cartonClaro, radio: 20),
       child: Column(
         children: [
-          const Icon(Icons.emoji_events_rounded, size: 44, color: Color(0xFFE0A93B)),
+          const Icon(Icons.emoji_events_rounded, size: 44, color: Paleta.ficha),
           const SizedBox(height: 8),
           Text(
             tableroLleno ? '¡Tablero completo!' : 'Fin de la partida',
-            style: textos.titleLarge?.copyWith(color: Paleta.tinta, fontWeight: FontWeight.w700),
+            style: textos.titleLarge?.copyWith(color: Paleta.tinta),
           ),
           const SizedBox(height: 4),
           Text(

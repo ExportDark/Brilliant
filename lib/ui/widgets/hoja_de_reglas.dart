@@ -31,7 +31,7 @@ Future<void> mostrarReglas(BuildContext context, Mapa mapa, {bool enLinea = fals
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    backgroundColor: Paleta.fondo,
+    backgroundColor: Paleta.carton,
     builder: (_) => HojaDeReglas(mapa: mapa, enLinea: enLinea),
   );
 }
@@ -125,6 +125,7 @@ class _ReglaDeZona extends StatelessWidget {
             decoration: BoxDecoration(
               color: coloresDeZona[tipo.color],
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Paleta.tinta, width: 2),
             ),
           ),
           const SizedBox(width: 14),
