@@ -9,6 +9,7 @@ import '../../modelo/mapa.dart';
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
 import '../tema.dart';
+import '../widgets/confirmacion.dart';
 import '../widgets/celda_widget.dart';
 import '../widgets/dado_widget.dart';
 import '../widgets/explicacion_de_jugada.dart';
@@ -110,26 +111,12 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
   }
 
   /// Pregunta si de verdad quiere dejar la partida. Devuelve si dijo que sí.
-  Future<bool> _confirmarSalida() async {
-    final salir = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('¿Salir de la partida?'),
-        content: const Text('Se pierde lo que llevas jugado.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Seguir jugando'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Salir'),
-          ),
-        ],
-      ),
-    );
-    return salir ?? false;
-  }
+  Future<bool> _confirmarSalida() => confirmar(
+    context,
+    titulo: '¿Salir de la partida?',
+    texto: 'Se pierde lo que llevas jugado.',
+    si: 'Salir',
+  );
 
   void _jugarOtraVez() {
     Navigator.of(context).pushReplacement(
@@ -314,8 +301,8 @@ class _FinDePartida extends StatelessWidget {
       decoration: decoracionDePieza(color: Paleta.cartonClaro, radio: 20),
       child: Column(
         children: [
-          const Icon(Icons.emoji_events_rounded, size: 44, color: Paleta.ficha),
-          const SizedBox(height: 8),
+          const Insignia(icono: Icons.emoji_events_rounded),
+          const SizedBox(height: 10),
           Text(
             tableroLleno ? '¡Tablero completo!' : 'Fin de la partida',
             style: textos.titleLarge?.copyWith(color: Paleta.tinta),
@@ -345,9 +332,15 @@ class _TextoConIcono extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Si no cabe (un celular angosto con la letra agrandada), el texto se corta con
+    // puntos suspensivos en vez de desbordarse.
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: [Icon(icono), const SizedBox(width: 8), Text(texto)],
+      children: [
+        Icon(icono),
+        const SizedBox(width: 8),
+        Flexible(child: Text(texto, overflow: TextOverflow.ellipsis)),
+      ],
     );
   }
 }

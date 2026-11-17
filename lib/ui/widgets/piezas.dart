@@ -121,3 +121,34 @@ class _PiezaPresionableState extends State<PiezaPresionable> {
     );
   }
 }
+
+/// Una ficha redonda con un ícono, como el trofeo del final de la partida: de color, con
+/// borde de tinta y sombra dura, y el ícono en tinta para que se lea sobre cualquier color.
+class Insignia extends StatelessWidget {
+  final IconData icono;
+  final Color color;
+  final double tamano;
+
+  const Insignia({
+    super.key,
+    required this.icono,
+    this.color = Paleta.ficha,
+    this.tamano = 64,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: tamano,
+      height: tamano,
+      margin: const EdgeInsets.only(bottom: 3),
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Paleta.tinta, width: grosorDeTinta),
+        boxShadow: sombraDura(3),
+      ),
+      child: Icon(icono, size: tamano * 0.52, color: Paleta.tinta),
+    );
+  }
+}

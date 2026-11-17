@@ -81,7 +81,9 @@ class TarjetaDeMapa extends StatelessWidget {
                 ),
                 Text(
                   '${mapa.zonas.length} zonas',
-                  style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
+                  style: textos.bodySmall?.copyWith(
+                    color: seleccionada ? Paleta.tinta : Paleta.tintaSuave,
+                  ),
                 ),
               ],
             ),

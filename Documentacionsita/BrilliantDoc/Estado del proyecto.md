@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-12 · Repos: https://github.com/ExportDark/Brilliant (la app)
+Última actualización: 2026-11-13 · Repos: https://github.com/ExportDark/Brilliant (la app)
 y https://github.com/ExportDark/Brilliant-Servidor (el servidor, en la carpeta hermana
 `Brilliant-servidor`)
 
@@ -121,10 +121,13 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Diseño de piezas de mesa** (2026-11-12) — toda la app: fieltro, bandejas de
       cartón, borde de tinta, sombra dura, letra Archivo; botones y dado ancla que se
       hunden. Revisado pantalla por pantalla en el emulador. Ver [[Interfaz del tablero]]
+- [x] **Diálogos y resultado** (2026-11-13) — lo que no tiene vuelta en rojo, el cartel del
+      resultado, el código de sala en fichas y los nombres que ya no se cortan. Ver
+      [[Interfaz del tablero#Diálogos, avisos y el final]]
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 762 tests de la app y 1043 del servidor, todos pasando, más 18 que
+puntos por zona. 770 tests de la app y 1043 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta
@@ -132,8 +135,6 @@ juegan contra el servidor de verdad.
 - [ ] **Probar en un celular de verdad que encuentra el servidor solo.** En el emulador
       la búsqueda corre, pero no puede encontrar el de la PC: su red (NAT) no deja pasar
       el multicast
-- [ ] **Terminar de pulir el diseño** en lo que no se revisó a fondo en el emulador:
-      crear cuenta, los diálogos (servidor, rendirse) y el resultado en línea
 - [ ] **Probar el multijugador con varios celulares** de verdad en la misma WiFi
 - [ ] **Decidir cómo se puntúa jugando solo.** Con las reglas actuales el tablero
       **siempre** termina lleno, así que contar casillas no distingue a nadie

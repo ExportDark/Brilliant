@@ -204,7 +204,11 @@ caber, por ejemplo a 42 px en un celular de 360 px.
   los colores planos de las 7 zonas; y `tintaSobre(fondo)`, que elige tinta o cartón por
   contraste para que el número siempre se lea.
 - `widgets/piezas.dart`: `Bandeja`, la bandeja de cartón donde va el contenido de cada
-  pantalla, y `PiezaPresionable`, que hace que un botón se hunda al tocarlo.
+  pantalla; `PiezaPresionable`, que hace que un botón se hunda al tocarlo; e `Insignia`,
+  una ficha redonda con un ícono (el trofeo del final).
+- `widgets/confirmacion.dart`: `confirmar()`, la pregunta antes de salir de la partida o
+  rendirse, con el botón de hacerlo en rojo (`estiloDePeligro`, en `tema.dart`) y, si no
+  caben en fila, los botones uno sobre otro con el rojo arriba.
 - `widgets/dado_widget.dart`: `DadoWidget`, un dado como pieza, con borde de tinta, sombra
   dura y los puntos de su cara. Con `anclado` se hunde, se pinta de amarillo y debajo
   lleva ⚓ "ancla": es el único lugar donde aparece el ancla. Para lectores de pantalla

@@ -28,7 +28,7 @@ class IndicadorDelServidor extends StatelessWidget {
           Disponibilidad.revisando => ('Buscando el servidor…', direccion),
           Disponibilidad.disponible => (
               'Servidor disponible',
-              nombre == null ? direccion : '$nombre · $direccion',
+              nombre == null ? direccion : '$nombre ($direccion)',
             ),
           Disponibilidad.noDisponible => (
               'Sin servidor',

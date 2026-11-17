@@ -42,7 +42,7 @@ class ListaDeServidores extends StatelessWidget {
             leading: const Icon(Icons.dns_rounded, color: Paleta.disponible),
             title: Text(servidor.nombre, overflow: TextOverflow.ellipsis),
             subtitle: Text(
-              'Disponible · ${textoDeDireccion(servidor.direccion)}',
+              'Disponible en ${textoDeDireccion(servidor.direccion)}',
             ),
             trailing: servidor.direccion == actual
                 ? const Icon(Icons.check_rounded)

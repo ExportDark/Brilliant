@@ -106,7 +106,7 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
                                 labelText: 'Usuario',
                                 helperText: 'De $largoMinimoUsuario a $largoMaximoUsuario caracteres: '
                                     'letras sin acento, números, punto, guion y guion bajo.',
-                                helperMaxLines: 2,
+                                helperMaxLines: 3,
                                 errorMaxLines: 3,
                                 prefixIcon: const Icon(Icons.person_outline_rounded),
                                 errorText: error?.de('username'),

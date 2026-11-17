@@ -113,7 +113,7 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
                             RecuadroDeAviso(
                               aviso,
                               key: const ValueKey('aviso-de-sesion'),
-                              icono: Icons.check_circle_outline_rounded,
+                              icono: Icons.info_outline_rounded,
                             ),
                           ],
                           const SizedBox(height: 28),

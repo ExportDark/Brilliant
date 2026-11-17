@@ -5,6 +5,7 @@ import '../../cuenta/buscador_de_servidores.dart';
 import '../../cuenta/direccion_del_servidor.dart';
 import '../../cuenta/servidor_cubit.dart';
 import '../widgets/lista_de_servidores.dart';
+import '../widgets/confirmacion.dart';
 
 /// El diálogo para elegir el servidor de cuentas. Al abrirse busca los que
 /// hay en la red, y basta con tocar uno. Si no aparece (por ejemplo, en la
@@ -67,6 +68,9 @@ class _DialogoDelServidorState extends State<DialogoDelServidor> {
       scrollable: true,
       icon: const Icon(Icons.dns_outlined, size: 32),
       title: const Text('Servidor'),
+      actionsOverflowAlignment: accionesApiladas.alineacion,
+      actionsOverflowDirection: accionesApiladas.direccion,
+      actionsOverflowButtonSpacing: accionesApiladas.separacion,
       content: Form(
         key: _formulario,
         child: Column(
@@ -123,10 +127,7 @@ class _DialogoDelServidorState extends State<DialogoDelServidor> {
           child: const Text('Cancelar'),
         ),
         FilledButton(
-          style: FilledButton.styleFrom(
-            minimumSize: const Size(0, 44),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-          ),
+          style: estiloDeBotonDeDialogo,
           onPressed: _guardar,
           child: const Text('Guardar'),
         ),

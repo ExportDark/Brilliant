@@ -10,6 +10,7 @@ import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../../tema.dart';
 import '../../widgets/celda_widget.dart';
+import '../../widgets/confirmacion.dart';
 import '../../widgets/dado_widget.dart';
 import '../../widgets/explicacion_de_jugada.dart';
 import '../../widgets/tablero_widget.dart';
@@ -74,27 +75,14 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
 
   Future<void> _confirmarRendirse() async {
     final bloc = context.read<SalaBloc>();
-    final seguro = await showDialog<bool>(
-      context: context,
-      builder: (contexto) => AlertDialog(
-        title: const Text('¿Rendirte?'),
-        content: const Text(
-          'Quedarás fuera de la partida. Conservas los puntos que ya ganaste.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(contexto).pop(false),
-            child: const Text('Seguir jugando'),
-          ),
-          FilledButton(
-            key: const ValueKey('confirmar-rendirse'),
-            onPressed: () => Navigator.of(contexto).pop(true),
-            child: const Text('Rendirme'),
-          ),
-        ],
-      ),
+    final seguro = await confirmar(
+      context,
+      titulo: '¿Rendirte?',
+      texto: 'Quedarás fuera de la partida. Conservas los puntos que ya ganaste.',
+      si: 'Rendirme',
+      claveSi: const ValueKey('confirmar-rendirse'),
     );
-    if (seguro == true) bloc.add(const Rendirse());
+    if (seguro) bloc.add(const Rendirse());
   }
 
   @override

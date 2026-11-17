@@ -59,6 +59,13 @@ List<BoxShadow> sombraDura([double alto = 4]) => [
   BoxShadow(color: Paleta.tinta, offset: Offset(0, alto), blurRadius: 0),
 ];
 
+/// El botón principal de lo que no se puede deshacer (borrar la cuenta, rendirse, salir
+/// de la partida): rojo, con la letra clara, que sobre el rojo se lee mejor que la tinta.
+final estiloDePeligro = FilledButton.styleFrom(
+  backgroundColor: Paleta.peligro,
+  foregroundColor: Paleta.cartonClaro,
+);
+
 /// El color de cada zona del tablero: planos y saturados, como fichas impresas, pero
 /// fáciles de distinguir entre sí.
 const coloresDeZona = {
@@ -249,6 +256,7 @@ ThemeData temaBrilliant() {
     dialogTheme: DialogThemeData(
       backgroundColor: Paleta.carton,
       surfaceTintColor: Colors.transparent,
+      iconColor: Paleta.tinta,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
         side: const BorderSide(color: Paleta.tinta, width: grosorDeTinta),

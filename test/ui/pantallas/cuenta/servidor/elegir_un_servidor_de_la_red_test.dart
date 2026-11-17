@@ -24,12 +24,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Buscando servidores…'), findsNothing);
     expect(find.widgetWithText(ListTile, 'Brilliant en ORION'), findsOneWidget);
-    expect(find.widgetWithText(ListTile, 'Disponible · 192.168.137.252'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, 'Disponible en 192.168.137.252'), findsOneWidget);
 
     await tocar(tester, find.byKey(const ValueKey('servidor-192.168.137.252')));
     expect(
       indicadorDelServidor(tester),
-      'Servidor disponible · Brilliant en ORION · 192.168.137.252',
+      'Servidor disponible · Brilliant en ORION (192.168.137.252)',
     );
 
     // Al volver a abrirlo, el que se usa lleva la palomita.

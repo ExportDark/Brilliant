@@ -149,9 +149,10 @@ void main() {
 
     expect(find.text('¡Ganaste!'), findsOneWidget);
     expect(find.text('Todos llenaron su tablero.'), findsOneWidget);
-    expect(find.text('ana ★'), findsOneWidget);
+    expect(find.text('ana'), findsOneWidget);
+    expect(find.text('Tú, 2 primeros puestos'), findsOneWidget);
     expect(find.text('17 pts'), findsOneWidget);
-    expect(find.text('carla (se rindió)'), findsOneWidget);
+    expect(find.text('Se rindió'), findsOneWidget);
     expect(find.byKey(const ValueKey('zona-10')), findsOneWidget);
     // Los jugadores se ordenan como dice el servidor.
     final filas = tester.widgetList(find.byWidgetPredicate(

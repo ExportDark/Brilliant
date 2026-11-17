@@ -7,6 +7,7 @@ import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../../../multijugador/sala_state.dart';
 import '../../../modelo/mapa.dart';
+import '../../widgets/confirmacion.dart';
 import '../../widgets/hoja_de_reglas.dart';
 import '../../widgets/recuadro_de_aviso.dart';
 import 'vista_lobby.dart';
@@ -81,26 +82,13 @@ class _Cuerpo extends StatelessWidget {
               context.read<SalaBloc>().add(const Rendirse());
               return;
             }
-            final seguro = await showDialog<bool>(
-              context: context,
-              builder: (contexto) => AlertDialog(
-                title: const Text('¿Rendirte?'),
-                content: const Text(
-                  'Salir es rendirte: quedarás fuera de la partida.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(contexto).pop(false),
-                    child: const Text('Seguir jugando'),
-                  ),
-                  FilledButton(
-                    onPressed: () => Navigator.of(contexto).pop(true),
-                    child: const Text('Rendirme'),
-                  ),
-                ],
-              ),
+            final seguro = await confirmar(
+              context,
+              titulo: '¿Rendirte?',
+              texto: 'Salir es rendirte: quedarás fuera de la partida.',
+              si: 'Rendirme',
             );
-            if (seguro == true && context.mounted) {
+            if (seguro && context.mounted) {
               context.read<SalaBloc>().add(const Rendirse());
             }
           },

@@ -53,18 +53,22 @@ se rinde o se desconecta conserva sus puntos, pero no puede ganar.
 
 ## El marcador y el panel de zonas
 
-Debajo del tablero, dos tarjetas blancas como las de "Elige un mapa" (rediseñadas el
-2026-11-11):
+Debajo del tablero, dos tarjetas de cartón con borde de tinta, como las de "Elige un
+mapa":
 
 - **Marcador** (`marcador.dart`). Los jugadores ordenados por puntos (si empatan, por
   primeros puestos; los empatados en todo comparten puesto) y los que se fueron al
-  final, tachados. Cada fila: el puesto en un círculo (lleno para el que va primero,
-  cuando ya hay puntos), el nombre, debajo **un punto del color de cada zona que llenó**,
-  si ya jugó la ronda y los **puntos grandes**, que cambian con un fundido suave. Mi fila
-  va con un fondo lavanda suave. El resultado final usa las mismas filas (`FilaDePuntos`).
-- **Zonas** (`panel_de_zonas.dart`). Una fila por zona: una franja de su color, "Azul · 4
+  final, tachados. Cada fila: el puesto en un círculo (amarillo para el que va primero,
+  cuando ya hay puntos), el nombre solo, debajo **"Tú" y si se fue** ("Tú, se rindió"),
+  **un punto del color de cada zona que llenó**, si ya jugó la ronda y los **puntos
+  grandes**, que cambian con un fundido suave. Mi fila va en amarillo suave. Las
+  etiquetas van debajo y no pegadas al nombre: en un celular se cortaban con él. El
+  resultado final usa las mismas filas (`FilaDePuntos`), con los primeros puestos en la
+  misma línea de abajo, y arriba un cartel con quién ganó (ver
+  [[Interfaz del tablero#Diálogos, avisos y el final]]).
+- **Zonas** (`panel_de_zonas.dart`). Una fila por zona: una franja de su color, "Azul, 4
   casillas", sus **tres puestos** —los tomados con quién ("1.º ana") y los libres con lo
-  que pagan ("2.º · 5"), el próximo con borde más marcado— y a la derecha lo que da ahora
+  que pagan ("2.º: 5"), el próximo con borde más marcado— y a la derecha lo que da ahora
   ("Da 5") o "Agotada" (la fila se apaga). Al dejar el dedo encima se ve en qué ronda la
   llenó cada uno. Para esto el servidor manda `puntos_por_puesto` en cada zona.
 

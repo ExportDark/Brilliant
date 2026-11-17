@@ -52,7 +52,9 @@ void main() {
     expect(alturaDe(tester, 'ana'), lessThan(alturaDe(tester, 'dani')));
     expect(puestoDe(tester, 'carla'), '1');
     expect(puestoDe(tester, 'beto'), '2');
-    expect(find.text('dani (se rindió)'), findsOneWidget);
+    // Si se fue va debajo del nombre, para que no se corte con él.
+    expect(find.text('dani'), findsOneWidget);
+    expect(find.text('Se rindió'), findsOneWidget);
   });
 
   testWidgets('Empatados en puntos y primeros comparten puesto', (tester) async {

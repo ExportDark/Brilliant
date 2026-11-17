@@ -27,7 +27,17 @@ void main() {
 
     expect(salas.llamadas, ['crear']);
     expect(find.byKey(const ValueKey('codigo-de-sala')), findsOneWidget);
-    expect(find.text('K7M4QX'), findsOneWidget);
+    // Una ficha por letra.
+    final letras = tester
+        .widgetList<Text>(
+          find.descendant(
+            of: find.byKey(const ValueKey('codigo-de-sala')),
+            matching: find.byType(Text),
+          ),
+        )
+        .map((texto) => texto.data)
+        .join();
+    expect(letras, 'K7M4QX');
     expect(find.textContaining('Jugadores (2/6)'), findsOneWidget);
     expect(find.byKey(const ValueKey('jugador-ana')), findsOneWidget);
   });

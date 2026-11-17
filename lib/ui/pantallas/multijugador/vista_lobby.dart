@@ -44,16 +44,23 @@ class VistaLobby extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Cada letra en su ficha, como las letras de un juego de mesa: así se
+                // dicta de a una sin perderse.
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: SelectableText(
-                      sala.codigo,
-                      key: const ValueKey('codigo-de-sala'),
-                      style: textos.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 6,
-                        color: Paleta.acento,
+                    child: Semantics(
+                      label: 'Código de la sala: ${sala.codigo.split('').join(' ')}',
+                      child: ExcludeSemantics(
+                        child: Row(
+                          key: const ValueKey('codigo-de-sala'),
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 6,
+                          children: [
+                            for (final letra in sala.codigo.split(''))
+                              _FichaDeLetra(letra),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -67,7 +74,7 @@ class VistaLobby extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 10),
             Text(
               'Dicta este código a quien quieras invitar. Pueden entrar hasta 6.',
               textAlign: TextAlign.center,
@@ -147,6 +154,32 @@ class VistaLobby extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Una letra del código de la sala en su ficha de cartón.
+class _FichaDeLetra extends StatelessWidget {
+  final String letra;
+
+  const _FichaDeLetra(this.letra);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 40,
+      height: 50,
+      alignment: Alignment.center,
+      margin: const EdgeInsets.only(bottom: 3),
+      decoration: decoracionDePieza(color: Paleta.cartonClaro, radio: 8, alto: 3),
+      child: Text(
+        letra,
+        style: const TextStyle(
+          fontFamily: familiaDeTitulos,
+          fontSize: 26,
+          color: Paleta.tinta,
+        ),
+      ),
     );
   }
 }

@@ -1,8 +1,8 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 762 tests, todos pasando, más 18 que hablan con el
-servidor de verdad y solo corren si se piden (2026-11-12). El servidor tiene los suyos
+las pruebas y qué se aprendió de ellas. 770 tests, todos pasando, más 18 que hablan con el
+servidor de verdad y solo corren si se piden (2026-11-13). El servidor tiene los suyos
 (1043, ver abajo).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
@@ -164,6 +164,9 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/pantallas/reglas/boton_de_reglas_en_preparacion_y_en_linea_test.dart` | La preparación también tiene "Reglas"; en línea aparece en la partida, con el mapa de la sala, y no en el lobby (2 casos) |
 | `ui/pantallas/reglas/cada_mapa_muestra_sus_colores_test.dart` | En cada mapa, cada color de zona sale una sola vez; en el Nivel 4, las dos naranjas con su rango; en línea, también cómo se ganan los puntos (6 casos) |
 | `ui/pantallas/reglas/la_hoja_de_reglas_es_de_carton_test.dart` | La hoja de reglas es de cartón y no del verde de la mesa, para que la letra oscura se lea |
+| `ui/widgets/confirmacion/salir_en_rojo_y_arriba_test.dart` | "Salir" de la partida es rojo con letra clara y, en 320 px, va arriba de "Seguir jugando" y centrado. Al escribirla salió que "Tirar dados" se desbordaba 9 px en 320 px |
+| `ui/pantallas/multijugador/resultado/el_cartel_del_resultado_test.dart` | El cartel del resultado es amarillo si ganaste, de cartón con el trofeo si ganó otro, y con una bandera si nadie ganó (3 casos) |
+| `ui/pantallas/multijugador/partida/etiquetas_bajo_el_nombre_test.dart` | La línea bajo el nombre: "Tú", si se fue y los primeros puestos, en orden y con mayúscula al empezar, o nada (4 casos) |
 
 ### Tamaños de pantalla
 

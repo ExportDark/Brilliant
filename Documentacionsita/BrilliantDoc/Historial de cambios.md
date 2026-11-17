@@ -7,6 +7,16 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-13 — Lo que faltaba del diseño
+
+- **Diálogos, resultado y detalles**: salir y rendirse preguntan con el botón en rojo, y
+  en un celular angosto los botones van uno sobre otro con el rojo arriba; el resultado
+  en línea tiene un cartel con trofeo (amarillo si ganaste); "Tú" y "se rindió" van
+  debajo del nombre, que ya no se corta; el código de la sala va en fichas; y varios
+  detalles que salieron en el emulador (la ayuda del usuario cortada, el ícono del
+  diálogo, el aviso de la sesión, "Tirar dados" desbordado en 320 px). Ver
+  [[Interfaz del tablero#Diálogos, avisos y el final]].
+
 ## 2026-11-12 — Botón de reglas y diseño de piezas de mesa
 
 - **Skills de diseño** (`b14e8b3`): `frontend-design` (de Anthropic) y dos de Flutter

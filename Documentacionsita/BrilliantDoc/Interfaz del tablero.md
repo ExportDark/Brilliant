@@ -166,7 +166,31 @@ zona de ese mapa**, una vez cada uno, con una ficha de su color (en el Nivel 4, 
 naranjas con su rango). En línea agrega cómo se ganan los puntos. Se cierra tocando fuera
 o deslizando hacia abajo, y la partida sigue igual.
 
+## Diálogos, avisos y el final
+
+- **Lo que no tiene vuelta va en rojo.** Salir de la partida, rendirse y borrar la cuenta
+  preguntan antes, con el botón de hacerlo en rojo y letra clara (`estiloDePeligro`); el
+  de quedarse es un botón de texto. Las dos primeras usan la misma pregunta
+  (`confirmacion.dart`). En un celular angosto los botones no caben en fila: van uno
+  sobre otro, centrados, con el principal arriba (también en el diálogo del servidor).
+- **Los íconos de los diálogos van en tinta**: el amarillo casi no se veía sobre el cartón.
+- **Los avisos de la sesión** ("Cerraste sesión.", "Tu sesión venció…") llevan un ícono de
+  información, no una palomita: no todos son buenas noticias.
+- **El final**: el de una partida sola y el cartel del resultado en línea llevan una
+  **insignia**, una ficha redonda con el trofeo (`Insignia`). En línea, si ganaste, el
+  cartel entero es amarillo; si ganó otro, de cartón con el trofeo amarillo; si nadie,
+  con una bandera.
+- **El código de la sala va en fichas**, una por letra, como las letras de un juego de
+  mesa: así se dicta de a una. Para lectores de pantalla se anuncia entero.
+
 ## Cómo se decidió
+
+- **2026-11-13, lo que faltaba revisar:** se recorrieron en el emulador crear cuenta, los
+  diálogos, el lobby y el resultado. Salieron: la ayuda del usuario cortada ("guio…"),
+  el ícono del diálogo amarillo sobre cartón, "Rendirme" y "Salir" en el amarillo de los
+  botones que invitan, los botones del diálogo apilados a la derecha, la ★ del ganador y
+  "(se rindió)" cortados con el nombre, y el resultado sin cartel. Una prueba nueva
+  encontró además que "Tirar dados" se desbordaba 9 px en 320 px.
 
 - **2026-11-12, piezas de mesa:** con la skill `frontend-design` se propusieron tres
   direcciones (hoja cuadriculada, gemas, piezas de mesa) y se eligió la de piezas de mesa.

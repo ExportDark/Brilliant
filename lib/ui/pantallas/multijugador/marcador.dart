@@ -81,7 +81,7 @@ class FilaDePuntos extends StatelessWidget {
   /// Si ya no está en la partida: se ve apagado.
   final bool fuera;
 
-  /// Una línea chica bajo el nombre ("se rindió", "2 primeros"…).
+  /// Una línea chica bajo el nombre ("Tú", "Se rindió", "2 primeros puestos"…).
   final String? detalle;
 
   /// Los colores de las zonas que llenó.
@@ -290,7 +290,11 @@ class Marcador extends StatelessWidget {
             FilaDePuntos(
               key: ValueKey('jugador-${jugador.usuario}'),
               puesto: puestos[i],
-              nombre: _nombre(jugador),
+              nombre: jugador.usuario,
+              detalle: etiquetasDeJugador(
+                mia: jugador.usuario == yo,
+                estado: jugador.estado,
+              ),
               puntos: jugador.puntos,
               lider: hayPuntos && puestos[i] == 1 && jugador.activo,
               mia: jugador.usuario == yo,
@@ -314,15 +318,4 @@ class Marcador extends StatelessWidget {
     );
   }
 
-  String _nombre(JugadorEnSala jugador) {
-    // En la partida, ser el anfitrión ya no importa: solo "tú" y si se fue. Así el nombre
-    // no se corta en un celular.
-    final etiquetas = [
-      if (jugador.usuario == yo) 'tú',
-      if (!jugador.activo) estadoDeSalida(jugador.estado),
-    ];
-    return etiquetas.isEmpty
-        ? jugador.usuario
-        : '${jugador.usuario} (${etiquetas.join(', ')})';
-  }
 }

@@ -39,3 +39,20 @@ String puestosDe(ZonaEnSala zona) => [
   for (final p in zona.puestos)
     '${ordinal(p.puesto)} ${p.usuario} (ronda ${p.ronda})',
 ].join(', ');
+
+/// La línea de abajo del nombre en el marcador y el resultado: "Tú", si se fue y, al
+/// final, cuántos primeros puestos sacó. Por ejemplo, "Tú, se rindió, 1 primer puesto".
+/// `null` si no hay nada que decir.
+String? etiquetasDeJugador({
+  required bool mia,
+  required String estado,
+  int primeros = 0,
+}) {
+  final etiquetas = [
+    if (mia) 'tú',
+    if (estado != 'activo') estadoDeSalida(estado),
+    if (primeros == 1) '1 primer puesto',
+    if (primeros > 1) '$primeros primeros puestos',
+  ].where((e) => e.isNotEmpty).join(', ');
+  return etiquetas.isEmpty ? null : '${etiquetas[0].toUpperCase()}${etiquetas.substring(1)}';
+}

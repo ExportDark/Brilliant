@@ -30,7 +30,7 @@ void main() {
 
     expect(
       indicadorDelServidor(tester),
-      'Servidor disponible · Brilliant en ORION · 192.168.137.252',
+      'Servidor disponible · Brilliant en ORION (192.168.137.252)',
     );
   });
 }

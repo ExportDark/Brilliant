@@ -5,6 +5,7 @@ import '../../cuenta/sesion_bloc.dart';
 import '../../cuenta/sesion_event.dart';
 import '../../cuenta/sesion_state.dart';
 import '../tema.dart';
+import '../widgets/confirmacion.dart';
 import '../widgets/campo_de_contrasena.dart';
 import '../widgets/recuadro_de_aviso.dart';
 import '../widgets/piezas.dart';
@@ -79,11 +80,13 @@ class PantallaMiCuenta extends StatelessWidget {
                         style: textos.bodyMedium?.copyWith(color: Paleta.tintaSuave),
                       ),
                       const SizedBox(height: 32),
-                      FilledButton.tonal(
-                        onPressed: state.ocupado
-                            ? null
-                            : () => context.read<SesionBloc>().add(const SalidaPedida()),
-                        child: const _TextoConIcono(Icons.logout_rounded, 'Cerrar sesión'),
+                      PiezaPresionable(
+                        child: FilledButton.tonal(
+                          onPressed: state.ocupado
+                              ? null
+                              : () => context.read<SesionBloc>().add(const SalidaPedida()),
+                          child: const _TextoConIcono(Icons.logout_rounded, 'Cerrar sesión'),
+                        ),
                       ),
                       const SizedBox(height: 12),
                       TextButton(
@@ -144,6 +147,9 @@ class _DialogoBorrarCuentaState extends State<_DialogoBorrarCuenta> {
           scrollable: true,
           icon: const Icon(Icons.warning_amber_rounded, color: Paleta.peligro, size: 36),
           title: const Text('¿Borrar tu cuenta?'),
+          actionsOverflowAlignment: accionesApiladas.alineacion,
+          actionsOverflowDirection: accionesApiladas.direccion,
+          actionsOverflowButtonSpacing: accionesApiladas.separacion,
           content: Form(
             key: _formulario,
             child: Column(
@@ -182,11 +188,7 @@ class _DialogoBorrarCuentaState extends State<_DialogoBorrarCuenta> {
               child: const Text('Cancelar'),
             ),
             FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: Paleta.peligro,
-                minimumSize: const Size(0, 44),
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-              ),
+              style: estiloDePeligro.merge(estiloDeBotonDeDialogo),
               onPressed: state.ocupado ? null : _borrar,
               child: const Text('Borrar cuenta'),
             ),
