@@ -138,6 +138,7 @@ class _Cuerpo extends StatelessWidget {
                         BotonDeReglas(
                           mapa: mapas.firstWhere((m) => m.nivel == state.vista!.nivel),
                           enLinea: true,
+                          meta: state.vista!.meta,
                         ),
                     ],
                   ),

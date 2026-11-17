@@ -70,7 +70,7 @@ class VistaResultado extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                motivoDelFin(resultado.motivo),
+                motivoDelFin(resultado.motivo, meta: sala.meta),
                 key: const ValueKey('motivo-del-fin'),
                 textAlign: TextAlign.center,
                 style: textos.bodyLarge?.copyWith(
@@ -91,6 +91,7 @@ class VistaResultado extends StatelessWidget {
                   puesto: puestos[i],
                   nombre: fila.usuario,
                   puntos: fila.puntos,
+                  meta: sala.meta,
                   lider: resultado.ganadores.contains(fila.usuario),
                   mia: fila.usuario == sala.yo.usuario,
                   fuera: fila.estado != 'activo',

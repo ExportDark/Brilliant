@@ -247,6 +247,11 @@ class VistaDeSala {
   final String anfitrion;
   final int ronda;
 
+  /// Los puntos para ganar: gana el primero que llega. Depende de cuántos empiezan (con
+  /// 2, 26; con 3, 24; con 4, 22; con 5 o 6, 20) y se fija al empezar; en el lobby es la
+  /// que tocaría con los que ya entraron. `null` si el servidor no la manda (uno viejo).
+  final int? meta;
+
   /// Los dos dados de la ronda, iguales para todos, o `null` fuera de la partida.
   final List<int>? dados;
   final double? segundosRestantes;
@@ -262,6 +267,7 @@ class VistaDeSala {
     required this.nivel,
     required this.anfitrion,
     required this.ronda,
+    this.meta,
     required this.dados,
     required this.segundosRestantes,
     required this.yo,
@@ -279,6 +285,7 @@ class VistaDeSala {
         nivel: json['nivel'] as int,
         anfitrion: json['anfitrion'] as String,
         ronda: json['ronda'] as int,
+        meta: json['meta'] as int?,
         dados: json['dados'] == null
             ? null
             : [for (final d in json['dados'] as List<dynamic>) d as int],

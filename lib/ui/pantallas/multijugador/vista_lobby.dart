@@ -10,6 +10,7 @@ import '../../../modelo/mapa.dart';
 import '../../tema.dart';
 import '../../widgets/tarjeta_de_mapa.dart';
 import 'lista_de_jugadores.dart';
+import 'textos_multijugador.dart';
 import '../../widgets/piezas.dart';
 
 /// El lobby: el código para invitar, quiénes ya entraron, el mapa y "Empezar" (solo el
@@ -85,6 +86,12 @@ class VistaLobby extends StatelessWidget {
               'Jugadores (${sala.jugadores.length}/6)',
               style: textos.titleMedium,
             ),
+            if (sala.meta case final meta?)
+              Text(
+                '${ganaQuienLlegaA(meta)} Con más jugadores, la meta baja.',
+                key: const ValueKey('meta-de-la-sala'),
+                style: textos.bodyMedium?.copyWith(color: Paleta.tintaSuave),
+              ),
             const SizedBox(height: 6),
             ListaDeJugadores(jugadores: sala.jugadores, yo: sala.yo.usuario),
             const SizedBox(height: 20),

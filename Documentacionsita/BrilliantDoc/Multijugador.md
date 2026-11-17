@@ -24,16 +24,17 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
 1. **Crear o unirse.** Desde "Elige un mapa", el botón de personas abre "Jugar con otros":
    "Crear sala" da un código de 6 caracteres, sin los que se confunden al dictarlo (0/O,
    1/I/L). Quien lo recibe lo escribe en "Código de la sala" y toca "Unirme".
-2. **El lobby.** El código grande (con botón para copiarlo), los jugadores (el anfitrión
-   con estrella, hasta 6) y el mapa. **El mapa se elige con las mismas tarjetas de "Elige
+2. **El lobby.** El código en fichas (con botón para copiarlo), la meta de puntos ("Gana el
+   primero que llegue a 26 puntos.", que baja al entrar más jugadores), los jugadores (el
+   anfitrión con estrella, hasta 6) y el mapa. **El mapa se elige con las mismas tarjetas de "Elige
    un mapa"**, con su tablero en miniatura (`TarjetaDeMapa`); la elegida lleva un borde de
-   color. Quien no es el anfitrión ve solo la tarjeta del mapa elegido. "Empezar" se
+   amarilla. Quien no es el anfitrión ve solo la tarjeta del mapa elegido. "Empezar" se
    habilita con 2 o más. **Salir del lobby** (o la flecha de atrás) vuelve directo a
    "Elige un mapa". Si el anfitrión cierra la sala, los demás ven "El anfitrión cerró la
    sala." (no un resultado: no hubo partida).
 3. **La preparación.** La misma pantalla del modo de un jugador (`PantallaPreparacion`, con
    `alConfirmar` y `titulo`), a pantalla completa, con la cuenta regresiva en el título
-   ("Reparte tus números · 60 s"). Al tocar "Inicio" el reparto va al servidor y se espera
+   ("Quedan 60 s"). Al tocar "Inicio" el reparto va al servidor y se espera
    a los demás, viendo quién ya terminó. A los 60 s, el servidor reparte al azar a quien
    no lo hizo. Si el servidor rechaza el reparto, o no le llega, la pantalla vuelve a ser
    editable con los mismos números (`PreparacionReabierta`) para corregirlo.
@@ -44,9 +45,12 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
    Las casillas que la regla de su zona bloquea se ven un poco apagadas y, al tocar una
    casilla que no vale, la línea de arriba explica por qué, igual que jugando solo (con
    las reglas de la app; la jugada nunca se manda).
-5. **El resultado.** Quién ganó y por qué ("Todos llenaron su tablero", "Ya nadie puede
-   jugar", "El anfitrión se fue: ganan los demás"…), el ranking con puntos y primeros
-   puestos, y cómo quedaron las zonas.
+5. **El resultado.** Quién ganó y por qué ("Se alcanzó la meta: 26 puntos.", "Todos
+   llenaron su tablero", "Ya nadie puede jugar", "El anfitrión se fue: ganan los
+   demás"…), el ranking con puntos y primeros puestos, y cómo quedaron las zonas.
+
+**Gana el primero que llega a la meta**: 26 puntos con 2 jugadores, 24 con 3, 22 con 4 y
+20 con 5 o 6. Se fija al empezar. Ver [[Puntuación#La meta (2026-11-17)]].
 
 "Rendirse" pide confirmación; salir de la pantalla a mitad de partida es rendirse. Quien
 se rinde o se desconecta conserva sus puntos, pero no puede ganar.
@@ -61,7 +65,8 @@ mapa":
   final, tachados. Cada fila: el puesto en un círculo (amarillo para el que va primero,
   cuando ya hay puntos), el nombre solo, debajo **"Tú" y si se fue** ("Tú, se rindió"),
   **un punto del color de cada zona que llenó**, si ya jugó la ronda y los **puntos
-  grandes**, que cambian con un fundido suave. Mi fila va en amarillo suave. Las
+  grandes**, que cambian con un fundido suave, y una **pista de puntos**: una barra fina
+  que se llena hasta la meta, para ver quién está cerca. La nota de arriba dice la meta. Mi fila va en amarillo suave. Las
   etiquetas van debajo y no pegadas al nombre: en un celular se cortaban con él. El
   resultado final usa las mismas filas (`FilaDePuntos`), con los primeros puestos en la
   misma línea de abajo, y arriba un cartel con quién ganó (ver

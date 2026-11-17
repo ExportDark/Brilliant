@@ -14,7 +14,9 @@ String nombreDeColor(String color) => switch (color) {
 };
 
 /// Por qué terminó la partida.
-String motivoDelFin(String motivo) => switch (motivo) {
+String motivoDelFin(String motivo, {int? meta}) => switch (motivo) {
+  'meta_alcanzada' =>
+    meta == null ? 'Alguien llegó a la meta de puntos.' : 'Se alcanzó la meta: $meta puntos.',
   'tablero_lleno' => 'Todos llenaron su tablero.',
   'sin_jugadas' => 'Ya nadie puede jugar.',
   'anfitrion_se_fue' => 'El anfitrión se fue: ganan los demás.',
@@ -56,3 +58,6 @@ String? etiquetasDeJugador({
   ].where((e) => e.isNotEmpty).join(', ');
   return etiquetas.isEmpty ? null : '${etiquetas[0].toUpperCase()}${etiquetas.substring(1)}';
 }
+
+/// La regla de la meta, para el lobby, el marcador y las reglas.
+String ganaQuienLlegaA(int meta) => 'Gana el primero que llegue a $meta puntos.';

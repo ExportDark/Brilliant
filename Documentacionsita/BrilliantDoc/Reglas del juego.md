@@ -16,6 +16,10 @@ Entre más zonas completes cumpliendo su regla, mejor tablero terminas.
 > cambia es cuántos turnos tarda. Este objetivo, tal como lo plantea el manual, supone un
 > número fijo de rondas. Ver [[Puntuación]].
 
+En línea el objetivo es otro: **llegar primero a la meta de puntos** (26 con 2 jugadores,
+24 con 3, 22 con 4, 20 con 5 o 6), llenando zonas antes que los demás. Ver
+[[Puntuación#La meta (2026-11-17)]].
+
 ## Materiales
 
 - Una hoja/tablero de 7×7 por jugador

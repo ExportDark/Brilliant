@@ -207,6 +207,16 @@ void main() {
           expect(fin.resultado, isNotNull, reason: 'partida $partida');
           expect(fin.resultado!.ranking.map((f) => f.usuario), unorderedEquals([ana.usuario, beto.usuario]));
           expect(fin.resultado!.ganadores, isNotEmpty);
+          // Con 2 jugadores se gana llegando a 26 puntos.
+          expect(fin.meta, 26);
+          expect(fin.resultado!.motivo, isIn(['meta_alcanzada', 'tablero_lleno', 'sin_jugadas']));
+          if (fin.resultado!.motivo == 'meta_alcanzada') {
+            for (final fila in fin.resultado!.ranking) {
+              if (fin.resultado!.ganadores.contains(fila.usuario)) {
+                expect(fila.puntos, greaterThanOrEqualTo(26));
+              }
+            }
+          }
           for (final fila in fin.resultado!.ranking) {
             expect(fila.puntos, greaterThanOrEqualTo(0));
           }
@@ -271,7 +281,7 @@ void main() {
   );
 
   test(
-    'Si el anfitrión se va en el lobby, la sala termina para todos; y los errores de salas',
+    'Si el anfitrión se va del lobby, la sala se cierra para todos; y los errores de salas',
     () async {
       final codigo = (await ana.salas.crear()).codigo;
       await beto.salas.unirse(codigo);
@@ -287,10 +297,16 @@ void main() {
       // Quien no está en la sala no la ve.
       expect((await errorDe(carla.salas.estado(codigo))).estadoHttp, 403);
 
+      // El anfitrión que cierra el lobby no recibe sala (el servidor contesta 204): no hubo
+      // partida. Los demás ven la sala cerrada, sin un "ganan los demás" de mentira.
       final cerrada = await ana.salas.rendirse(codigo);
-      expect(cerrada?.resultado?.motivo, 'anfitrion_se_fue');
+      expect(cerrada, isNull);
       final vistaDeBeto = await beto.salas.estado(codigo);
-      expect(vistaDeBeto?.estado, anyOf(EstadoDeSala.terminada, isNull));
+      if (vistaDeBeto != null) {
+        expect(vistaDeBeto.estado, EstadoDeSala.terminada);
+        expect(vistaDeBeto.resultado?.motivo, 'sala_cerrada');
+        expect(vistaDeBeto.resultado?.ganadores, isEmpty);
+      }
     },
     skip: _conServidor ? false : _sinServidor,
   );
@@ -330,6 +346,7 @@ void main() {
 
       expect(fin.resultado!.ranking, hasLength(6));
       expect(fin.resultado!.ganadores, isNotEmpty);
+      expect(fin.meta, 20); // con 6 jugadores
       // Los puntos salen en orden de mayor a menor.
       final puntos = [for (final f in fin.resultado!.ranking) f.puntos];
       expect(puntos, orderedEquals([...puntos]..sort((a, b) => b.compareTo(a))));

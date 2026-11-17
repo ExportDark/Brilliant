@@ -25,6 +25,7 @@ class PreparacionEnLinea extends StatelessWidget {
       mapa: mapa,
       // Corto, para que la cuenta quepa en la barra de arriba.
       titulo: tiempo == null ? 'Reparte tus números' : 'Quedan ${tiempo.ceil()} s',
+      meta: sala.meta,
       alConfirmar: (valores) => context.read<SalaBloc>().add(
         PreparacionEnviada({
           for (final MapEntry(:key, :value) in valores.entries)

@@ -93,6 +93,9 @@ class FilaDePuntos extends StatelessWidget {
   /// La clave del texto de los puntos.
   final Key? clavePuntos;
 
+  /// La meta de la partida: si se sabe, debajo del nombre va una pista con cuánto falta.
+  final int? meta;
+
   const FilaDePuntos({
     super.key,
     required this.puesto,
@@ -105,6 +108,7 @@ class FilaDePuntos extends StatelessWidget {
     this.zonas = const [],
     this.estado,
     this.clavePuntos,
+    this.meta,
   });
 
   @override
@@ -113,6 +117,7 @@ class FilaDePuntos extends StatelessWidget {
     final tinta = fuera ? Paleta.tintaSuave : Paleta.tinta;
     final detalle = this.detalle;
     final estado = this.estado;
+    final meta = this.meta;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
@@ -164,6 +169,14 @@ class FilaDePuntos extends StatelessWidget {
                     detalle,
                     style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
                   ),
+                if (meta != null && meta > 0) ...[
+                  const SizedBox(height: 5),
+                  _PistaDePuntos(
+                    key: ValueKey('pista-$nombre'),
+                    avance: (puntos / meta).clamp(0.0, 1.0),
+                    apagada: fuera,
+                  ),
+                ],
               ],
             ),
           ),
@@ -198,6 +211,38 @@ class FilaDePuntos extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// La pista de puntos: una barra fina de lo que lleva sobre la meta, como la pista de
+/// puntos de un tablero de juego. Se llena en tinta; la de quien se fue, apagada.
+class _PistaDePuntos extends StatelessWidget {
+  final double avance;
+  final bool apagada;
+
+  const _PistaDePuntos({super.key, required this.avance, required this.apagada});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 6,
+      decoration: BoxDecoration(
+        color: Paleta.baseTablero,
+        borderRadius: BorderRadius.circular(3),
+      ),
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: avance,
+        heightFactor: 1,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          decoration: BoxDecoration(
+            color: apagada ? Paleta.tintaSuave : Paleta.tinta,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
       ),
     );
   }
@@ -256,11 +301,15 @@ class Marcador extends StatelessWidget {
   final String yo;
   final List<ZonaEnSala> zonas;
 
+  /// La meta de la partida, o `null` si el servidor no la manda.
+  final int? meta;
+
   const Marcador({
     super.key,
     required this.jugadores,
     required this.yo,
     required this.zonas,
+    this.meta,
   });
 
   @override
@@ -283,7 +332,10 @@ class Marcador extends StatelessWidget {
     return TarjetaDeSeccion(
       key: const ValueKey('marcador'),
       titulo: 'Marcador',
-      nota: 'Cada punto de color es una zona que llenó.',
+      nota: [
+        if (meta != null) ganaQuienLlegaA(meta!),
+        'Cada punto de color es una zona que llenó.',
+      ].join(' '),
       child: Column(
         children: [
           for (final (i, jugador) in ordenados.indexed)
@@ -296,6 +348,7 @@ class Marcador extends StatelessWidget {
                 estado: jugador.estado,
               ),
               puntos: jugador.puntos,
+              meta: meta,
               lider: hayPuntos && puestos[i] == 1 && jugador.activo,
               mia: jugador.usuario == yo,
               fuera: !jugador.activo,

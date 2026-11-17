@@ -12,7 +12,15 @@ class BotonDeReglas extends StatelessWidget {
   /// Si es una partida en línea: la hoja también explica los puntos.
   final bool enLinea;
 
-  const BotonDeReglas({super.key, required this.mapa, this.enLinea = false});
+  /// En línea, los puntos para ganar (si se saben).
+  final int? meta;
+
+  const BotonDeReglas({
+    super.key,
+    required this.mapa,
+    this.enLinea = false,
+    this.meta,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,19 +28,25 @@ class BotonDeReglas extends StatelessWidget {
       key: const ValueKey('boton-reglas'),
       tooltip: 'Reglas de las zonas',
       icon: const Icon(Icons.menu_book_rounded),
-      onPressed: () => mostrarReglas(context, mapa, enLinea: enLinea),
+      onPressed: () =>
+          mostrarReglas(context, mapa, enLinea: enLinea, meta: meta),
     );
   }
 }
 
 /// Abre las reglas de [mapa] en una hoja que sube desde abajo, sin dejar la partida.
-Future<void> mostrarReglas(BuildContext context, Mapa mapa, {bool enLinea = false}) {
+Future<void> mostrarReglas(
+  BuildContext context,
+  Mapa mapa, {
+  bool enLinea = false,
+  int? meta,
+}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
     backgroundColor: Paleta.carton,
-    builder: (_) => HojaDeReglas(mapa: mapa, enLinea: enLinea),
+    builder: (_) => HojaDeReglas(mapa: mapa, enLinea: enLinea, meta: meta),
   );
 }
 
@@ -42,7 +56,15 @@ class HojaDeReglas extends StatelessWidget {
   final Mapa mapa;
   final bool enLinea;
 
-  const HojaDeReglas({super.key, required this.mapa, this.enLinea = false});
+  /// En línea, los puntos para ganar (si se saben).
+  final int? meta;
+
+  const HojaDeReglas({
+    super.key,
+    required this.mapa,
+    this.enLinea = false,
+    this.meta,
+  });
 
   /// Los tipos de zona del mapa, sin repetir, en el orden en que aparecen.
   static List<TipoRegion> tiposDe(Mapa mapa) {
@@ -73,23 +95,33 @@ class HojaDeReglas extends StatelessWidget {
                 children: [
                   Text(
                     'Reglas del ${mapa.nombre}',
-                    style: textos.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                    style: textos.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     'Toca un dado: es el ancla. El otro número va en una casilla vacía '
                     'pegada (arriba, abajo o a un lado) a una que tenga el número del '
                     'ancla, y tiene que respetar la regla de su zona.',
-                    style: textos.bodyLarge?.copyWith(color: Paleta.tinta, height: 1.4),
+                    style: textos.bodyLarge?.copyWith(
+                      color: Paleta.tinta,
+                      height: 1.4,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   for (final tipo in tiposDe(mapa)) _ReglaDeZona(tipo: tipo),
                   if (enLinea) ...[
                     const SizedBox(height: 12),
                     Text(
-                      'En línea, cada zona da puntos al que la llena primero, segundo y '
+                      '${meta == null ? 'En línea, cada' : 'En línea gana el primero que llegue a '
+                                '$meta puntos: cada'} zona da puntos al que la llena primero, segundo y '
                       'tercero. Cuánto da cada una está en el panel de zonas.',
-                      style: textos.bodyMedium?.copyWith(color: Paleta.tintaSuave, height: 1.4),
+                      key: const ValueKey('reglas-en-linea'),
+                      style: textos.bodyMedium?.copyWith(
+                        color: Paleta.tintaSuave,
+                        height: 1.4,
+                      ),
                     ),
                   ],
                 ],
@@ -135,7 +167,9 @@ class _ReglaDeZona extends StatelessWidget {
               children: [
                 Text(
                   '${nombre[0].toUpperCase()}${nombre.substring(1)}',
-                  style: textos.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  style: textos.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 Text(
                   '${tipo.regla.descripcion}.',

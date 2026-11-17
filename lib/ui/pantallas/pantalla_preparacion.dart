@@ -34,12 +34,16 @@ class PantallaPreparacion extends StatelessWidget {
   /// El título de la barra de arriba, si no es el nombre del mapa.
   final String? titulo;
 
+  /// En línea, los puntos para ganar, para la hoja de reglas.
+  final int? meta;
+
   const PantallaPreparacion({
     super.key,
     this.mapa = nivel1,
     this.tirarDado,
     this.alConfirmar,
     this.titulo,
+    this.meta,
   });
 
   @override
@@ -56,6 +60,7 @@ class PantallaPreparacion extends StatelessWidget {
         tirarDado: tirarDado,
         alConfirmar: alConfirmar,
         titulo: titulo,
+        meta: meta,
       ),
     );
   }
@@ -66,12 +71,14 @@ class _VistaPreparacion extends StatefulWidget {
   final int Function()? tirarDado;
   final void Function(Map<Posicion, int> valores)? alConfirmar;
   final String? titulo;
+  final int? meta;
 
   const _VistaPreparacion({
     required this.mapa,
     required this.tirarDado,
     required this.alConfirmar,
     required this.titulo,
+    required this.meta,
   });
 
   @override
@@ -183,7 +190,13 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
           appBar: AppBar(
             title: Text(widget.titulo ?? widget.mapa.nombre),
             // En línea, la preparación es la misma pantalla con `alConfirmar`.
-            actions: [BotonDeReglas(mapa: widget.mapa, enLinea: widget.alConfirmar != null)],
+            actions: [
+              BotonDeReglas(
+                mapa: widget.mapa,
+                enLinea: widget.alConfirmar != null,
+                meta: widget.meta,
+              ),
+            ],
           ),
           body: SafeArea(
             child: SingleChildScrollView(

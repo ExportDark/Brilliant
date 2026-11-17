@@ -7,6 +7,17 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-17 — La meta de puntos en línea
+
+- **Gana el primero que llega a la meta** (servidor y app): 26 puntos con 2 jugadores, 24
+  con 3, 22 con 4, 20 con 5 o 6. Se fija al empezar y no cambia si alguien se va. Al
+  cerrar la ronda en que alguien llega, la partida termina; si llegan varios, gana el de
+  más puntos. Se ve en el lobby, el marcador (con una pista de puntos por jugador), las
+  reglas y el resultado. Ver [[Puntuación#La meta (2026-11-17)]].
+- **Una prueba contra el servidor de verdad estaba vieja**: esperaba "el anfitrión se
+  fue" al cerrar el lobby, que desde el 2026-11-11 es "sala cerrada" sin sala para el
+  anfitrión. Se actualizó; las 14 partidas contra el servidor pasan.
+
 ## 2026-11-13 — Lo que faltaba del diseño
 
 - **Diálogos, resultado y detalles**: salir y rendirse preguntan con el botón en rojo, y

@@ -185,7 +185,12 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
             ),
           ),
         const SizedBox(height: 20),
-        Marcador(jugadores: sala.jugadores, yo: yo.usuario, zonas: sala.zonas),
+        Marcador(
+          jugadores: sala.jugadores,
+          yo: yo.usuario,
+          zonas: sala.zonas,
+          meta: sala.meta,
+        ),
         const SizedBox(height: 14),
         PanelDeZonas(zonas: sala.zonas),
         if (yo.activo) ...[

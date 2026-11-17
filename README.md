@@ -35,8 +35,8 @@ Construcción incremental, módulo por módulo:
       cerrar sesión, y borrarla
 - [x] La app encuentra el servidor sola en la WiFi (mDNS), aunque la PC cambie de red; con
       varios, se elige de la lista en "Iniciar sesión"
-- [x] Multijugador: salas con código de 2 a 6 jugadores, con puntos por zona (jugable, sin
-      diseño todavía)
+- [x] Multijugador: salas con código de 2 a 6 jugadores, con puntos por zona; gana el primero
+      que llega a la meta (26 puntos con 2 jugadores, 24 con 3, 22 con 4, 20 con 5 o 6)
 - [ ] Puntuación jugando solo
 
 ## Estructura
@@ -417,7 +417,9 @@ anfitrión elige el mapa con las mismas tarjetas del inicio y empieza con 2 o m�
 
 El servidor tira los dados, valida y calcula los puntos por zona; la app (`ClienteSalas`,
 `SalaBloc`) pregunta cada segundo y dibuja. Nadie ve el tablero de los demás; un panel de
-zonas dice cuáles siguen dando puntos. Quien pasa 10 s sin hablarle al servidor queda
+zonas dice cuáles siguen dando puntos. Gana el primero que llega a la meta de puntos
+(`VistaDeSala.meta`, que manda el servidor): se ve en el lobby, en el marcador (con una
+pista de puntos por jugador), en las reglas y en el resultado. Quien pasa 10 s sin hablarle al servidor queda
 fuera ("Reconectando…" a los 3 s); si se va el anfitrión, ganan los demás. Ver las notas
 "Multijugador", "Puntuación" y "Revisión de lógica" del vault.
 
