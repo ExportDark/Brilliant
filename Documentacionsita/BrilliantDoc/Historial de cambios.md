@@ -16,6 +16,9 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
   detalles que salieron en el emulador (la ayuda del usuario cortada, el ícono del
   diálogo, el aviso de la sesión, "Tirar dados" desbordado en 320 px). Ver
   [[Interfaz del tablero#Diálogos, avisos y el final]].
+- **Ícono propio y arranque**: un dado de cartón con el cinco en los colores de las zonas,
+  hecho por `tool/generar_icono.py`, en Android (adaptable y temático) y en la web; la app
+  arranca en el fieltro en vez de en blanco. Ver [[Versión Android#El ícono y el arranque]].
 
 ## 2026-11-12 — Botón de reglas y diseño de piezas de mesa
 

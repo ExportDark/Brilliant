@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- La mesa de fieltro: el fondo de la app (Paleta.mesa en lib/ui/tema.dart). -->
+    <color name="mesa">#2F5D50</color>
+</resources>

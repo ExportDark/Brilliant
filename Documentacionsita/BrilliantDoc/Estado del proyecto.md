@@ -124,6 +124,9 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Diálogos y resultado** (2026-11-13) — lo que no tiene vuelta en rojo, el cartel del
       resultado, el código de sala en fichas y los nombres que ya no se cortan. Ver
       [[Interfaz del tablero#Diálogos, avisos y el final]]
+- [x] **Ícono propio y arranque** (2026-11-13) — un dado con el cinco en los colores de las
+      zonas, sobre el fieltro, en Android y en la web; la app arranca en la mesa. Ver
+      [[Versión Android#El ícono y el arranque]]
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
@@ -142,7 +145,6 @@ juegan contra el servidor de verdad.
 - [ ] Tests de integración reproduciendo las Partidas 1 y 2 del manual. Ojo: esas partidas
       se jugaron con la regla del PDF (cualquier casilla libre), sin la regla del dado
       ancla. Sirven para validar las reglas de color, no la del dado ancla
-- [ ] Ícono propio para la app de Android (hoy usa el de Flutter)
 
 ## Cómo se viene trabajando
 

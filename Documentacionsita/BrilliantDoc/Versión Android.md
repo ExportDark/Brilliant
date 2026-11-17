@@ -13,12 +13,28 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Interfaz del tablero]] · [
 | Paquete (applicationId) | `com.exportdark.brilliant` |
 | Orientación | Solo vertical (`android:screenOrientation="portrait"`) |
 | Versión | La de `pubspec.yaml` (hoy `1.0.0+1`) |
-| Ícono | El de Flutter, por ahora |
+| Ícono | Un dado de cartón con el cinco en los colores de las zonas, sobre el fieltro (ver abajo) |
 | Firma | La clave de depuración de la PC (`~/.android/debug.keystore`) |
 
 Todo eso vive en `android/`, que creó `flutter create --platforms=android --org
-com.exportdark .`. Lo único que se tocó a mano es `android/app/src/main/AndroidManifest.xml`:
-el nombre y la orientación.
+com.exportdark .`. A mano se tocaron `android/app/src/main/AndroidManifest.xml` (el nombre y
+la orientación) y el ícono y el arranque.
+
+## El ícono y el arranque
+
+- **El ícono** es un dado de cartón con borde de tinta y sombra dura, que muestra el cinco
+  con un punto de cada color de zona, sobre la mesa de fieltro: los dados y las zonas, que
+  son el juego. Lo genera `tool/generar_icono.py` (`python tool/generar_icono.py`), sin
+  librerías: escribe el ícono adaptable de Android 8 en adelante como vector
+  (`drawable/ic_launcher_foreground.xml`, con su silueta de un color para los íconos
+  temáticos de Android 13), los PNG de los Android viejos y los de la web (`web/icons/`,
+  `favicon.png`).
+- **Antes se probó** con cuatro fichas de colores en dos por dos: se parecía demasiado al
+  logo de Windows.
+- **El arranque** es la mesa de fieltro (`@color/mesa`, el mismo `#2F5D50` de la app), con
+  el ícono al centro en Android 12 en adelante (`values-v31/styles.xml`). Antes era blanco
+  con el logo de Flutter. La web también arranca en fieltro, con el nombre "Brilliant" y
+  el color en el `manifest.json`.
 
 ## Compilar el APK
 

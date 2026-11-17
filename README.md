@@ -59,7 +59,8 @@ lib/
     tema.dart   colores, letra y estilo de la app
 assets/fuentes/ Archivo y Archivo Black (licencia OFL)
   main.dart
-tool/       exportar_para_el_servidor.dart: los mapas y las jugadas en JSON, para el servidor
+tool/       exportar_para_el_servidor.dart: los mapas y las jugadas en JSON, para el servidor;
+            generar_icono.py: el ícono de Android y de la web (python tool/generar_icono.py)
 test/       tests, misma estructura que lib/
 (el servidor vive en otro repositorio: https://github.com/ExportDark/Brilliant-Servidor,
  clonado en la carpeta hermana `Brilliant-servidor`)
