@@ -1,7 +1,7 @@
 # Revisión de lógica
 
 Una revisión de los errores de lógica del proyecto (app y servidor), hecha a pedido el
-2026-11-10 y 2026-11-11 (y otra el 2026-11-17, ver abajo), después del reporte "no me deja iniciar sesión porque ya aparece
+2026-11-10 y 2026-11-11 (y otras el 2026-11-17 y el 2026-11-18, ver abajo), después del reporte "no me deja iniciar sesión porque ya aparece
 que está logueado". Cada error que se encontró se arregló con una prueba que lo
 reproduce, y se comprobó que esa prueba falla sin el arreglo.
 
@@ -65,6 +65,18 @@ había pruebas en los dos repos), así que validar el reparto casilla por casill
 
 Se comprobó con `tool/probar_todo.sh`: 1093 pruebas del servidor, 790 de la app, y las 4 de
 cuentas y las 14 de partidas contra el servidor de verdad, todas pasando.
+
+## Tercera revisión: las animaciones (2026-11-18)
+
+Después de las animaciones de cartoon viejo, que es lo más nuevo. Se leyó todo el código
+de las animaciones buscando lo que pudiera fallar; cada prueba nueva se vio fallar sin
+su arreglo.
+
+| Error | Qué pasaba | Arreglo | Commit |
+|---|---|---|---|
+| **Las casillas tocables quedaron partidas para el lector de pantalla** | Para no perder la animación, el toque pasó a una capa encima de la casilla: el lector leía el número en un elemento que no se podía tocar, y encima un botón vacío | La acción de tocar va en la misma casilla que su número, y la capa de encima no se lee | app (este commit) |
+| **Un botón podía quedar hundido y aplastado** | Si se deshabilitaba con el dedo encima (por ejemplo, "Empezar" justo cuando se va un jugador), al soltar no se soltaba, y al volver a habilitarse quedaba hundido hasta el próximo toque | Soltar siempre suelta, y al deshabilitarse se suelta solo | app (este commit) |
+| **La explicación se fundía con "Quitar animaciones"** | Era la única animación con su duración fija | Usa `Cartoon.duracion`, como todas | app (este commit) |
 
 ## Riesgos conocidos, sin arreglar
 

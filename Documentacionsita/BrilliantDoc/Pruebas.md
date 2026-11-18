@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 822 tests, todos pasando, más 18 que hablan con el
+las pruebas y qué se aprendió de ellas. 828 tests, todos pasando, más 18 que hablan con el
 servidor de verdad y solo corren si se piden (2026-11-18). El servidor tiene los suyos
 (1093, ver abajo).
 
@@ -28,7 +28,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/juego/` | 130 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
 | `test/cuenta/` | 133 (+4) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
 | `test/multijugador/` | 80 (+14) | Los modelos que manda el servidor, `ClienteSalas` (cada ruta y cada error, con `MockClient`), `SalaBloc` (preguntar cada segundo, reconectando, conexión perdida, sala que desapareció o que cerró el anfitrión, doble toque…) y el reloj que no depende de la hora del teléfono; y, si se pide, partidas contra el servidor de verdad |
-| `test/ui/` | 278 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/ui/` | 284 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
 | `test/herramientas/` | 3 | Que los JSON que se copian al servidor (`tool/exportado/`) coincidan con lo que generaría el código de hoy |
 | `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
@@ -140,6 +140,9 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/animacion/nada_se_mueve_solo_test.dart` | Después de abrir cada pantalla y dejar que se asiente, no queda ningún cuadro pendiente: iniciar sesión, elegir mapa, preparación, partida con los dados, lobby, partida en línea y resultado (5 casos) |
 | `ui/animacion/la_tirada_salta_test.dart` | El dado salta, gira y cae quieto y derecho en su cara; durante el salto se lee "Dado: N" con la cara real y se puede tocar; salta cuando cambia la tirada y no si sigue la misma; el ancla brinca; con movimiento reducido, nada (5 casos) |
 | `ui/animacion/pieza_que_se_aplasta_test.dart` | El botón se aplasta al apretarlo, al soltarlo se estira un instante y se asienta como era, y después no queda nada moviéndose; con movimiento reducido o deshabilitado, no se aplasta (3 casos) |
+| `ui/animacion/boton_que_se_deshabilita_apretado_test.dart` | Si el botón se deshabilita con el dedo encima, al volver a habilitarse no queda hundido ni aplastado; y si se habilita antes de soltar, tampoco (2 casos; sin el arreglo quedaba aplastado en 0,08) |
+| `ui/animacion/explicacion_sin_movimiento_test.dart` | La explicación aparece con un fundido; con movimiento reducido aparece y se va de una vez (2 casos) |
+| `ui/widgets/tablero/casilla_tocable_es_un_solo_elemento_test.dart` | Para el lector de pantalla, una casilla tocable es un solo elemento con su número y la acción de tocar, y tocarla ahí llega a la casilla; una que no responde no se ofrece (2 casos; sin el arreglo el número no tenía la acción) |
 | `ui/widgets/celda/aro_solo_en_iniciales_test.dart` | Solo las casillas iniciales llevan el aro tenue de 2 px, y no es negro |
 | `ui/widgets/celda/numero_legible_sobre_cada_color_test.dart` | `tintaSobre`: el número va en tinta sobre los 7 colores de zona y en cartón sobre un fondo oscuro |
 | `ui/widgets/tablero/sin_coordenadas_test.dart` | El tablero no muestra las letras A–G ni los números 1–7 |

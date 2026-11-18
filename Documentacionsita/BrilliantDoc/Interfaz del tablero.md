@@ -147,7 +147,7 @@ sombra dura y **los puntos** de su cara (de 1 a 6), repartidos en una grilla de 
 
 Al tocar una casilla vacía donde no se puede jugar, el motivo aparece **en la misma línea
 de la indicación, arriba del tablero**, sin recuadro: un punto del color de la zona y el
-texto, con un fundido (`LineaDeIndicacion`). La casilla tocada lleva un **aro suave** en un
+texto, con un fundido (`LineaDeIndicacion`; con "Quitar animaciones", sin fundido). La casilla tocada lleva un **aro suave** en un
 tono oscuro de su zona (`CeldaWidget.marcada`). A los 4 segundos, o con lo siguiente que
 haga el jugador, vuelve la indicación de siempre. Puede ser que no está junto a ninguna
 casilla con el número buscado, o la regla de la zona con lo que la zona ya tiene. Es lo
@@ -231,7 +231,10 @@ Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
 Al dibujarse por primera vez (por ejemplo, al abrir una partida ya empezada) el tablero no
 se mueve: todo sale de comparar con lo que había antes. Para que una casilla no pierda su
 animación al volverse tocable, la ficha va siempre en el mismo lugar y el toque va
-encima, en una capa aparte.
+encima, en una capa aparte. Esa capa no se lee: para un lector de pantalla, la acción de
+tocar va en la misma casilla que su número (hasta el 2026-11-18 quedaba como un botón
+vacío encima de cada casilla). Si un botón se deshabilita con el dedo encima, se suelta
+solo: no queda hundido ni aplastado al volver a habilitarse.
 
 ## Cómo se decidió
 

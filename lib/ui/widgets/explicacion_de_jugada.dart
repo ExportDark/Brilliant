@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../juego/validacion_jugada.dart';
 import '../../modelo/color_zona.dart';
 import '../../modelo/posicion.dart';
+import '../animacion/cartoon.dart';
 import '../tema.dart';
 
 /// Un espacio que no se corta: así un número nunca queda solo en la línea de abajo
@@ -56,7 +57,8 @@ Explicacion? explicarJugada(ResultadoJugada resultado, {required int valor}) {
 
 /// La línea de arriba del tablero: qué hay que hacer, o, por unos segundos, por qué no se
 /// pudo anotar donde se tocó. Sin recuadro, para que no tape ni mueva nada: un punto del
-/// color de la zona y el texto, que aparece y se va con un fundido.
+/// color de la zona y el texto, que aparece y se va con un fundido (sin fundido si el
+/// sistema pide reducir movimiento).
 class LineaDeIndicacion extends StatelessWidget {
   final String indicacion;
   final Explicacion? explicacion;
@@ -80,7 +82,8 @@ class LineaDeIndicacion extends StatelessWidget {
     final color = explicacion?.color;
 
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 220),
+      // Con "Quitar animaciones", cambia de una vez.
+      duration: Cartoon.duracion(context, const Duration(milliseconds: 220)),
       child: explicacion == null
           ? Text(
               indicacion,

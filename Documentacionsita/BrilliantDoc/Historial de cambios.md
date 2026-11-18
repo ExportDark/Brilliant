@@ -7,6 +7,14 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-18 — Tercera revisión: las animaciones
+
+- **Las casillas tocables quedaron partidas para el lector de pantalla** (app): el número
+  y el toque vuelven a ser un solo elemento.
+- **Un botón podía quedar hundido** si se deshabilitaba con el dedo encima (app).
+- **La explicación se fundía con "Quitar animaciones"** (app).
+  Ver [[Revisión de lógica#Tercera revisión: las animaciones (2026-11-18)]].
+
 ## 2026-11-18 — Animaciones de cartoon viejo
 
 - Las piezas se mueven como en los dibujos animados viejos: aplastar y estirar, rebote de

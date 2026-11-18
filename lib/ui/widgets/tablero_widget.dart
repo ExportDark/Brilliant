@@ -219,21 +219,29 @@ class _TableroWidgetState extends State<TableroWidget>
     final tocable =
         widget.alTocar != null && (widget.esTocable?.call(posicion) ?? true);
 
+    final alTocar = tocable ? () => widget.alTocar!(posicion) : null;
+
     // La ficha va siempre en el mismo lugar (así conserva sus animaciones al volverse
-    // tocable); el toque va encima, solo si responde.
-    return Stack(
-      children: [
-        celda,
-        if (tocable)
-          Positioned.fill(
-            child: GestureDetector(
-              key: ValueKey('casilla-${posicion.notacion}'),
-              behavior: HitTestBehavior.opaque,
-              onTap: () => widget.alTocar!(posicion),
-              child: const MouseRegion(cursor: SystemMouseCursors.click),
+    // tocable); el toque va encima, solo si responde. Para el lector de pantalla, el
+    // toque va en la misma casilla que su número: la capa de encima no se lee (si no,
+    // sería un botón vacío sobre cada casilla).
+    return Semantics(
+      onTap: alTocar,
+      child: Stack(
+        children: [
+          celda,
+          if (tocable)
+            Positioned.fill(
+              child: GestureDetector(
+                key: ValueKey('casilla-${posicion.notacion}'),
+                behavior: HitTestBehavior.opaque,
+                excludeFromSemantics: true,
+                onTap: alTocar,
+                child: const MouseRegion(cursor: SystemMouseCursors.click),
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

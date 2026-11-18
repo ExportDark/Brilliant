@@ -100,8 +100,21 @@ class _PiezaPresionableState extends State<PiezaPresionable>
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(PiezaPresionable antes) {
+    super.didUpdateWidget(antes);
+    // Si se deshabilita con el dedo encima, se suelta sola: si no, al volver a
+    // habilitarse quedaría hundida y aplastada hasta el próximo toque.
+    if (!_activa && _hundida) {
+      _hundida = false;
+      _rebote.value = 1;
+    }
+  }
+
   void _hundir(bool hundida) {
-    if (!_activa || hundida == _hundida) return;
+    if (hundida == _hundida) return;
+    // Deshabilitada no se aprieta, pero soltarla siempre la suelta.
+    if (hundida && !_activa) return;
     setState(() => _hundida = hundida);
     if (hundida) {
       _rebote.value = 1;
