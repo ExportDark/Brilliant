@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 790 tests, todos pasando, más 18 que hablan con el
+las pruebas y qué se aprendió de ellas. 796 tests, todos pasando, más 18 que hablan con el
 servidor de verdad y solo corren si se piden (2026-11-17). El servidor tiene los suyos
 (1093, ver abajo).
 
@@ -133,6 +133,8 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 
 | Archivo | Qué prueba |
 |---|---|
+| `ui/animacion/curvas_cartoon_test.dart` | La goma empieza en 0, se pasa de 1 y termina exacto en 1; "en dos" se queda quieto dentro de cada cuadro de 1/12 s (3 casos) |
+| `ui/animacion/pieza_que_se_aplasta_test.dart` | El botón se aplasta al apretarlo, al soltarlo se estira un instante y se asienta como era, y después no queda nada moviéndose; con movimiento reducido o deshabilitado, no se aplasta (3 casos) |
 | `ui/widgets/celda/aro_solo_en_iniciales_test.dart` | Solo las casillas iniciales llevan el aro tenue de 2 px, y no es negro |
 | `ui/widgets/celda/numero_legible_sobre_cada_color_test.dart` | `tintaSobre`: el número va en tinta sobre los 7 colores de zona y en cartón sobre un fondo oscuro |
 | `ui/widgets/tablero/sin_coordenadas_test.dart` | El tablero no muestra las letras A–G ni los números 1–7 |

@@ -183,6 +183,39 @@ o deslizando hacia abajo, y la partida sigue igual.
 - **El código de la sala va en fichas**, una por letra, como las letras de un juego de
   mesa: así se dicta de a una. Para lectores de pantalla se anuncia entero.
 
+## Animaciones (cartoon viejo)
+
+Desde el 2026-11-17 las piezas se mueven como en los dibujos animados viejos, sin copiar
+ninguno: con sus principios. Se decidió **solo movimiento** (sin grano ni efectos de
+película: el fieltro, el cartón y la tinta quedan como están), **marcadas pero rápidas**
+y el **iris solo al empezar y al terminar la partida**.
+
+- **Aplastar y estirar:** las piezas se aplastan al chocar (más anchas y más bajas) y se
+  estiran en el aire (`AplastarYEstirar`, desde abajo, como contra la mesa).
+- **Rebote de goma** (`CurvaDeGoma`): se pasa de largo (alrededor de un 30 %) y vuelve
+  con dos oscilaciones que se apagan, terminando exacto donde va.
+- **"Animar en dos"** (`EnDos`): lo decorativo cambia a 12 cuadros por segundo, lo que
+  da el aire de dibujo animado viejo; el movimiento de las piezas va suave.
+- **Polvo y rayitas de brillo** (`NubesDePolvo`, `RayitasDeBrillo`): el "¡puf!" y el
+  "¡ding!" de los cartoons, en cartón con borde de tinta y en tinta.
+
+Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
+(`Cartoon.toque`, `Cartoon.tirada`…). Reglas para todas:
+
+- **Solo se mueve algo cuando pasa algo** (tocar, tirar, anotar, terminar). Nada se
+  mueve en reposo: no gasta batería y las pruebas que esperan a que todo se quiete no se
+  traban. Una prueba lo exige después de abrir cada pantalla.
+- **Con "Quitar animaciones"** del sistema (`MediaQuery.disableAnimationsOf`), todo queda
+  en su estado final al instante.
+- **Solo transformaciones**, nunca cambios de tamaño: nada se desborda a mitad de camino.
+- **El estado real cambia al instante**: lo que lee un lector de pantalla y lo que se
+  puede tocar no esperan a la animación.
+- **Medio segundo como máximo** cada una; el iris del final dura más, una vez por partida.
+
+| Qué | Cuándo | Cómo |
+|---|---|---|
+| Botones principales (`PiezaPresionable`) | Al apretar y al soltar | Apretado, se hunde y se aplasta; al soltar, vuelve con la goma (se estira un instante) en 0,32 s |
+
 ## Cómo se decidió
 
 - **2026-11-13, lo que faltaba revisar:** se recorrieron en el emulador crear cuenta, los

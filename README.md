@@ -206,8 +206,13 @@ caber, por ejemplo a 42 px en un celular de 360 px.
   y `grosorDeTinta`, la sombra sin difuminar y el borde de las piezas; `coloresDeZona`,
   los colores planos de las 7 zonas; y `tintaSobre(fondo)`, que elige tinta o cartón por
   contraste para que el número siempre se lea.
+- `animacion/cartoon.dart`: la base de las animaciones al estilo de los dibujos animados
+  viejos: la curva de goma, "animar en dos" (12 cuadros por segundo), `AplastarYEstirar`,
+  el polvo y las rayitas de brillo, y las duraciones. Con "Quitar animaciones" del sistema,
+  nada se mueve.
 - `widgets/piezas.dart`: `Bandeja`, la bandeja de cartón donde va el contenido de cada
-  pantalla; `PiezaPresionable`, que hace que un botón se hunda al tocarlo; e `Insignia`,
+  pantalla; `PiezaPresionable`, que hace que un botón se hunda y se aplaste al tocarlo y
+  rebote al soltarlo; e `Insignia`,
   una ficha redonda con un ícono (el trofeo del final).
 - `widgets/confirmacion.dart`: `confirmar()`, la pregunta antes de salir de la partida o
   rendirse, con el botón de hacerlo en rojo (`estiloDePeligro`, en `tema.dart`) y, si no

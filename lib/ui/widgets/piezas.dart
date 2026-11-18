@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../animacion/cartoon.dart';
 import '../tema.dart';
 
 /// La decoración de una pieza de cartón: el color, el borde de tinta y la sombra dura.
@@ -62,6 +63,9 @@ class Bandeja extends StatelessWidget {
 /// Una pieza que se hunde al tocarla: la sombra dura se acorta y la pieza baja, como un
 /// botón de verdad. Envuelve a un botón (u otra cosa tocable) que ya tiene su borde; esta
 /// solo pone la sombra y el movimiento. Sin [activa], la sombra no se ve.
+///
+/// Como en los dibujos animados viejos, al apretarla además se aplasta (más ancha y más
+/// baja), y al soltarla vuelve con un rebote de goma: se estira un poco y se asienta.
 class PiezaPresionable extends StatefulWidget {
   final Widget child;
   final bool activa;
@@ -80,13 +84,38 @@ class PiezaPresionable extends StatefulWidget {
   State<PiezaPresionable> createState() => _PiezaPresionableState();
 }
 
-class _PiezaPresionableState extends State<PiezaPresionable> {
+class _PiezaPresionableState extends State<PiezaPresionable>
+    with SingleTickerProviderStateMixin {
+  /// Cuánto se aplasta mientras se la aprieta.
+  static const aplastadaAlApretar = 0.08;
+
   var _hundida = false;
 
+  /// El rebote al soltarla. Empieza terminado: en reposo, la pieza está como es.
+  late final _rebote = AnimationController(vsync: this, duration: Cartoon.toque, value: 1);
+
+  @override
+  void dispose() {
+    _rebote.dispose();
+    super.dispose();
+  }
+
   void _hundir(bool hundida) {
-    if (_activa && hundida != _hundida) {
-      setState(() => _hundida = hundida);
+    if (!_activa || hundida == _hundida) return;
+    setState(() => _hundida = hundida);
+    if (hundida) {
+      _rebote.value = 1;
+    } else if (!Cartoon.quieto(context)) {
+      _rebote.forward(from: 0);
     }
+  }
+
+  /// Cuánto se aplasta ahora: apretada, un poco; al soltarla, de ahí a cero con la goma
+  /// (que se pasa: se estira un instante antes de asentarse).
+  double get _aplastado {
+    if (!_activa || Cartoon.quieto(context)) return 0;
+    if (_hundida) return aplastadaAlApretar;
+    return aplastadaAlApretar * (1 - curvaDeGoma.transform(_rebote.value));
   }
 
   /// Si se ve como pieza: no si se la apagó, ni si el botón que envuelve está deshabilitado.
@@ -116,7 +145,15 @@ class _PiezaPresionableState extends State<PiezaPresionable> {
           borderRadius: BorderRadius.circular(widget.radio),
           boxShadow: alto > 0 ? sombraDura(alto) : null,
         ),
-        child: widget.child,
+        child: AnimatedBuilder(
+          animation: _rebote,
+          builder: (context, hijo) => AplastarYEstirar(
+            key: const ValueKey('aplastar-y-estirar'),
+            aplastado: _aplastado,
+            child: hijo!,
+          ),
+          child: widget.child,
+        ),
       ),
     );
   }
