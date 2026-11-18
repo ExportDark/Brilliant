@@ -41,9 +41,7 @@ class ListaDeServidores extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.dns_rounded, color: Paleta.disponible),
             title: Text(servidor.nombre, overflow: TextOverflow.ellipsis),
-            subtitle: Text(
-              'Disponible en ${textoDeDireccion(servidor.direccion)}',
-            ),
+            subtitle: const Text('Disponible'),
             trailing: servidor.direccion == actual
                 ? const Icon(Icons.check_rounded)
                 : null,

@@ -7,6 +7,15 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-18 — Al buscar el servidor, nada de lo de adentro
+
+- **Los mensajes ya no hablan de cómo funciona el servidor por dentro** (app): el diálogo
+  "Servidor" ya no manda a mirar `iniciar.bat` ("¿No aparece? Escribe su dirección.
+  Pídesela a quien encendió el servidor."), y el indicador, la lista y los avisos de
+  conexión ya no muestran direcciones ni puertos. Un servidor viejo que no dice su
+  nombre se llama "Servidor Brilliant" en lugar de su IP. La dirección solo se ve en el
+  campo donde se escribe. Ver [[Cuentas en la app#Si está disponible, a la vista]].
+
 ## 2026-11-18 — Tercera revisión: las animaciones
 
 - **Las casillas tocables quedaron partidas para el lector de pantalla** (app `d2f0a08`): el número

@@ -9,9 +9,6 @@ void main() {
     final servidor = ServidorFalso()..apagado = true;
     await abrirApp(tester, servidor: servidor, conSesion: false, buscador: BuscadorFalso());
 
-    expect(
-      indicadorDelServidor(tester),
-      'Sin servidor · No contesta en servidor.test. Toca para buscar otro.',
-    );
+    expect(indicadorDelServidor(tester), sinServidor);
   });
 }

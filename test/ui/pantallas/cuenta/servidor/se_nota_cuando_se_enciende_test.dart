@@ -19,6 +19,7 @@ void main() {
     await tester.pump(const Duration(seconds: 10));
     await tester.pumpAndSettle();
 
-    expect(indicadorDelServidor(tester), 'Servidor disponible · servidor.test');
+    expect(indicadorDelServidor(tester), servidorListo);
+    expect(servidorEnUso(tester), 'servidor.test');
   });
 }

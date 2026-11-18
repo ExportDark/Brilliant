@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 
 import 'almacen_de_sesion.dart';
 import 'cliente_cuentas.dart';
-import 'direccion_del_servidor.dart';
 import 'servidor_cubit.dart';
 import 'sesion_event.dart';
 import 'sesion_state.dart';
@@ -81,17 +80,16 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     }
   }
 
-  /// Cuando no se puede hablar con el servidor: dice con qué dirección se
-  /// intentó, para que se note si es la de otra red.
+  /// Cuando no se puede hablar con el servidor: qué hacer, sin la dirección (es un
+  /// dato de adentro; si es la de otra red, "Servidor" busca el de esta).
   ErrorDeCuenta _sinConexion(SinConexion error) => ErrorDeCuenta(
         generales: [
           if (error.agotada)
-            'El servidor (${textoDeDireccion(servidor)}) tardó demasiado en contestar. Puede '
-                'estar ocupado: espera un momento e intenta de nuevo.'
+            'El servidor tardó demasiado en contestar. Puede estar ocupado: espera un '
+                'momento e intenta de nuevo.'
           else
-            'No se pudo conectar con el servidor (${textoDeDireccion(servidor)}). Revisa que '
-                'esté encendido y que estés en la misma red, o cambia la dirección en '
-                '"Servidor".',
+            'No se pudo conectar con el servidor. Revisa que esté encendido y que estés en '
+                'la misma red, o elige otro en "Servidor".',
         ],
       );
 
@@ -264,8 +262,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       final encontrados = await _servidor.buscarOtro(intentada);
       if (encontrados.length > 1) {
         throw ErrorDeCuenta(generales: [
-          'No se pudo conectar con el servidor (${textoDeDireccion(intentada)}), y en la red '
-              'hay ${encontrados.length}. Elige uno en "Servidor".',
+          'No se pudo conectar con el servidor, y en la red hay ${encontrados.length}. '
+              'Elige uno en "Servidor".',
         ]);
       }
       if (encontrados.isEmpty) rethrow;

@@ -16,6 +16,7 @@ void main() {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpAndSettle();
 
-    expect(indicadorDelServidor(tester), 'Servidor disponible · servidor.test');
+    expect(indicadorDelServidor(tester), servidorListo);
+    expect(servidorEnUso(tester), 'servidor.test');
   });
 }

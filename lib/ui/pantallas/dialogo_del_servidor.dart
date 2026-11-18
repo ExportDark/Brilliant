@@ -9,8 +9,8 @@ import '../widgets/confirmacion.dart';
 
 /// El diálogo para elegir el servidor de cuentas. Al abrirse busca los que
 /// hay en la red, y basta con tocar uno. Si no aparece (por ejemplo, en la
-/// web, donde no se puede buscar), se escribe la IP de la PC donde corre
-/// `Brilliant-servidor\iniciar.bat`, que la muestra al arrancar.
+/// web, donde no se puede buscar), se escribe su dirección. Los textos no hablan
+/// de cómo funciona el servidor por dentro: la dirección se la da quien lo encendió.
 ///
 /// Al elegir o guardar, el [ServidorCubit] la guarda en el aparato y revisa
 /// que el servidor conteste ahí; el resultado se ve en "Iniciar sesión".
@@ -89,13 +89,12 @@ class _DialogoDelServidorState extends State<DialogoDelServidor> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'O escribe la dirección de la PC. Al arrancar, iniciar.bat del servidor '
-                'muestra cuál.',
+                '¿No aparece? Escribe su dirección. Pídesela a quien encendió el '
+                'servidor.',
               ),
             ] else
               const Text(
-                'La dirección de la PC donde corre el servidor. Al arrancar, '
-                'iniciar.bat del servidor muestra cuál escribir.',
+                'Escribe la dirección del servidor. Pídesela a quien lo encendió.',
               ),
             const SizedBox(height: 16),
             TextFormField(

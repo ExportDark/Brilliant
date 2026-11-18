@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../cuenta/direccion_del_servidor.dart';
 import '../../cuenta/servidor_cubit.dart';
 import '../../cuenta/servidor_state.dart';
 import '../tema.dart';
 
 /// Si el servidor de cuentas está disponible, a la vista: un punto verde y
 /// "Servidor disponible", un punto rojo y "Sin servidor", o una ruedita
-/// mientras lo busca. Debajo, a qué servidor se está hablando.
+/// mientras lo busca. Debajo, cómo se llama el servidor, si se sabe (nunca su
+/// dirección: es un dato de adentro).
 ///
 /// Se toca para elegir otro servidor ([alTocar]).
 class IndicadorDelServidor extends StatelessWidget {
@@ -22,17 +22,16 @@ class IndicadorDelServidor extends StatelessWidget {
 
     return BlocBuilder<ServidorCubit, ServidorState>(
       builder: (context, servidor) {
-        final direccion = textoDeDireccion(servidor.direccion);
         final nombre = servidor.nombre;
         final (titulo, detalle) = switch (servidor.disponibilidad) {
-          Disponibilidad.revisando => ('Buscando el servidor…', direccion),
+          Disponibilidad.revisando => ('Buscando el servidor…', nombre ?? 'Un momento.'),
           Disponibilidad.disponible => (
               'Servidor disponible',
-              nombre == null ? direccion : '$nombre ($direccion)',
+              nombre ?? 'Listo para jugar.',
             ),
           Disponibilidad.noDisponible => (
               'Sin servidor',
-              'No contesta en $direccion. Toca para buscar otro.',
+              'No contesta. Toca para buscar otro.',
             ),
           Disponibilidad.variosEncontrados => (
               'Hay varios servidores',

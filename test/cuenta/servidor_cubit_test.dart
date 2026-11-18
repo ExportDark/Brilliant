@@ -329,7 +329,8 @@ void main() {
       expect(await cubit.buscarServidores(), [anunciado('192.168.137.252', pc: 'VEGA')]);
     });
 
-    test('si el servidor no dice su nombre (uno de antes), se llama por su IP', () async {
+    test('si el servidor no dice su nombre (uno de antes), se llama "Servidor Brilliant", sin '
+        'su IP', () async {
       servidor.sinRutaDeNombre = true;
       buscador.anunciados.add(
         ServidorEncontrado(nombre: '', direccion: Uri.parse('https://192.168.137.252:8443/')),
@@ -339,7 +340,24 @@ void main() {
 
       final encontrados = await cubit.buscarServidores();
 
-      expect(encontrados.single.nombre, 'Brilliant en 192.168.137.252');
+      expect(encontrados.single.nombre, 'Servidor Brilliant');
+    });
+
+    test('dos servidores de antes, sin nombre, no se juntan en uno aunque se llamen igual', () async {
+      servidor
+        ..sinRutaDeNombre = true
+        ..otrasDirecciones.add('192.168.137.40');
+      buscador.anunciados.addAll([
+        ServidorEncontrado(nombre: '', direccion: Uri.parse('https://192.168.137.252:8443/')),
+        ServidorEncontrado(nombre: '', direccion: Uri.parse('https://192.168.137.40:8443/')),
+      ]);
+      final cubit = cubitConLaPcEnOtraRed();
+      addTearDown(cubit.close);
+
+      final encontrados = await cubit.buscarServidores();
+
+      expect(encontrados, hasLength(2));
+      expect(encontrados.map((e) => e.nombre).toSet(), {'Servidor Brilliant'});
     });
 
     test('el mismo servidor encontrado por mDNS y probando direcciones aparece una vez, con '

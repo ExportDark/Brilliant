@@ -8,7 +8,8 @@ void main() {
   testWidgets('PantallaEntrar: muestra a la vista que el servidor está disponible', (tester) async {
     await abrirApp(tester, conSesion: false);
 
-    expect(indicadorDelServidor(tester), 'Servidor disponible · servidor.test');
+    expect(indicadorDelServidor(tester), servidorListo);
+    expect(servidorEnUso(tester), 'servidor.test');
     // Un punto verde.
     expect(
       find.byWidgetPredicate(

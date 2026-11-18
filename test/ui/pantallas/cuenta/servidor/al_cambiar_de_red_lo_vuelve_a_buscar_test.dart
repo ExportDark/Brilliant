@@ -19,7 +19,8 @@ void main() {
       buscador: buscador,
       cambiosDeRed: cambiosDeRed.stream,
     );
-    expect(indicadorDelServidor(tester), 'Servidor disponible · servidor.test');
+    expect(indicadorDelServidor(tester), servidorListo);
+    expect(servidorEnUso(tester), 'servidor.test');
 
     // El celular y la PC se pasan a otra WiFi: el servidor ahora se anuncia en
     // la IP nueva, y en la vieja ya no contesta.
@@ -28,9 +29,7 @@ void main() {
     cambiosDeRed.add(null);
     await tester.pumpAndSettle();
 
-    expect(
-      indicadorDelServidor(tester),
-      'Servidor disponible · Brilliant en ORION (192.168.137.252)',
-    );
+    expect(indicadorDelServidor(tester), 'Servidor disponible · Brilliant en ORION');
+    expect(servidorEnUso(tester), '192.168.137.252');
   });
 }

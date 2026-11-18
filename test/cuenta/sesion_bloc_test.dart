@@ -400,7 +400,7 @@ void main() {
       verify: (bloc) {
         expect(
           bloc.state.error!.generales.single,
-          startsWith('No se pudo conectar con el servidor (servidor.test)'),
+          startsWith('No se pudo conectar con el servidor.'),
         );
         expect(buscador.busquedas, 1);
         expect(bloc.servidor, cubit.porDefecto);
@@ -425,8 +425,7 @@ void main() {
       verify: (bloc) {
         expect(
           bloc.state.error!.generales.single,
-          'No se pudo conectar con el servidor (servidor.test), y en la red hay 2. '
-          'Elige uno en "Servidor".',
+          'No se pudo conectar con el servidor, y en la red hay 2. Elige uno en "Servidor".',
         );
         expect(bloc.servidor, cubit.porDefecto);
       },

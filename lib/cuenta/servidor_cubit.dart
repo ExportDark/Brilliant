@@ -24,6 +24,9 @@ class ServidorCubit extends Cubit<ServidorState> {
   /// falta tanto como para un pedido de verdad.
   static const espera = Duration(seconds: 4);
 
+  /// Cómo se llama un servidor que no dice su nombre (uno de antes de `GET /servidor/`).
+  static const sinNombre = 'Servidor Brilliant';
+
   final ClienteCuentas _cuentas;
   final AlmacenDeSesion _almacen;
   final BuscadorDeServidores _buscador;
@@ -116,7 +119,8 @@ class ServidorCubit extends Cubit<ServidorState> {
   /// las dos búsquedas (mDNS y probando direcciones), también.
   ///
   /// Los que se encontraron sin nombre (probando direcciones) se lo preguntan al
-  /// servidor; si no lo dice, se llama por su IP.
+  /// servidor; si no lo dice (uno de antes), se llama [sinNombre]: nunca por su IP, que
+  /// es un dato de adentro.
   Future<List<ServidorEncontrado>> buscarServidores() async {
     // Uno por dirección, quedándose con el que trae nombre.
     final porDireccion = <Uri, ServidorEncontrado>{};
@@ -132,19 +136,23 @@ class ServidorCubit extends Cubit<ServidorState> {
       for (final candidato in candidatos) _contesta(candidato.direccion),
     ]);
 
-    final porNombre = <String, ServidorEncontrado>{};
+    // Los que dicen su nombre se juntan por nombre (uno con varias IPs aparece una vez);
+    // los que no, uno por dirección, aunque se muestren todos como "Servidor Brilliant".
+    final unoPorServidor = <String, ServidorEncontrado>{};
     for (final (i, candidato) in candidatos.indexed) {
       if (!contestan[i]) continue;
-      final conNombre = candidato.nombre.isNotEmpty
-          ? candidato
-          : ServidorEncontrado(
-              nombre: await _cuentas.nombreDelServidor(candidato.direccion) ??
-                  'Brilliant en ${candidato.direccion.host}',
-              direccion: candidato.direccion,
-            );
-      porNombre.putIfAbsent(conNombre.nombre, () => conNombre);
+      final nombre = candidato.nombre.isNotEmpty
+          ? candidato.nombre
+          : await _cuentas.nombreDelServidor(candidato.direccion);
+      unoPorServidor.putIfAbsent(
+        nombre ?? '${candidato.direccion}',
+        () => ServidorEncontrado(
+          nombre: nombre ?? sinNombre,
+          direccion: candidato.direccion,
+        ),
+      );
     }
-    return [...porNombre.values];
+    return [...unoPorServidor.values];
   }
 
   @override

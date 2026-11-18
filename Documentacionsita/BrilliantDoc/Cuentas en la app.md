@@ -175,8 +175,13 @@ entrar, antes de intentarlo:
 | Se ve | Cuándo |
 |---|---|
 | Una ruedita y "Buscando el servidor…" | Mientras revisa o busca |
-| Un punto verde y **"Servidor disponible"**, con la dirección (y el nombre, como "Brilliant en ORION", si lo encontró buscando) | El servidor contesta |
-| Un punto rojo y **"Sin servidor"**: "No contesta en 10.0.2.2. Toca para buscar otro." | No contesta, y en la red no se encontró otro |
+| Un punto verde y **"Servidor disponible"**, con el nombre si lo encontró buscando ("Brilliant en ORION"), o "Listo para jugar." | El servidor contesta |
+| Un punto rojo y **"Sin servidor"**: "No contesta. Toca para buscar otro." | No contesta, y en la red no se encontró otro |
+
+Desde el 2026-11-18, **nada de lo que se ve al buscar el servidor habla de cómo funciona por
+dentro**: ni direcciones ni puertos (antes decía "No contesta en 10.0.2.2"), ni la PC, ni
+los archivos del servidor. La dirección solo se ve en el campo donde se escribe, en el
+diálogo "Servidor".
 
 Tocándolo se abre el diálogo "Servidor".
 
@@ -210,7 +215,8 @@ borrarla), el `ServidorCubit`:
      igual para jugar, así que esto funciona donde funcione el juego. Solo recorre redes
      locales (10.x, 172.16–31.x, 192.168.x), no la de los datos móviles. Las direcciones
      que encuentra no traen nombre: se le pregunta a cada servidor con `GET /servidor/`
-     ("Brilliant en ORION"), y si es uno de antes que no lo dice, se llama por su IP;
+     ("Brilliant en ORION"), y si es uno de antes que no lo dice, se llama "Servidor
+     Brilliant" (hasta el 2026-11-18, por su IP; dos así no se juntan en uno);
 2. le pregunta a cada dirección si contesta, con el mismo cliente que solo confía en la
    autoridad de Brilliant: así solo cuentan los servidores de Brilliant. Si un servidor
    aparece con varias IPs, o por las dos búsquedas, queda una vez;
@@ -219,8 +225,9 @@ borrarla), el `ServidorCubit`:
      jugador no nota nada;
    - **varios**: no elige, porque cada uno tiene sus propias cuentas. Pide elegir uno en
      "Servidor";
-   - **ninguno**: "Sin servidor", y en un pedido, el error de siempre con la dirección
-     que se intentó.
+   - **ninguno**: "Sin servidor", y en un pedido, el error de siempre: "No se pudo
+     conectar con el servidor. Revisa que esté encendido y que estés en la misma red, o
+     elige otro en "Servidor"." (hasta el 2026-11-18 decía la dirección que se intentó).
 
 Mientras el servidor contesta, no se busca nada. Así, **si la PC y el celular se pasan a
 otra WiFi**, el servidor se vuelve a levantar y a anunciar en la nueva, y la app, al
@@ -230,11 +237,14 @@ notar el cambio de red, lo encuentra ahí.
 
 El indicador abre un diálogo con:
 
-- **"En tu red"**: los servidores que encuentra al abrirse, cada uno con "Disponible" y su
-  dirección, como "Brilliant en ORION". Solo aparecen los que contestan. Basta con tocar
+- **"En tu red"**: los servidores que encuentra al abrirse, cada uno con su nombre, como
+  "Brilliant en ORION", y "Disponible". Solo aparecen los que contestan. Basta con tocar
   uno; el que se usa ahora lleva una palomita. Si no hay ninguno, lo dice y deja
   **buscar de nuevo**;
-- **la dirección a mano**, por si no aparece: la IP que muestra `Brilliant-servidor\iniciar.bat`;
+- **la dirección a mano**, por si no aparece: "¿No aparece? Escribe su dirección. Pídesela a
+  quien encendió el servidor." (en la web, donde no se busca: "Escribe la dirección del
+  servidor. Pídesela a quien lo encendió."). Hasta el 2026-11-18 mandaba a mirar lo que
+  muestra `iniciar.bat` al arrancar: un archivo del servidor que el jugador no conoce;
 - **Restablecer**, que vuelve a la dirección de partida.
 
 Al elegir o guardar, el `ServidorCubit` lo guarda y revisa que conteste, y el indicador lo

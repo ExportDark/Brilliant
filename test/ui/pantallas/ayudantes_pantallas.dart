@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brilliant/cuenta/buscador_de_servidores.dart';
+import 'package:brilliant/cuenta/direccion_del_servidor.dart';
+import 'package:brilliant/cuenta/servidor_cubit.dart';
 import 'package:brilliant/multijugador/cliente_salas.dart';
 import 'package:brilliant/multijugador/modelos.dart';
 import 'package:brilliant/ui/pantallas/multijugador/pantalla_multijugador.dart';
@@ -185,6 +187,18 @@ String indicadorDelServidor(WidgetTester tester) => tester
     )
     .map((texto) => texto.data)
     .join(' · ');
+
+/// La dirección del servidor que usa la app ahora ("servidor.test", "192.168.137.252"). No
+/// se lee de la pantalla: la dirección es un dato de adentro y no se le muestra al jugador.
+String servidorEnUso(WidgetTester tester) => textoDeDireccion(
+  tester.element(find.byType(IndicadorDelServidor)).read<ServidorCubit>().state.direccion,
+);
+
+/// Lo que dice el indicador cuando el servidor contesta y no se sabe su nombre.
+const servidorListo = 'Servidor disponible · Listo para jugar.';
+
+/// Lo que dice el indicador cuando el servidor no contesta.
+const sinServidor = 'Sin servidor · No contesta. Toca para buscar otro.';
 
 /// Escribe [direccion] en el diálogo del servidor y la guarda.
 Future<void> cambiarServidor(WidgetTester tester, String direccion) async {

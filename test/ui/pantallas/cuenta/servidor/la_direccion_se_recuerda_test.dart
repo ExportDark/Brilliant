@@ -16,6 +16,7 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await abrirApp(tester, servidor: servidor, almacen: almacen);
 
-    expect(indicadorDelServidor(tester), 'Servidor disponible · 192.168.137.252');
+    expect(indicadorDelServidor(tester), servidorListo);
+    expect(servidorEnUso(tester), '192.168.137.252');
   });
 }
