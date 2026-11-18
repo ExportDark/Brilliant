@@ -190,6 +190,7 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
           yo: yo.usuario,
           zonas: sala.zonas,
           meta: sala.meta,
+          mapa: mapa,
         ),
         const SizedBox(height: 14),
         PanelDeZonas(zonas: sala.zonas),

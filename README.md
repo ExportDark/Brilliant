@@ -416,7 +416,9 @@ Salas en línea con código, de 2 a 6 jugadores. Se entra desde el ícono de per
 anfitrión elige el mapa con las mismas tarjetas del inicio y empieza con 2 o más.
 
 El servidor tira los dados, valida y calcula los puntos por zona; la app (`ClienteSalas`,
-`SalaBloc`) pregunta cada segundo y dibuja. Nadie ve el tablero de los demás; un panel de
+`SalaBloc`) pregunta cada segundo y dibuja. De los demás se ve su tablero chico en el
+marcador (`TableroChico`): qué casillas ocuparon, nunca con qué número, y la de la última
+ronda con un aro; la de la ronda en curso, recién cuando la ronda termina. Un panel de
 zonas dice cuáles siguen dando puntos. Gana el primero que llega a la meta de puntos
 (`VistaDeSala.meta`, que manda el servidor): se ve en el lobby, en el marcador (con una
 pista de puntos por jugador), en las reglas y en el resultado. Quien pasa 10 s sin hablarle al servidor queda

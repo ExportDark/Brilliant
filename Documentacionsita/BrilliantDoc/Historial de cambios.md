@@ -7,6 +7,14 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-17 — El tablero chico de cada jugador
+
+- **En el marcador se ve el tablero de cada uno, en chico** (servidor y app): qué casillas
+  ocupó, nunca con qué número, y la de la última ronda con un aro amarillo. La casilla de
+  la ronda en curso no se ve hasta que la ronda termina, para que nadie elija viendo lo
+  que hicieron los demás. Cambia la decisión de privacidad: antes no se veía nada del
+  tablero de otro. Ver [[Multijugador#El tablero chico de cada uno (2026-11-17)]].
+
 ## 2026-11-17 — La meta de puntos en línea
 
 - **Gana el primero que llega a la meta** (servidor y app): 26 puntos con 2 jugadores, 24

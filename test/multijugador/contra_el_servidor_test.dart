@@ -220,6 +220,12 @@ void main() {
           for (final fila in fin.resultado!.ranking) {
             expect(fila.puntos, greaterThanOrEqualTo(0));
           }
+          // Al terminar, en la vista de ana se ven todas las casillas de beto (las mismas
+          // de su tablero), solo por su nombre: nunca los números.
+          final deAna = (await ana.salas.estado(codigo))!;
+          final deBeto = (await beto.salas.estado(codigo))!;
+          final betoParaAna = deAna.jugadores.firstWhere((j) => j.usuario == beto.usuario);
+          expect(betoParaAna.ocupadas.toSet(), deBeto.yo.tablero.keys.toSet());
           // Al terminar ya se puede crear otra sala sin salir de la anterior.
           final otra = await ana.salas.crear();
           await ana.salas.rendirse(otra.codigo);

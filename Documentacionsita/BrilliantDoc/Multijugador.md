@@ -15,7 +15,7 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
 | Conexión | HTTP: la app le pregunta al servidor cada segundo (`GET /salas/<código>/?version=N`, 304 si no cambió) |
 | Quién manda | El servidor. Tiene las reglas del juego portadas a Python, y una prueba de paridad exige que den lo mismo que las de la app |
 | Salirse o desconectarse | Fuera al instante. Con 2 jugadores, gana el otro. **Si se va el anfitrión, ganan los demás.** Con 3 o más, si se va otro, la partida sigue; si queda uno solo, gana |
-| Privacidad | Nadie ve los números ni las casillas de los demás: el servidor manda a cada uno solo su tablero |
+| Privacidad | Nadie ve los números de los demás. Desde el 2026-11-17 se ve **qué casillas ocupó cada uno** (su tablero chico, en el marcador), al terminar cada ronda: la casilla de la ronda en curso no se muestra hasta que la ronda termina, porque todos juegan a la vez con los mismos dados. Antes no se veía nada del tablero de otro |
 | Fin | Cuando todos llenaron su tablero o ya nadie puede jugar |
 | Salas | Viven en la memoria del servidor: si se reinicia, las partidas terminan |
 
@@ -77,8 +77,26 @@ mapa":
   ("Da 5") o "Agotada" (la fila se apaga). Al dejar el dedo encima se ve en qué ronda la
   llenó cada uno. Para esto el servidor manda `puntos_por_puesto` en cada zona.
 
-Así se sabe quién va ganando y qué zonas siguen dando puntos sin ver los tableros de
-nadie. Los puntos de cada puesto están en [[Puntuación]].
+### El tablero chico de cada uno (2026-11-17)
+
+Cada fila del marcador (y del resultado) lleva, debajo del nombre y a todo lo ancho, el
+**tablero chico** del jugador (`tablero_chico.dart`, un solo `CustomPainter`):
+
+- las casillas **ocupadas** con el color pleno de su zona y las **vacías** aclaradas hacia
+  el cartón, para que se distingan por la claridad y no solo por el color;
+- **nunca los números**: el servidor manda solo los nombres de las casillas (`ocupadas`);
+- la casilla que ocupó en la **última ronda** con un **aro amarillo**, dibujado sobre la
+  tinta de alrededor para que se vea aunque la casilla sea amarilla (`ultima`);
+- el de quien se fue, apagado.
+
+El servidor guarda la casilla de cada jugador por ronda: la de la ronda en curso no se
+manda hasta que la ronda termina; en la preparación no se manda nada (el reparto es
+secreto); al terminar la partida, todo. Al lado del nombre no cabía en un celular de
+320 px, por eso va debajo, con lo demás (las zonas llenas, "Tú" y la pista de puntos) a
+su derecha.
+
+Así se sabe quién va ganando, cómo avanza cada uno y qué zonas siguen dando puntos sin
+ver los números de nadie. Los puntos de cada puesto están en [[Puntuación]].
 
 ## Desconexiones
 

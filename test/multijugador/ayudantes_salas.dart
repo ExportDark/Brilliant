@@ -62,6 +62,8 @@ Map<String, dynamic> jugadorJson(
   int puntos = 0,
   int primeros = 0,
   List<int> zonas = const [],
+  List<String> ocupadas = const [],
+  String? ultima,
 }) {
   return {
     'usuario': usuario,
@@ -71,6 +73,8 @@ Map<String, dynamic> jugadorJson(
     'puntos': puntos,
     'primeros': primeros,
     'zonas': zonas,
+    'ocupadas': ocupadas,
+    'ultima': ultima,
   };
 }
 

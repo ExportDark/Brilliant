@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../modelo/color_zona.dart';
+import '../../../modelo/mapa.dart';
 import '../../../multijugador/modelos.dart';
 import '../../tema.dart';
+import 'tablero_chico.dart';
 import 'textos_multijugador.dart';
 
 /// La tarjeta blanca de las secciones del multijugador (marcador, zonas, resultado): la
@@ -96,6 +98,10 @@ class FilaDePuntos extends StatelessWidget {
   /// La meta de la partida: si se sabe, debajo del nombre va una pista con cuánto falta.
   final int? meta;
 
+  /// El tablero chico del jugador (ver [TableroChico]): va debajo de la fila, a todo lo
+  /// ancho, con lo demás a su lado, para no quitarle ancho al nombre.
+  final Widget? tablero;
+
   const FilaDePuntos({
     super.key,
     required this.puesto,
@@ -109,6 +115,7 @@ class FilaDePuntos extends StatelessWidget {
     this.estado,
     this.clavePuntos,
     this.meta,
+    this.tablero,
   });
 
   @override
@@ -118,6 +125,7 @@ class FilaDePuntos extends StatelessWidget {
     final detalle = this.detalle;
     final estado = this.estado;
     final meta = this.meta;
+    final tablero = this.tablero;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
@@ -126,94 +134,123 @@ class FilaDePuntos extends StatelessWidget {
         color: mia ? Paleta.ficha.withValues(alpha: 0.3) : null,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Puesto(numero: puesto, lider: lider && !fuera),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  nombre,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textos.bodyLarge?.copyWith(
-                    color: tinta,
-                    fontWeight: mia || lider
-                        ? FontWeight.w700
-                        : FontWeight.w500,
-                    decoration: fuera ? TextDecoration.lineThrough : null,
+          Row(
+            children: [
+              _Puesto(numero: puesto, lider: lider && !fuera),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      nombre,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textos.bodyLarge?.copyWith(
+                        color: tinta,
+                        fontWeight: mia || lider
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        decoration: fuera ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                    if (tablero == null) ..._detalles(textos, detalle, meta),
+                  ],
+                ),
+              ),
+              if (estado != null) ...[estado, const SizedBox(width: 8)],
+              // Los puntos cambian con un fundido suave, para que se note cuando suben.
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (hijo, animacion) => FadeTransition(
+                  opacity: animacion,
+                  child: ScaleTransition(
+                    scale: Tween(begin: 0.8, end: 1.0).animate(animacion),
+                    child: hijo,
                   ),
                 ),
-                if (zonas.isNotEmpty) ...[
-                  const SizedBox(height: 3),
-                  Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
+                child: Text.rich(
+                  TextSpan(
                     children: [
-                      for (final color in zonas)
-                        Container(
-                          width: 9,
-                          height: 9,
-                          decoration: BoxDecoration(
-                            color: coloresDeZona[color],
-                            shape: BoxShape.circle,
-                          ),
+                      TextSpan(
+                        text: '$puntos',
+                        style: textos.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: tinta,
                         ),
+                      ),
+                      TextSpan(
+                        text: ' pts',
+                        style: textos.bodySmall?.copyWith(
+                          color: Paleta.tintaSuave,
+                        ),
+                      ),
                     ],
                   ),
-                ],
-                if (detalle != null && detalle.isNotEmpty)
-                  Text(
-                    detalle,
-                    style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
-                  ),
-                if (meta != null && meta > 0) ...[
-                  const SizedBox(height: 5),
-                  _PistaDePuntos(
-                    key: ValueKey('pista-$nombre'),
-                    avance: (puntos / meta).clamp(0.0, 1.0),
-                    apagada: fuera,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          if (estado != null) ...[estado, const SizedBox(width: 8)],
-          // Los puntos cambian con un fundido suave, para que se note cuando suben.
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (hijo, animacion) => FadeTransition(
-              opacity: animacion,
-              child: ScaleTransition(
-                scale: Tween(begin: 0.8, end: 1.0).animate(animacion),
-                child: hijo,
+                  key: clavePuntos ?? ValueKey('puntos-$nombre-$puntos'),
+                ),
               ),
-            ),
-            child: Text.rich(
-              TextSpan(
+            ],
+          ),
+          if (tablero != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextSpan(
-                    text: '$puntos',
-                    style: textos.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: tinta,
+                  tablero,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _detalles(textos, detalle, meta),
                     ),
                   ),
-                  TextSpan(
-                    text: ' pts',
-                    style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
-                  ),
                 ],
               ),
-              key: clavePuntos ?? ValueKey('puntos-$nombre-$puntos'),
             ),
-          ),
         ],
       ),
     );
   }
+
+  /// Lo que va debajo del nombre: un punto por zona llena, las etiquetas y la pista.
+  List<Widget> _detalles(TextTheme textos, String? detalle, int? meta) => [
+    if (zonas.isNotEmpty) ...[
+      const SizedBox(height: 3),
+      Wrap(
+        spacing: 4,
+        runSpacing: 4,
+        children: [
+          for (final color in zonas)
+            Container(
+              width: 9,
+              height: 9,
+              decoration: BoxDecoration(
+                color: coloresDeZona[color],
+                shape: BoxShape.circle,
+              ),
+            ),
+        ],
+      ),
+    ],
+    if (detalle != null && detalle.isNotEmpty)
+      Text(
+        detalle,
+        style: textos.bodySmall?.copyWith(color: Paleta.tintaSuave),
+      ),
+    if (meta != null && meta > 0) ...[
+      const SizedBox(height: 5),
+      _PistaDePuntos(
+        key: ValueKey('pista-$nombre'),
+        avance: (puntos / meta).clamp(0.0, 1.0),
+        apagada: fuera,
+      ),
+    ],
+  ];
 }
 
 /// La pista de puntos: una barra fina de lo que lleva sobre la meta, como la pista de
@@ -222,7 +259,11 @@ class _PistaDePuntos extends StatelessWidget {
   final double avance;
   final bool apagada;
 
-  const _PistaDePuntos({super.key, required this.avance, required this.apagada});
+  const _PistaDePuntos({
+    super.key,
+    required this.avance,
+    required this.apagada,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -304,12 +345,16 @@ class Marcador extends StatelessWidget {
   /// La meta de la partida, o `null` si el servidor no la manda.
   final int? meta;
 
+  /// El mapa de la partida, para el tablero chico de cada uno.
+  final Mapa? mapa;
+
   const Marcador({
     super.key,
     required this.jugadores,
     required this.yo,
     required this.zonas,
     this.meta,
+    this.mapa,
   });
 
   @override
@@ -349,6 +394,7 @@ class Marcador extends StatelessWidget {
               ),
               puntos: jugador.puntos,
               meta: meta,
+              tablero: tableroChicoDe(mapa, jugador),
               lider: hayPuntos && puestos[i] == 1 && jugador.activo,
               mia: jugador.usuario == yo,
               fuera: !jugador.activo,
@@ -370,5 +416,17 @@ class Marcador extends StatelessWidget {
       ),
     );
   }
+}
 
+/// El tablero chico de [jugador], o `null` si no se sabe el mapa.
+Widget? tableroChicoDe(Mapa? mapa, JugadorEnSala? jugador) {
+  if (mapa == null || jugador == null) return null;
+  return TableroChico(
+    key: ValueKey('tablero-chico-${jugador.usuario}'),
+    mapa: mapa,
+    usuario: jugador.usuario,
+    ocupadas: jugador.ocupadas.toSet(),
+    ultima: jugador.ultima,
+    apagado: !jugador.activo,
+  );
 }

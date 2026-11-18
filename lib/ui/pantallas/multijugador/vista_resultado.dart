@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../modelo/mapa.dart';
 import '../../../multijugador/modelos.dart';
 import '../../tema.dart';
 import '../../widgets/piezas.dart';
@@ -20,6 +21,7 @@ class VistaResultado extends StatelessWidget {
     final resultado = sala.resultado!;
     final gane = resultado.ganadores.contains(sala.yo.usuario);
     final jugadores = {for (final j in sala.jugadores) j.usuario: j};
+    final mapa = mapas.where((m) => m.nivel == sala.nivel).firstOrNull;
     final colorPorZona = {for (final z in sala.zonas) z.id: colorDeZona(z.color)};
     // Los empatados en puntos y primeros comparten puesto.
     final puestos = puestosConEmpates(
@@ -92,6 +94,7 @@ class VistaResultado extends StatelessWidget {
                   nombre: fila.usuario,
                   puntos: fila.puntos,
                   meta: sala.meta,
+                  tablero: tableroChicoDe(mapa, jugadores[fila.usuario]),
                   lider: resultado.ganadores.contains(fila.usuario),
                   mia: fila.usuario == sala.yo.usuario,
                   fuera: fila.estado != 'activo',

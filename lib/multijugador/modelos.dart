@@ -114,6 +114,13 @@ class JugadorEnSala {
   /// Los ids de las zonas que llenó, sin casillas ni números.
   final List<int> zonas;
 
+  /// Las casillas que tiene ocupadas ("D1", "E7"…), nunca con qué número: su tablero
+  /// chico. La de la ronda en curso no viene hasta que la ronda termina.
+  final List<String> ocupadas;
+
+  /// La casilla que ocupó en la última ronda que terminó, o `null` si pasó.
+  final String? ultima;
+
   const JugadorEnSala({
     required this.usuario,
     required this.estado,
@@ -122,6 +129,8 @@ class JugadorEnSala {
     required this.puntos,
     required this.primeros,
     required this.zonas,
+    this.ocupadas = const [],
+    this.ultima,
   });
 
   bool get activo => estado == 'activo';
@@ -134,6 +143,9 @@ class JugadorEnSala {
         puntos: json['puntos'] as int,
         primeros: json['primeros'] as int,
         zonas: [for (final z in json['zonas'] as List<dynamic>) z as int],
+        // Un servidor viejo no las manda.
+        ocupadas: [for (final c in json['ocupadas'] as List<dynamic>? ?? const []) c as String],
+        ultima: json['ultima'] as String?,
       );
 }
 
