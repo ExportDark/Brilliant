@@ -7,6 +7,14 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-18 — Los botones pedían dos toques
+
+- **Un toque alcanza otra vez** (app): al apoyar el dedo, el botón se aplastaba y Flutter
+  lo creaba de nuevo, perdiendo el toque; pasaba en todos los botones principales y en
+  el dado mientras caía. Venía de las animaciones de cartoon (`c92191f`). Ahora la pieza
+  va siempre dentro del mismo `Transform`, y las pruebas de pantalla tocan como un dedo,
+  apoyándolo un cuadro antes de soltar. Ver [[Revisión de lógica]].
+
 ## 2026-11-18 — Al buscar el servidor, nada de lo de adentro
 
 - **Los mensajes ya no hablan de cómo funciona el servidor por dentro** (app): el diálogo

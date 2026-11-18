@@ -208,6 +208,10 @@ Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
 - **Con "Quitar animaciones"** del sistema (`MediaQuery.disableAnimationsOf`), todo queda
   en su estado final al instante.
 - **Solo transformaciones**, nunca cambios de tamaño: nada se desborda a mitad de camino.
+- **Siempre dentro del mismo `Transform`**, también en reposo (con la identidad). Si una
+  pieza que se toca cambia de lugar en el árbol al empezar a moverse, Flutter la crea de
+  nuevo y se pierde el toque en curso: así los botones pedían dos toques hasta el
+  2026-11-18 (ver [[Revisión de lógica]]).
 - **El estado real cambia al instante**: lo que lee un lector de pantalla y lo que se
   puede tocar no esperan a la animación.
 - **Medio segundo como máximo** cada una; el iris del final dura más, una vez por partida.

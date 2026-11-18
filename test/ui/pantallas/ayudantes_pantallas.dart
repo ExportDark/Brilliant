@@ -131,7 +131,12 @@ Future<void> tocar(WidgetTester tester, Finder objetivo) async {
   // cuadro, sin dejar pasar tiempo: así no corren los relojes de la pantalla.
   await tester.ensureVisible(objetivo);
   await tester.pump();
-  await tester.tap(objetivo);
+  // Y como un dedo: queda apoyado mientras se dibuja un cuadro antes de levantarse (un
+  // dedo de verdad queda unos 100 ms). `tester.tap` lo levanta sin dibujar nada en el
+  // medio, y así no se veía que el botón, al aplastarse, perdía el toque (2026-11-18).
+  final dedo = await tester.startGesture(tester.getCenter(objetivo));
+  await tester.pump();
+  await dedo.up();
   await tester.pumpAndSettle();
 }
 

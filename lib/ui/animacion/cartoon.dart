@@ -104,7 +104,9 @@ class AplastarYEstirar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (aplastado == 0) return child;
+    // Siempre dentro del mismo Transform, también en reposo (la identidad). Si en reposo
+    // se devolviera el hijo solo, al aplastarse cambiaría de lugar en el árbol: Flutter
+    // lo crearía de nuevo y se perdería el toque en curso (había que tocar dos veces).
     return Transform(
       alignment: alineacion,
       transform: Matrix4.diagonal3Values(1 + aplastado * 0.8, 1 - aplastado, 1),

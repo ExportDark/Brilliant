@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 865 tests, todos pasando, más 18 que hablan con el
+las pruebas y qué se aprendió de ellas. 869 tests, todos pasando, más 18 que hablan con el
 servidor de verdad y solo corren si se piden (2026-11-18). El servidor tiene los suyos
 (1093, ver abajo).
 
@@ -28,7 +28,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/juego/` | 130 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
 | `test/cuenta/` | 134 (+4) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
 | `test/multijugador/` | 80 (+14) | Los modelos que manda el servidor, `ClienteSalas` (cada ruta y cada error, con `MockClient`), `SalaBloc` (preguntar cada segundo, reconectando, conexión perdida, sala que desapareció o que cerró el anfitrión, doble toque…) y el reloj que no depende de la hora del teléfono; y, si se pide, partidas contra el servidor de verdad |
-| `test/ui/` | 320 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/ui/` | 324 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
 | `test/herramientas/` | 3 | Que los JSON que se copian al servidor (`tool/exportado/`) coincidan con lo que generaría el código de hoy |
 | `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
@@ -54,7 +54,10 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
   - `test/ui/pantallas/ayudantes_pantallas.dart`: `abrirApp()` (la app entera, con dados
     fijos), `abrirPreparacion()`, `abrirPartida()`,
     `tocar()`, `tirarYElegirAncla()`, `celdaEn()`, `celdasDibujadasDonde()` y los
-    buscadores de botones, dados y casillas.
+    buscadores de botones, dados y casillas. Desde el 2026-11-18, `tocar()` toca como un
+    dedo: lo apoya, dibuja un cuadro y recién entonces lo levanta, sin adelantar el reloj.
+    `tester.tap` lo levanta sin dibujar nada en el medio, y así no se veía que los
+    botones, al aplastarse, perdían el toque.
   - `test/ui/animacion/ayudantes_animacion.dart`: `conMovimientoReducido()`,
     `expectQuieto()` (no queda ningún cuadro pendiente) y, para los recorridos de
     pantalla, qué se está moviendo ahora: `irisPintando()`, `polvoEnElTablero()`,
@@ -152,6 +155,7 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/animacion/iris_test.dart` | "Inicio" entra con el iris (la pantalla nueva ya está aunque no se vea) y al terminar no queda tinta; con movimiento reducido no hay iris; al terminar, el iris se queda alrededor del trofeo (su centro, radio 52) y se vuelve a abrir; la apertura se juega al aparecer si se pide; sin disparador, nada (5 casos) |
 | `ui/animacion/nada_se_mueve_solo_test.dart` | Después de abrir cada pantalla y dejar que se asiente, no queda ningún cuadro pendiente: iniciar sesión, elegir mapa, preparación, partida con los dados, lobby, partida en línea y resultado (5 casos) |
 | `ui/animacion/la_tirada_salta_test.dart` | El dado salta, gira y cae quieto y derecho en su cara; durante el salto se lee "Dado: N" con la cara real y se puede tocar; salta cuando cambia la tirada y no si sigue la misma; el ancla brinca; con movimiento reducido, nada (5 casos) |
+| `ui/animacion/un_toque_alcanza_test.dart` | Con el dedo apoyado varios cuadros, como un dedo de verdad: un botón que se aplasta responde a un solo toque (y otra vez después del rebote); "Entrar" entra; "Tirar dados" tira; un dado que está cayendo se elige de ancla (4 casos; sin el arreglo, los 4 perdían el toque) |
 | `ui/animacion/pieza_que_se_aplasta_test.dart` | El botón se aplasta al apretarlo, al soltarlo se estira un instante y se asienta como era, y después no queda nada moviéndose; con movimiento reducido o deshabilitado, no se aplasta (3 casos) |
 | `ui/animacion/boton_que_se_deshabilita_apretado_test.dart` | Si el botón se deshabilita con el dedo encima, al volver a habilitarse no queda hundido ni aplastado; y si se habilita antes de soltar, tampoco (2 casos; sin el arreglo quedaba aplastado en 0,08) |
 | `ui/animacion/explicacion_sin_movimiento_test.dart` | La explicación aparece con un fundido; con movimiento reducido aparece y se va de una vez (2 casos) |
