@@ -131,35 +131,33 @@ class _Cuerpo extends StatelessWidget {
                     ),
                   ],
                 )
-              : Scaffold(
-                  appBar: AppBar(
-                    title: const Text('Multijugador'),
-                    actions: [
-                      // En la partida, las reglas del mapa que se está jugando.
-                      if (state.enSala &&
-                          state.vista!.estado == EstadoDeSala.jugando)
-                        BotonDeReglas(
-                          mapa: mapas.firstWhere(
-                            (m) => m.nivel == state.vista!.nivel,
-                          ),
-                          enLinea: true,
-                          meta: state.vista!.meta,
-                        ),
-                    ],
-                  ),
-                  // Los momentos clave, con el iris: se abre al empezar la partida (aunque
-                  // llegue de golpe, sin pasar por la espera) y se cierra sobre el trofeo
-                  // al terminar.
-                  body: Iris.cierre(
-                    disparador: _conResultado(state)
+              // Los momentos clave, con el iris, sobre toda la pantalla (también la
+              // barra de arriba): se abre al empezar la partida (aunque llegue de golpe,
+              // sin pasar por la espera) y se cierra sobre el trofeo al terminar.
+              : Iris.cierre(
+                  disparador: _conResultado(state) ? state.vista!.codigo : null,
+                  child: Iris.apertura(
+                    disparador: state.vista?.estado == EstadoDeSala.jugando
                         ? state.vista!.codigo
                         : null,
-                    child: Iris.apertura(
-                      disparador: state.vista?.estado == EstadoDeSala.jugando
-                          ? state.vista!.codigo
-                          : null,
-                      alAparecer: true,
-                      child: SafeArea(
+                    alAparecer: true,
+                    child: Scaffold(
+                      appBar: AppBar(
+                        title: const Text('Multijugador'),
+                        actions: [
+                          // En la partida, las reglas del mapa que se está jugando.
+                          if (state.enSala &&
+                              state.vista!.estado == EstadoDeSala.jugando)
+                            BotonDeReglas(
+                              mapa: mapas.firstWhere(
+                                (m) => m.nivel == state.vista!.nivel,
+                              ),
+                              enLinea: true,
+                              meta: state.vista!.meta,
+                            ),
+                        ],
+                      ),
+                      body: SafeArea(
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                           child: Center(

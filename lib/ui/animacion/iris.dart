@@ -239,8 +239,12 @@ class _IrisState extends State<Iris> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // Ocupa toda el área que recibe, aunque lo de adentro sea más bajo (por ejemplo, el
+    // contenido de una pantalla que se desplaza): si no, el iris dejaría un pedazo sin
+    // tinta.
     return Stack(
       key: _area,
+      fit: StackFit.expand,
       children: [
         widget.child,
         Positioned.fill(

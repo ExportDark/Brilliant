@@ -23,7 +23,8 @@ import 'celda_widget.dart';
 /// Cuando cambia el tablero, festeja como en los dibujos animados viejos: donde
 /// se anotó un número sale un "¡puf!" de polvo, y las casillas de una zona que se
 /// acaba de llenar se menean (ver [CeldaWidget]). Al dibujarse por primera vez no
-/// se mueve nada.
+/// se mueve nada, ni cuando pasa a ser el tablero de otro mapa (por ejemplo, la tarjeta
+/// del lobby cuando el anfitrión cambia de mapa).
 class TableroWidget extends StatefulWidget {
   final Tablero tablero;
   final Posicion? seleccionada;
@@ -73,6 +74,18 @@ class _TableroWidgetState extends State<TableroWidget>
   var _festejando = <Posicion>{};
   var _festejo = 0;
 
+  /// La forma del mapa que se está dibujando (ver [_formaDe]).
+  late var _forma = _formaDe(widget.tablero);
+
+  /// La forma de un mapa: qué casillas tiene cada zona, de qué color y con qué regla. Dos
+  /// tableros con la misma forma son el mismo mapa, con otros números. Contar las zonas no
+  /// alcanza: el Nivel 3 y el Nivel 4 tienen 8 cada uno.
+  static String _formaDe(Tablero tablero) => [
+    for (final region in tablero.regiones)
+      '${region.tipo.color.name} ${region.tipo.regla.descripcion}: '
+          '${region.casillas.map((c) => c.posicion.notacion).join(',')}',
+  ].join(' | ');
+
   @override
   void dispose() {
     _polvo.dispose();
@@ -82,11 +95,19 @@ class _TableroWidgetState extends State<TableroWidget>
   @override
   void didUpdateWidget(TableroWidget antes) {
     super.didUpdateWidget(antes);
-    if (Cartoon.quieto(context)) return;
     final ahora = widget.tablero;
     final previo = antes.tablero;
-    // Solo si es el mismo tablero que cambió (no otro mapa).
-    if (ahora.regiones.length != previo.regiones.length) return;
+    final forma = _formaDe(ahora);
+    if (forma != _forma) {
+      // Otro mapa: no hay nada que festejar. Las casillas se dibujan de nuevo (ver
+      // `build`), así tampoco festejan ellas.
+      _forma = forma;
+      _conPolvo = [];
+      _polvo.value = 1;
+      _festejando = {};
+      return;
+    }
+    if (Cartoon.quieto(context)) return;
 
     final nuevas = [
       for (final celda in ahora.celdas)
@@ -142,6 +163,9 @@ class _TableroWidgetState extends State<TableroWidget>
         final tamano = _tamanoQueCabe(restricciones.maxWidth);
 
         final base = Container(
+          // Con otro mapa, las casillas empiezan de nuevo: como al dibujarse por primera
+          // vez, no comparan con las del mapa de antes.
+          key: ValueKey(_forma),
           padding: const EdgeInsets.all(TableroWidget.relleno),
           // Deja ver la sombra dura bajo el tablero.
           margin: const EdgeInsets.only(bottom: 5),

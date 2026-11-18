@@ -144,15 +144,16 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
             final navegador = Navigator.of(context);
             if (await _confirmarSalida()) navegador.pop();
           },
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text(widget.mapa.nombre),
-              actions: [BotonDeReglas(mapa: widget.mapa)],
-            ),
-            // Al terminar, el iris se cierra sobre el trofeo y se vuelve a abrir.
-            body: Iris.cierre(
-              disparador: state.terminada ? 'fin' : null,
-              child: SafeArea(
+          // Al terminar, el iris se cierra sobre el trofeo y se vuelve a abrir, sobre
+          // toda la pantalla (también la barra de arriba).
+          child: Iris.cierre(
+            disparador: state.terminada ? 'fin' : null,
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text(widget.mapa.nombre),
+                actions: [BotonDeReglas(mapa: widget.mapa)],
+              ),
+              body: SafeArea(
                 // Arriba y no centrado en vertical: así el tablero no se mueve
                 // cuando aparecen los dados o la explicación.
                 child: SingleChildScrollView(

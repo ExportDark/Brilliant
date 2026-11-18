@@ -225,11 +225,13 @@ Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
 | El logo (`LogoBrilliant`) | Al aparecer "Iniciar sesión" | Las 5 fichas caen una tras otra, como con gravedad, y rebotan al tocar la bandeja: 0,65 s, una sola vez |
 | La insignia (`Insignia`) | Al aparecer el final | Entra de golpe con la goma y suelta rayitas de brillo alrededor, "en dos": 0,48 s |
 | El iris al empezar (`RutaConIris`, `Iris.apertura`) | Al tocar "Inicio" jugando solo; en línea, al empezar la ronda 1 | Jugando solo, el círculo se cierra sobre la preparación hasta quedar todo en tinta y se abre desde el centro sobre la partida: 0,45 s (al volver, al revés). En línea solo se abre, aunque la partida llegue de golpe sin pasar por la espera |
-| El iris al terminar (`Iris.cierre`) | Al terminar la partida, sola o en línea (no si se cerró el lobby) | El círculo se cierra hasta dejar solo el trofeo, se queda un instante y se vuelve a abrir: 1,1 s, una vez por partida. Si el trofeo quedó fuera de la pantalla, se lleva a la vista; si no se lo encuentra, se cierra sobre el centro. Nunca bloquea los toques |
+| El iris al terminar (`Iris.cierre`) | Al terminar la partida, sola o en línea (no si se cerró el lobby) | Sobre toda la pantalla, con la barra de arriba (como el de empezar). El círculo se cierra hasta dejar solo el trofeo, se queda un instante y se vuelve a abrir: 1,1 s, una vez por partida. Si el trofeo quedó fuera de la pantalla, se lleva a la vista; si no se lo encuentra, se cierra sobre el centro. Nunca bloquea los toques |
 | Una zona llena | La vez que se llena | Sus casillas se menean y se agrandan un poco, en ola: 0,46 s. Se detecta comparando el tablero de antes con el nuevo (`Region.completada`), así que sirve igual jugando solo y en línea |
 
 Al dibujarse por primera vez (por ejemplo, al abrir una partida ya empezada) el tablero no
-se mueve: todo sale de comparar con lo que había antes. Para que una casilla no pierda su
+se mueve: todo sale de comparar con lo que había antes. Tampoco cuando pasa a ser el
+tablero de otro mapa: compara la forma del mapa (qué casillas tiene cada zona, su color y
+su regla), no la cantidad de zonas, y con otro mapa las casillas se dibujan de nuevo. Para que una casilla no pierda su
 animación al volverse tocable, la ficha va siempre en el mismo lugar y el toque va
 encima, en una capa aparte. Esa capa no se lee: para un lector de pantalla, la acción de
 tocar va en la misma casilla que su número (hasta el 2026-11-18 quedaba como un botón

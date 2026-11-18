@@ -9,10 +9,14 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ## 2026-11-18 — Tercera revisión: las animaciones
 
-- **Las casillas tocables quedaron partidas para el lector de pantalla** (app): el número
+- **Las casillas tocables quedaron partidas para el lector de pantalla** (app `d2f0a08`): el número
   y el toque vuelven a ser un solo elemento.
-- **Un botón podía quedar hundido** si se deshabilitaba con el dedo encima (app).
-- **La explicación se fundía con "Quitar animaciones"** (app).
+- **Un botón podía quedar hundido** si se deshabilitaba con el dedo encima (app `d2f0a08`).
+- **La explicación se fundía con "Quitar animaciones"** (app `d2f0a08`).
+- **El tablero decidía si era el mismo mapa contando las zonas** (app): ahora compara la
+  forma del mapa, así un tablero de otro mapa no festeja.
+- **El iris no tapaba toda la pantalla** (app): ni la barra de arriba ni, en una pantalla
+  alta, el pedazo de abajo del contenido.
   Ver [[Revisión de lógica#Tercera revisión: las animaciones (2026-11-18)]].
 
 ## 2026-11-18 — Animaciones de cartoon viejo
