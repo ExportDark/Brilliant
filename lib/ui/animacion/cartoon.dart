@@ -78,9 +78,11 @@ class EnDos extends Curve {
   /// Cuántos cuadros de 1/12 s caben en la animación (al menos uno).
   int get cuadros => math.max(1, (duracion.inMilliseconds * 12 / 1000).round());
 
+  /// Cada cuadro toma el valor del medio de su tramo: así el primero ya se ve (no se
+  /// queda en 0) y el último no termina antes de tiempo.
   @override
   double transformInternal(double t) {
-    final escalon = (t * cuadros).floor() / cuadros;
+    final escalon = ((t * cuadros).floor() + 0.5) / cuadros;
     return curva.transform(escalon.clamp(0.0, 1.0));
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../modelo/posicion.dart';
 import '../../modelo/tablero.dart';
+import '../animacion/cartoon.dart';
 import '../tema.dart';
 import 'celda_widget.dart';
 
@@ -18,7 +19,12 @@ import 'celda_widget.dart';
 ///
 /// El tablero se adapta al ancho que tenga: las fichas miden hasta
 /// [tamanoMaximoCelda], y se achican si no caben, como en un celular angosto.
-class TableroWidget extends StatelessWidget {
+///
+/// Cuando cambia el tablero, festeja como en los dibujos animados viejos: donde
+/// se anotó un número sale un "¡puf!" de polvo, y las casillas de una zona que se
+/// acaba de llenar se menean (ver [CeldaWidget]). Al dibujarse por primera vez no
+/// se mueve nada.
+class TableroWidget extends StatefulWidget {
   final Tablero tablero;
   final Posicion? seleccionada;
   final void Function(Posicion)? alTocar;
@@ -48,14 +54,85 @@ class TableroWidget extends StatelessWidget {
   /// El borde de la base alrededor de las fichas.
   static const relleno = 6.0;
 
+  @override
+  State<TableroWidget> createState() => _TableroWidgetState();
+}
+
+class _TableroWidgetState extends State<TableroWidget>
+    with SingleTickerProviderStateMixin {
+  /// El polvo de las casillas recién anotadas. Empieza terminado.
+  late final _polvo = AnimationController(
+    vsync: this,
+    duration: Cartoon.anotar,
+    value: 1,
+  );
+  var _conPolvo = <Posicion>[];
+
+  /// Las casillas de las zonas que se acaban de llenar, y un número que cambia con cada
+  /// festejo (así la casilla sabe que es uno nuevo).
+  var _festejando = <Posicion>{};
+  var _festejo = 0;
+
+  @override
+  void dispose() {
+    _polvo.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(TableroWidget antes) {
+    super.didUpdateWidget(antes);
+    if (Cartoon.quieto(context)) return;
+    final ahora = widget.tablero;
+    final previo = antes.tablero;
+    // Solo si es el mismo tablero que cambió (no otro mapa).
+    if (ahora.regiones.length != previo.regiones.length) return;
+
+    final nuevas = [
+      for (final celda in ahora.celdas)
+        if (celda.valor != null &&
+            previo.celdaEn(celda.posicion)?.valor == null)
+          celda.posicion,
+    ];
+    if (nuevas.isNotEmpty) {
+      _conPolvo = nuevas;
+      _polvo.forward(from: 0);
+    }
+
+    final llenas = <Posicion>{};
+    for (final (i, region) in ahora.regiones.indexed) {
+      if (region.completada && !previo.regiones[i].completada) {
+        llenas.addAll(region.casillas.map((c) => c.posicion));
+      }
+    }
+    if (llenas.isNotEmpty) {
+      _festejando = llenas;
+      _festejo++;
+    }
+  }
+
   /// El tamaño de ficha que cabe en [anchoDisponible], sin pasar del máximo:
   /// el tablero ocupa 7 fichas, sus separaciones y el relleno de la base. Se
   /// redondea hacia abajo para que no sobre ni medio píxel.
   double _tamanoQueCabe(double anchoDisponible) {
-    if (!anchoDisponible.isFinite) return tamanoMaximoCelda;
+    if (!anchoDisponible.isFinite) return widget.tamanoMaximoCelda;
     final queCabe =
-        ((anchoDisponible - 2 * relleno) / Tablero.columnas - separacion).floorToDouble();
-    return queCabe < tamanoMaximoCelda ? queCabe : tamanoMaximoCelda;
+        ((anchoDisponible - 2 * TableroWidget.relleno) / Tablero.columnas -
+                TableroWidget.separacion)
+            .floorToDouble();
+    return queCabe < widget.tamanoMaximoCelda
+        ? queCabe
+        : widget.tamanoMaximoCelda;
+  }
+
+  /// El centro de la casilla [posicion] dentro de la base, con fichas de [tamano].
+  static Offset _centroDe(Posicion posicion, double tamano) {
+    const paso = TableroWidget.separacion;
+    final lado = tamano + paso;
+    return Offset(
+      TableroWidget.relleno + posicion.columna * lado + paso / 2 + tamano / 2,
+      TableroWidget.relleno + posicion.fila * lado + paso / 2 + tamano / 2,
+    );
   }
 
   @override
@@ -64,8 +141,8 @@ class TableroWidget extends StatelessWidget {
       builder: (context, restricciones) {
         final tamano = _tamanoQueCabe(restricciones.maxWidth);
 
-        return Container(
-          padding: const EdgeInsets.all(relleno),
+        final base = Container(
+          padding: const EdgeInsets.all(TableroWidget.relleno),
           // Deja ver la sombra dura bajo el tablero.
           margin: const EdgeInsets.only(bottom: 5),
           decoration: BoxDecoration(
@@ -82,13 +159,47 @@ class TableroWidget extends StatelessWidget {
                   children: [
                     for (var columna = 0; columna < Tablero.columnas; columna++)
                       Padding(
-                        padding: const EdgeInsets.all(separacion / 2),
-                        child: _celda(Posicion(fila: fila, columna: columna), tamano),
+                        padding: const EdgeInsets.all(
+                          TableroWidget.separacion / 2,
+                        ),
+                        child: _celda(
+                          Posicion(fila: fila, columna: columna),
+                          tamano,
+                        ),
                       ),
                   ],
                 ),
             ],
           ),
+        );
+
+        // El polvo va encima de todas las fichas, para que no lo tape la de al lado.
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            base,
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: _polvo,
+                  builder: (context, _) => CustomPaint(
+                    key: const ValueKey('polvo-del-tablero'),
+                    painter: _PolvoEnCasillas(
+                      // "Animado en dos": a 12 cuadros por segundo.
+                      progreso: const EnDos(
+                        Curves.linear,
+                        Cartoon.anotar,
+                      ).transform(_polvo.value),
+                      centros: [
+                        for (final p in _conPolvo) _centroDe(p, tamano),
+                      ],
+                      alcance: tamano * 0.62,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -96,21 +207,63 @@ class TableroWidget extends StatelessWidget {
 
   Widget _celda(Posicion posicion, double tamano) {
     final celda = CeldaWidget(
-      celda: tablero.celdaEn(posicion)!,
+      celda: widget.tablero.celdaEn(posicion)!,
       tamano: tamano,
-      seleccionada: posicion == seleccionada,
-      iluminacion: iluminacionDe?.call(posicion) ?? Iluminacion.normal,
-      numeroResaltado: numeroResaltadoEn?.call(posicion) ?? false,
-      marcada: posicion == marcada,
+      seleccionada: posicion == widget.seleccionada,
+      iluminacion: widget.iluminacionDe?.call(posicion) ?? Iluminacion.normal,
+      numeroResaltado: widget.numeroResaltadoEn?.call(posicion) ?? false,
+      marcada: posicion == widget.marcada,
+      festejo: _festejando.contains(posicion) ? _festejo : 0,
     );
 
-    final tocable = alTocar != null && (esTocable?.call(posicion) ?? true);
-    if (!tocable) return celda;
+    final tocable =
+        widget.alTocar != null && (widget.esTocable?.call(posicion) ?? true);
 
-    return GestureDetector(
-      key: ValueKey('casilla-${posicion.notacion}'),
-      onTap: () => alTocar!(posicion),
-      child: MouseRegion(cursor: SystemMouseCursors.click, child: celda),
+    // La ficha va siempre en el mismo lugar (así conserva sus animaciones al volverse
+    // tocable); el toque va encima, solo si responde.
+    return Stack(
+      children: [
+        celda,
+        if (tocable)
+          Positioned.fill(
+            child: GestureDetector(
+              key: ValueKey('casilla-${posicion.notacion}'),
+              behavior: HitTestBehavior.opaque,
+              onTap: () => widget.alTocar!(posicion),
+              child: const MouseRegion(cursor: SystemMouseCursors.click),
+            ),
+          ),
+      ],
     );
   }
+}
+
+/// El "¡puf!" de polvo en cada casilla recién anotada.
+class _PolvoEnCasillas extends CustomPainter {
+  final double progreso;
+  final List<Offset> centros;
+  final double alcance;
+
+  const _PolvoEnCasillas({
+    required this.progreso,
+    required this.centros,
+    required this.alcance,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final centro in centros) {
+      NubesDePolvo(
+        progreso: progreso,
+        centro: centro,
+        alcance: alcance,
+      ).paint(canvas, size);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_PolvoEnCasillas antes) =>
+      progreso != antes.progreso ||
+      centros.length != antes.centros.length ||
+      alcance != antes.alcance;
 }

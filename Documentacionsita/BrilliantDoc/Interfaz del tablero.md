@@ -217,6 +217,15 @@ Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
 | Botones principales (`PiezaPresionable`) | Al apretar y al soltar | Apretado, se hunde y se aplasta; al soltar, vuelve con la goma (se estira un instante) en 0,32 s |
 | La tirada (`DadoWidget`) | Al tirar, y en línea con cada ronda (`tirada`) | Se agacha, salta estirándose y da una vuelta con las caras cambiando "en dos", y cae aplastado en su cara rebotando: 0,48 s; el segundo dado sale 60 ms después. La etiqueta "Dado: N" y el toque son siempre los de la cara real, aunque esté en el aire |
 | El dado ancla | Al elegirlo | Brinca, cae aplastándose y queda hundido: 0,3 s |
+| Anotar (`CeldaWidget`, `TableroWidget`) | Cuando aparece un número | El número aparece de golpe (de nada, se pasa y vuelve) y sale un "¡puf!" de polvo alrededor de la casilla, "en dos": 0,38 s. El polvo va encima de todo el tablero, para que no lo tape la ficha de al lado |
+| "Aquí no se puede" | Al marcarse la casilla | Sacude la cabeza: de un lado al otro, tres veces, cada vez menos: 0,32 s |
+| Casillas donde se puede anotar | Al encenderse | Un saltito, "¡aquí!", en ola desde arriba a la izquierda: 0,24 s cada una |
+| Una zona llena | La vez que se llena | Sus casillas se menean y se agrandan un poco, en ola: 0,46 s. Se detecta comparando el tablero de antes con el nuevo (`Region.completada`), así que sirve igual jugando solo y en línea |
+
+Al dibujarse por primera vez (por ejemplo, al abrir una partida ya empezada) el tablero no
+se mueve: todo sale de comparar con lo que había antes. Para que una casilla no pierda su
+animación al volverse tocable, la ficha va siempre en el mismo lugar y el toque va
+encima, en una capa aparte.
 
 ## Cómo se decidió
 

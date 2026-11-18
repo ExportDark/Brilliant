@@ -186,7 +186,10 @@ Para anotar: `conValor(posicion, valor)`, `conValores({posicion: valor, ...})` y
 ## Módulo: TableroWidget (`lib/ui/widgets/tablero_widget.dart`)
 
 Dibuja un `Tablero` completo: las 49 fichas con el color de su región y el número que
-tengan anotado, separadas entre sí sobre una base de tinta. **No muestra coordenadas**:
+tengan anotado, separadas entre sí sobre una base de tinta. Cuando cambia, festeja como
+en los dibujos animados viejos: el número nuevo aparece de golpe con un "¡puf!" de polvo,
+la casilla que no se pudo usar sacude la cabeza, las que se encienden dan un saltito y
+las de una zona recién llena se menean. **No muestra coordenadas**:
 la notación del manual (C1, F2…) solo existe en el código.
 
 Como se dibuja siempre a partir de un `Tablero`, para mostrar lo que el jugador va
