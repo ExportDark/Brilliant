@@ -17,9 +17,8 @@ void main() {
 
   test('Con menos exceso, se pasa menos', () {
     const suave = CurvaDeGoma(exceso: 0.1, rebotes: 1);
-    final maximo = [for (var i = 0; i <= 100; i++) suave.transform(i / 100)].reduce(
-      (a, b) => a > b ? a : b,
-    );
+    final maximo = [for (var i = 0; i <= 100; i++) suave.transform(i / 100)]
+        .reduce((a, b) => a > b ? a : b);
 
     expect(maximo, closeTo(1.1, 0.04));
     expect(suave.transform(1), 1);

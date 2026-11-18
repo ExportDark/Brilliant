@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../animacion/iris.dart';
 import '../../juego/preparacion_bloc.dart';
 import '../../juego/preparacion_event.dart';
 import '../../juego/preparacion_state.dart';
@@ -172,8 +173,9 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
           context.read<PreparacionBloc>().add(const PreparacionReabierta());
           return;
         }
+        // Empezar la partida es un momento clave: entra con el iris.
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
+          RutaConIris(
             builder: (_) => PantallaPartida(
               tablero: _tableroBase.conValores(state.valores),
               mapa: widget.mapa,
@@ -218,7 +220,9 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
                       Text(
                         _indicacion(state),
                         textAlign: TextAlign.center,
-                        style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
+                        style: textos.bodyLarge?.copyWith(
+                          color: Paleta.tintaSuave,
+                        ),
                       ),
                       if (_cuantosFaltan(state) case final cuantos?) ...[
                         const SizedBox(height: 2),
@@ -244,8 +248,11 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
                         builder: (context, restricciones) {
                           const separacion = 10.0;
                           final queCabe =
-                              (restricciones.maxWidth - separacion * 5) / valoresPosibles.length;
-                          final tamano = queCabe < 52 ? queCabe.floorToDouble() : 52.0;
+                              (restricciones.maxWidth - separacion * 5) /
+                              valoresPosibles.length;
+                          final tamano = queCabe < 52
+                              ? queCabe.floorToDouble()
+                              : 52.0;
 
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -275,32 +282,38 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
                           _Accion(
                             icono: Icons.backspace_outlined,
                             texto: 'Quitar',
-                            alTocar: seleccionada != null && state.valorDe(seleccionada) != null
+                            alTocar:
+                                seleccionada != null &&
+                                    state.valorDe(seleccionada) != null
                                 ? _quitar
                                 : null,
                           ),
                           _Accion(
                             icono: Icons.refresh_rounded,
                             texto: 'Reiniciar',
-                            alTocar: state.valores.isNotEmpty ? () => _reiniciar(state) : null,
+                            alTocar: state.valores.isNotEmpty
+                                ? () => _reiniciar(state)
+                                : null,
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      PiezaPresionable(child: FilledButton(
-                        // Sin todas las casillas llenas no se puede empezar. El bloc
-                        // tampoco confirmaría, pero así el jugador lo ve de entrada.
-                        onPressed: state.completa
-                            ? () => _bloc.add(const PreparacionConfirmada())
-                            : null,
-                        style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Inicio'),
-                          ],
+                      PiezaPresionable(
+                        child: FilledButton(
+                          // Sin todas las casillas llenas no se puede empezar. El bloc
+                          // tampoco confirmaría, pero así el jugador lo ve de entrada.
+                          onPressed: state.completa
+                              ? () => _bloc.add(const PreparacionConfirmada())
+                              : null,
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(220, 56),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [Text('Inicio')],
+                          ),
                         ),
-                      )),
+                      ),
                     ],
                   ),
                 ),
@@ -320,7 +333,11 @@ class _FichaDeNumero extends StatelessWidget {
   final double tamano;
   final VoidCallback? alElegir;
 
-  const _FichaDeNumero({required this.valor, required this.tamano, required this.alElegir});
+  const _FichaDeNumero({
+    required this.valor,
+    required this.tamano,
+    required this.alElegir,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -340,10 +357,15 @@ class _FichaDeNumero extends StatelessWidget {
         disabledBackgroundColor: Paleta.baseTablero,
         disabledForegroundColor: Paleta.tintaSuave,
         side: BorderSide(
-          color: alElegir == null ? Paleta.tintaSuave.withValues(alpha: 0.4) : Paleta.tinta,
+          color: alElegir == null
+              ? Paleta.tintaSuave.withValues(alpha: 0.4)
+              : Paleta.tinta,
           width: grosorDeTinta,
         ),
-        textStyle: TextStyle(fontFamily: familiaDeTitulos, fontSize: tamano * 0.4),
+        textStyle: TextStyle(
+          fontFamily: familiaDeTitulos,
+          fontSize: tamano * 0.4,
+        ),
       ),
       child: Text('$valor'),
     );
@@ -356,7 +378,11 @@ class _Accion extends StatelessWidget {
   final String texto;
   final VoidCallback? alTocar;
 
-  const _Accion({required this.icono, required this.texto, required this.alTocar});
+  const _Accion({
+    required this.icono,
+    required this.texto,
+    required this.alTocar,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -364,7 +390,11 @@ class _Accion extends StatelessWidget {
       onPressed: alTocar,
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [Icon(icono, size: 20), const SizedBox(width: 6), Text(texto)],
+        children: [
+          Icon(icono, size: 20),
+          const SizedBox(width: 6),
+          Text(texto),
+        ],
       ),
     );
   }

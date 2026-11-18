@@ -11,7 +11,10 @@ Future<void> abrirBoton(WidgetTester tester, {bool habilitado = true}) async {
       home: Scaffold(
         body: Center(
           child: PiezaPresionable(
-            child: FilledButton(onPressed: habilitado ? () {} : null, child: const Text('Tirar')),
+            child: FilledButton(
+              onPressed: habilitado ? () {} : null,
+              child: const Text('Tirar'),
+            ),
           ),
         ),
       ),
@@ -19,8 +22,9 @@ Future<void> abrirBoton(WidgetTester tester, {bool habilitado = true}) async {
   );
 }
 
-double aplastado(WidgetTester tester) =>
-    tester.widget<AplastarYEstirar>(find.byKey(const ValueKey('aplastar-y-estirar'))).aplastado;
+double aplastado(WidgetTester tester) => tester
+    .widget<AplastarYEstirar>(find.byKey(const ValueKey('aplastar-y-estirar')))
+    .aplastado;
 
 void main() {
   testWidgets('Al apretarla se aplasta, al soltarla rebota (se estira un instante) y se '
@@ -28,7 +32,9 @@ void main() {
     await abrirBoton(tester);
     expect(aplastado(tester), 0);
 
-    final dedo = await tester.startGesture(tester.getCenter(find.text('Tirar')));
+    final dedo = await tester.startGesture(
+      tester.getCenter(find.text('Tirar')),
+    );
     await tester.pump();
     expect(aplastado(tester), greaterThan(0));
 
@@ -47,11 +53,15 @@ void main() {
     expectQuieto(tester);
   });
 
-  testWidgets('Con movimiento reducido no se aplasta ni rebota', (tester) async {
+  testWidgets('Con movimiento reducido no se aplasta ni rebota', (
+    tester,
+  ) async {
     conMovimientoReducido(tester);
     await abrirBoton(tester);
 
-    final dedo = await tester.startGesture(tester.getCenter(find.text('Tirar')));
+    final dedo = await tester.startGesture(
+      tester.getCenter(find.text('Tirar')),
+    );
     await tester.pump();
     expect(aplastado(tester), 0);
     await dedo.up();
@@ -67,7 +77,9 @@ void main() {
   testWidgets('Deshabilitado, no se aplasta', (tester) async {
     await abrirBoton(tester, habilitado: false);
 
-    final dedo = await tester.startGesture(tester.getCenter(find.text('Tirar')));
+    final dedo = await tester.startGesture(
+      tester.getCenter(find.text('Tirar')),
+    );
     await tester.pump();
     expect(aplastado(tester), 0);
     await dedo.up();

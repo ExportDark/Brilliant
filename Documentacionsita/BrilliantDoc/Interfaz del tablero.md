@@ -224,6 +224,8 @@ Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
 | La ficha del tiempo (`Sacudida`) | Cada segundo de los últimos 10 | Tiembla un instante, de un lado al otro, cada vez menos: 0,22 s |
 | El logo (`LogoBrilliant`) | Al aparecer "Iniciar sesión" | Las 5 fichas caen una tras otra, como con gravedad, y rebotan al tocar la bandeja: 0,65 s, una sola vez |
 | La insignia (`Insignia`) | Al aparecer el final | Entra de golpe con la goma y suelta rayitas de brillo alrededor, "en dos": 0,48 s |
+| El iris al empezar (`RutaConIris`, `Iris.apertura`) | Al tocar "Inicio" jugando solo; en línea, al empezar la ronda 1 | Jugando solo, el círculo se cierra sobre la preparación hasta quedar todo en tinta y se abre desde el centro sobre la partida: 0,45 s (al volver, al revés). En línea solo se abre, aunque la partida llegue de golpe sin pasar por la espera |
+| El iris al terminar (`Iris.cierre`) | Al terminar la partida, sola o en línea (no si se cerró el lobby) | El círculo se cierra hasta dejar solo el trofeo, se queda un instante y se vuelve a abrir: 1,1 s, una vez por partida. Si el trofeo quedó fuera de la pantalla, se lleva a la vista; si no se lo encuentra, se cierra sobre el centro. Nunca bloquea los toques |
 | Una zona llena | La vez que se llena | Sus casillas se menean y se agrandan un poco, en ola: 0,46 s. Se detecta comparando el tablero de antes con el nuevo (`Region.completada`), así que sirve igual jugando solo y en línea |
 
 Al dibujarse por primera vez (por ejemplo, al abrir una partida ya empezada) el tablero no
@@ -232,6 +234,13 @@ animación al volverse tocable, la ficha va siempre en el mismo lugar y el toque
 encima, en una capa aparte.
 
 ## Cómo se decidió
+
+- **2026-11-17, animaciones de cartoon viejo:** se pidió que la app tuviera animaciones
+  "estilo cartoon viejito". Se eligió solo movimiento (sin grano ni parpadeo de película,
+  que ensuciaban el texto y gastaban batería), marcadas pero rápidas (ninguna jugada se
+  frena más de medio segundo) y el iris solo al empezar y al terminar. Se descartaron las
+  animaciones que se repiten solas (por ejemplo, casillas que laten en reposo): gastan
+  batería y traban las pruebas que esperan a que todo se quiete.
 
 - **2026-11-13, lo que faltaba revisar:** se recorrieron en el emulador crear cuenta, los
   diálogos, el lobby y el resultado. Salieron: la ayuda del usuario cortada ("guio…"),

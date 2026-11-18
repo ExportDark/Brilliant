@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: 2026-11-17 · Repos: https://github.com/ExportDark/Brilliant (la app)
+Última actualización: 2026-11-18 · Repos: https://github.com/ExportDark/Brilliant (la app)
 y https://github.com/ExportDark/Brilliant-Servidor (el servidor, en la carpeta hermana
 `Brilliant-servidor`)
 
@@ -100,6 +100,9 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       tablero de otro. Jugable, sin diseño. Ver [[Multijugador]]
 - [x] **Puntos del multijugador** (2026-11-10) — la tabla por mapa y color, por puesto en
       que se llena cada zona. Ver [[Puntuación]]
+- [x] **Animaciones de cartoon viejo** (2026-11-18) — aplastar y estirar, rebotes de goma,
+      polvo y brillo, e iris al empezar y al terminar la partida; nada se mueve en reposo.
+      Ver [[Interfaz del tablero#Animaciones (cartoon viejo)]]
 - [x] **Segunda revisión de integridad y lógica** (2026-11-17) — 3 errores arreglados con
       su prueba, invariantes en las partidas simuladas y un script para correr todo. Ver
       [[Revisión de lógica]]
@@ -138,7 +141,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 790 tests de la app y 1093 del servidor, todos pasando, más 18 que
+puntos por zona. 822 tests de la app y 1093 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta

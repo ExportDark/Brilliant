@@ -7,6 +7,21 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-18 — Animaciones de cartoon viejo
+
+- Las piezas se mueven como en los dibujos animados viejos: aplastar y estirar, rebote de
+  goma, "animar en dos" (12 cuadros por segundo), polvo y rayitas de brillo. Solo cuando
+  pasa algo; nada se mueve en reposo, y con "Quitar animaciones" del sistema, nada.
+  - **Base y botones** (`c92191f`): los botones principales se aplastan y rebotan.
+  - **La tirada** (`45fc32d`): los dados saltan, giran y caen rebotando; el ancla brinca.
+  - **El tablero** (`f7ec365`): el número aparece de golpe con polvo, la casilla que no se
+    pudo usar sacude la cabeza, las que se encienden saltan en ola, una zona llena se
+    menea.
+  - **Festejos** (`877b11d`): los puntos hacen "¡boing!", el tiempo tiembla en los últimos
+    10 s, el logo cae ficha por ficha, la insignia entra con rayitas de brillo.
+  - **El iris**: se abre al empezar la partida y se cierra sobre el trofeo al terminarla.
+  Ver [[Interfaz del tablero#Animaciones (cartoon viejo)]].
+
 ## 2026-11-17 — Segunda revisión de integridad y lógica
 
 - **Quien se iba se llevaba el puesto** (servidor `31030c8`): ahora los puestos se

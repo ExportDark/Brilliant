@@ -1,8 +1,8 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 812 tests, todos pasando, más 18 que hablan con el
-servidor de verdad y solo corren si se piden (2026-11-17). El servidor tiene los suyos
+las pruebas y qué se aprendió de ellas. 822 tests, todos pasando, más 18 que hablan con el
+servidor de verdad y solo corren si se piden (2026-11-18). El servidor tiene los suyos
 (1093, ver abajo).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
@@ -136,6 +136,8 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/animacion/curvas_cartoon_test.dart` | La goma empieza en 0, se pasa de 1 y termina exacto en 1; "en dos" se queda quieto dentro de cada cuadro de 1/12 s (3 casos) |
 | `ui/animacion/el_tablero_festeja_test.dart` | Al anotar, el número aparece de golpe (por debajo de 1, después por encima) con polvo, y queda quieto; al dibujarse con números ya anotados no se mueve; la marcada sacude la cabeza; las que se encienden saltan en ola (la lejana, después); al llenarse una zona se menean solo sus casillas y solo esa vez; con movimiento reducido, nada (6 casos) |
 | `ui/animacion/festejos_test.dart` | Los puntos nuevos se pasan de tamaño y vuelven, la pista se pasa un poco y se asienta (y la primera vez se dibuja donde está); la ficha del tiempo tiembla solo en los últimos 10 s; las fichas del logo caen una tras otra; la insignia entra rebotando con rayitas que se van; con movimiento reducido, nada (5 casos) |
+| `ui/animacion/iris_test.dart` | "Inicio" entra con el iris (la pantalla nueva ya está aunque no se vea) y al terminar no queda tinta; con movimiento reducido no hay iris; al terminar, el iris se queda alrededor del trofeo (su centro, radio 52) y se vuelve a abrir; la apertura se juega al aparecer si se pide; sin disparador, nada (5 casos) |
+| `ui/animacion/nada_se_mueve_solo_test.dart` | Después de abrir cada pantalla y dejar que se asiente, no queda ningún cuadro pendiente: iniciar sesión, elegir mapa, preparación, partida con los dados, lobby, partida en línea y resultado (5 casos) |
 | `ui/animacion/la_tirada_salta_test.dart` | El dado salta, gira y cae quieto y derecho en su cara; durante el salto se lee "Dado: N" con la cara real y se puede tocar; salta cuando cambia la tirada y no si sigue la misma; el ancla brinca; con movimiento reducido, nada (5 casos) |
 | `ui/animacion/pieza_que_se_aplasta_test.dart` | El botón se aplasta al apretarlo, al soltarlo se estira un instante y se asienta como era, y después no queda nada moviéndose; con movimiento reducido o deshabilitado, no se aplasta (3 casos) |
 | `ui/widgets/celda/aro_solo_en_iniciales_test.dart` | Solo las casillas iniciales llevan el aro tenue de 2 px, y no es negro |

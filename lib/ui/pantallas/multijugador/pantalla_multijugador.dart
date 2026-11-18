@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../animacion/iris.dart';
 import '../../../multijugador/cliente_salas.dart';
 import '../../../multijugador/modelos.dart';
 import '../../../multijugador/sala_bloc.dart';
@@ -68,9 +69,10 @@ class _Cuerpo extends StatelessWidget {
       // redibuje, para que la pantalla ya deje salir.
       listenWhen: (antes, ahora) =>
           antes.fin != FinDeSala.teFuiste && ahora.fin == FinDeSala.teFuiste,
-      listener: (context, _) => WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) Navigator.of(context).maybePop();
-      }),
+      listener: (context, _) =>
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) Navigator.of(context).maybePop();
+          }),
       builder: (context, state) {
         return PopScope(
           canPop:
@@ -134,47 +136,70 @@ class _Cuerpo extends StatelessWidget {
                     title: const Text('Multijugador'),
                     actions: [
                       // En la partida, las reglas del mapa que se está jugando.
-                      if (state.enSala && state.vista!.estado == EstadoDeSala.jugando)
+                      if (state.enSala &&
+                          state.vista!.estado == EstadoDeSala.jugando)
                         BotonDeReglas(
-                          mapa: mapas.firstWhere((m) => m.nivel == state.vista!.nivel),
+                          mapa: mapas.firstWhere(
+                            (m) => m.nivel == state.vista!.nivel,
+                          ),
                           enLinea: true,
                           meta: state.vista!.meta,
                         ),
                     ],
                   ),
-                  body: SafeArea(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                      child: Center(
-                        child: Bandeja(
-                          anchoMaximo: 480,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (state.enSala &&
-                                  state.conexion != Conexion.conectada)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: RecuadroDeAviso(
-                                    state.conexion == Conexion.reconectando
-                                        ? 'Reconectando con el servidor…'
-                                        : 'Se perdió la conexión. Si no vuelve, quedas fuera de la '
-                                              'partida.',
-                                    key: const ValueKey('aviso-de-conexion'),
-                                    icono: Icons.wifi_off_rounded,
-                                  ),
-                                ),
-                              if (state.error != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: RecuadroDeAviso(
-                                    state.error!,
-                                    key: const ValueKey('error-de-sala'),
-                                    icono: Icons.error_outline_rounded,
-                                  ),
-                                ),
-                              _contenido(context, state),
-                            ],
+                  // Los momentos clave, con el iris: se abre al empezar la partida (aunque
+                  // llegue de golpe, sin pasar por la espera) y se cierra sobre el trofeo
+                  // al terminar.
+                  body: Iris.cierre(
+                    disparador: _conResultado(state)
+                        ? state.vista!.codigo
+                        : null,
+                    child: Iris.apertura(
+                      disparador: state.vista?.estado == EstadoDeSala.jugando
+                          ? state.vista!.codigo
+                          : null,
+                      alAparecer: true,
+                      child: SafeArea(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                          child: Center(
+                            child: Bandeja(
+                              anchoMaximo: 480,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (state.enSala &&
+                                      state.conexion != Conexion.conectada)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 12,
+                                      ),
+                                      child: RecuadroDeAviso(
+                                        state.conexion == Conexion.reconectando
+                                            ? 'Reconectando con el servidor…'
+                                            : 'Se perdió la conexión. Si no vuelve, quedas fuera de la '
+                                                  'partida.',
+                                        key: const ValueKey(
+                                          'aviso-de-conexion',
+                                        ),
+                                        icono: Icons.wifi_off_rounded,
+                                      ),
+                                    ),
+                                  if (state.error != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 12,
+                                      ),
+                                      child: RecuadroDeAviso(
+                                        state.error!,
+                                        key: const ValueKey('error-de-sala'),
+                                        icono: Icons.error_outline_rounded,
+                                      ),
+                                    ),
+                                  _contenido(context, state),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -185,6 +210,12 @@ class _Cuerpo extends StatelessWidget {
       },
     );
   }
+
+  /// Si la partida terminó con un resultado que mostrar (no si se cerró el lobby).
+  static bool _conResultado(SalaState state) =>
+      state.fin == FinDeSala.ninguno &&
+      state.vista?.estado == EstadoDeSala.terminada &&
+      state.vista?.resultado != null;
 
   /// Si me toca repartir mis números: esa pantalla ocupa todo, como en un jugador.
   static bool _repartiendo(SalaState state) {
@@ -213,11 +244,13 @@ class _Cuerpo extends StatelessWidget {
                 children: [
                   VistaResultado(sala: sala),
                   const SizedBox(height: 16),
-                  PiezaPresionable(child: FilledButton(
-                    key: const ValueKey('boton-volver'),
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    child: const Text('Salir'),
-                  )),
+                  PiezaPresionable(
+                    child: FilledButton(
+                      key: const ValueKey('boton-volver'),
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      child: const Text('Salir'),
+                    ),
+                  ),
                 ],
               ),
     };
@@ -240,7 +273,8 @@ class _FinDeSala extends StatelessWidget {
         const SizedBox(height: 24),
         Text(
           switch (fin) {
-            FinDeSala.desaparecio => 'La sala ya no existe: el servidor se reinició o la cerró.',
+            FinDeSala.desaparecio =>
+              'La sala ya no existe: el servidor se reinició o la cerró.',
             FinDeSala.cerrada => 'El anfitrión cerró la sala.',
             FinDeSala.teFuiste => 'Saliste de la sala.',
             _ => 'Ya no estás en la sala.',
@@ -250,11 +284,13 @@ class _FinDeSala extends StatelessWidget {
           style: textos.titleMedium,
         ),
         const SizedBox(height: 24),
-        PiezaPresionable(child: FilledButton(
-          key: const ValueKey('boton-volver'),
-          onPressed: () => Navigator.of(context).maybePop(),
-          child: const Text('Volver'),
-        )),
+        PiezaPresionable(
+          child: FilledButton(
+            key: const ValueKey('boton-volver'),
+            onPressed: () => Navigator.of(context).maybePop(),
+            child: const Text('Volver'),
+          ),
+        ),
       ],
     );
   }

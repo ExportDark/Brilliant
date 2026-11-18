@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../animacion/iris.dart';
 import '../animacion/cartoon.dart';
 import '../../juego/partida_bloc.dart';
 import '../../juego/partida_event.dart';
@@ -122,7 +123,8 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
   void _jugarOtraVez() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => PantallaPreparacion(mapa: widget.mapa, tirarDado: widget.tirarDado),
+        builder: (_) =>
+            PantallaPreparacion(mapa: widget.mapa, tirarDado: widget.tirarDado),
       ),
     );
   }
@@ -147,88 +149,114 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
               title: Text(widget.mapa.nombre),
               actions: [BotonDeReglas(mapa: widget.mapa)],
             ),
-            body: SafeArea(
-              // Arriba y no centrado en vertical: así el tablero no se mueve
-              // cuando aparecen los dados o la explicación.
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
-                child: Center(
-                  child: Bandeja(
-                    anchoMaximo: 480,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _Encabezado(
-                          titulo: state.terminada ? 'Partida terminada' : 'Turno ${state.turno}',
-                          casillasLlenas: state.casillasLlenas,
-                        ),
-                        if (!state.terminada) ...[
-                          const SizedBox(height: 10),
-                          LineaDeIndicacion(
-                            indicacion: _indicacion(state),
-                            explicacion: explicacion,
-                            estilo: textos.bodyLarge,
+            // Al terminar, el iris se cierra sobre el trofeo y se vuelve a abrir.
+            body: Iris.cierre(
+              disparador: state.terminada ? 'fin' : null,
+              child: SafeArea(
+                // Arriba y no centrado en vertical: así el tablero no se mueve
+                // cuando aparecen los dados o la explicación.
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                  child: Center(
+                    child: Bandeja(
+                      anchoMaximo: 480,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _Encabezado(
+                            titulo: state.terminada
+                                ? 'Partida terminada'
+                                : 'Turno ${state.turno}',
+                            casillasLlenas: state.casillasLlenas,
                           ),
-                        ],
-                        const SizedBox(height: 14),
-                        TableroWidget(
-                          tablero: state.tablero,
-                          iluminacionDe: (posicion) => _iluminacion(state, posicion),
-                          numeroResaltadoEn: state.tieneNumeroBuscado,
-                          esTocable: (posicion) =>
-                              state.valorAncla != null &&
-                              state.tablero.celdaEn(posicion)!.estaVacia,
-                          alTocar: (posicion) => _tocarCasilla(state, posicion),
-                          marcada: explicada,
-                        ),
-                        if (state.terminada) ...[
-                          const SizedBox(height: 20),
-                          _FinDePartida(
-                            tableroLleno: state.casillasLlenas == Tablero.filas * Tablero.columnas,
-                            turnos: state.turno - 1,
-                            alJugarOtraVez: _jugarOtraVez,
-                          ),
-                        ] else ...[
-                          if (dados != null) ...[
-                            const SizedBox(height: 18),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 20,
-                              children: [
-                                for (final (indice, valor) in dados.indexed)
-                                  DadoWidget(
-                                    key: ValueKey('dado-$indice'),
-                                    valor: valor,
-                                    // Al tirarlos, saltan; el segundo, un poquito después.
-                                    saltaAlAparecer: true,
-                                    demora: indice == 0
-                                        ? Duration.zero
-                                        : Cartoon.desfaseDelSegundoDado,
-                                    anclado: indice == state.dadoElegido,
-                                    alTocar: () => _enviar(DadoElegido(indice)),
-                                  ),
-                              ],
+                          if (!state.terminada) ...[
+                            const SizedBox(height: 10),
+                            LineaDeIndicacion(
+                              indicacion: _indicacion(state),
+                              explicacion: explicacion,
+                              estilo: textos.bodyLarge,
                             ),
                           ],
-                          // Con los dados en la mesa no hace falta ningún botón,
-                          // salvo para pasar el turno cuando no hay jugada.
-                          if (state.sinJugada) ...[
+                          const SizedBox(height: 14),
+                          TableroWidget(
+                            tablero: state.tablero,
+                            iluminacionDe: (posicion) =>
+                                _iluminacion(state, posicion),
+                            numeroResaltadoEn: state.tieneNumeroBuscado,
+                            esTocable: (posicion) =>
+                                state.valorAncla != null &&
+                                state.tablero.celdaEn(posicion)!.estaVacia,
+                            alTocar: (posicion) =>
+                                _tocarCasilla(state, posicion),
+                            marcada: explicada,
+                          ),
+                          if (state.terminada) ...[
                             const SizedBox(height: 20),
-                            PiezaPresionable(child: FilledButton.tonal(
-                              onPressed: () => _enviar(const TurnoPasado()),
-                              style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
-                              child: const _TextoConIcono(Icons.skip_next_rounded, 'Pasar turno'),
-                            )),
-                          ] else if (dados == null) ...[
-                            const SizedBox(height: 20),
-                            PiezaPresionable(child: FilledButton(
-                              onPressed: () => _enviar(const DadosTirados()),
-                              style: FilledButton.styleFrom(minimumSize: const Size(220, 56)),
-                              child: const _TextoConIcono(Icons.casino_rounded, 'Tirar dados'),
-                            )),
+                            _FinDePartida(
+                              tableroLleno:
+                                  state.casillasLlenas ==
+                                  Tablero.filas * Tablero.columnas,
+                              turnos: state.turno - 1,
+                              alJugarOtraVez: _jugarOtraVez,
+                            ),
+                          ] else ...[
+                            if (dados != null) ...[
+                              const SizedBox(height: 18),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: 20,
+                                children: [
+                                  for (final (indice, valor) in dados.indexed)
+                                    DadoWidget(
+                                      key: ValueKey('dado-$indice'),
+                                      valor: valor,
+                                      // Al tirarlos, saltan; el segundo, un poquito después.
+                                      saltaAlAparecer: true,
+                                      demora: indice == 0
+                                          ? Duration.zero
+                                          : Cartoon.desfaseDelSegundoDado,
+                                      anclado: indice == state.dadoElegido,
+                                      alTocar: () =>
+                                          _enviar(DadoElegido(indice)),
+                                    ),
+                                ],
+                              ),
+                            ],
+                            // Con los dados en la mesa no hace falta ningún botón,
+                            // salvo para pasar el turno cuando no hay jugada.
+                            if (state.sinJugada) ...[
+                              const SizedBox(height: 20),
+                              PiezaPresionable(
+                                child: FilledButton.tonal(
+                                  onPressed: () => _enviar(const TurnoPasado()),
+                                  style: FilledButton.styleFrom(
+                                    minimumSize: const Size(220, 56),
+                                  ),
+                                  child: const _TextoConIcono(
+                                    Icons.skip_next_rounded,
+                                    'Pasar turno',
+                                  ),
+                                ),
+                              ),
+                            ] else if (dados == null) ...[
+                              const SizedBox(height: 20),
+                              PiezaPresionable(
+                                child: FilledButton(
+                                  onPressed: () =>
+                                      _enviar(const DadosTirados()),
+                                  style: FilledButton.styleFrom(
+                                    minimumSize: const Size(220, 56),
+                                  ),
+                                  child: const _TextoConIcono(
+                                    Icons.casino_rounded,
+                                    'Tirar dados',
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -258,7 +286,10 @@ class _Encabezado extends StatelessWidget {
       children: [
         Text(
           titulo,
-          style: textos.headlineSmall?.copyWith(color: Paleta.tinta, fontWeight: FontWeight.w700),
+          style: textos.headlineSmall?.copyWith(
+            color: Paleta.tinta,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         const SizedBox(height: 8),
         SizedBox(
@@ -319,10 +350,15 @@ class _FinDePartida extends StatelessWidget {
             style: textos.bodyLarge?.copyWith(color: Paleta.tintaSuave),
           ),
           const SizedBox(height: 18),
-          PiezaPresionable(child: FilledButton(
-            onPressed: alJugarOtraVez,
-            child: const _TextoConIcono(Icons.replay_rounded, 'Jugar otra vez'),
-          )),
+          PiezaPresionable(
+            child: FilledButton(
+              onPressed: alJugarOtraVez,
+              child: const _TextoConIcono(
+                Icons.replay_rounded,
+                'Jugar otra vez',
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -350,4 +386,3 @@ class _TextoConIcono extends StatelessWidget {
     );
   }
 }
-

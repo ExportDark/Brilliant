@@ -13,7 +13,11 @@ void conMovimientoReducido(WidgetTester tester) {
 
 /// Que no quede ningún cuadro pendiente: nada se mueve solo.
 void expectQuieto(WidgetTester tester) {
-  expect(tester.binding.hasScheduledFrame, isFalse, reason: 'algo se sigue moviendo solo');
+  expect(
+    tester.binding.hasScheduledFrame,
+    isFalse,
+    reason: 'algo se sigue moviendo solo',
+  );
 }
 
 /// La matriz de un `Transform`, o la identidad si no hay.

@@ -209,6 +209,9 @@ caber, por ejemplo a 42 px en un celular de 360 px.
   y `grosorDeTinta`, la sombra sin difuminar y el borde de las piezas; `coloresDeZona`,
   los colores planos de las 7 zonas; y `tintaSobre(fondo)`, que elige tinta o cartón por
   contraste para que el número siempre se lea.
+- `animacion/iris.dart`: el iris de los dibujos animados viejos, solo en los momentos
+  clave: `RutaConIris` (al tocar "Inicio"), `Iris.apertura` (al empezar en línea) e
+  `Iris.cierre` (al terminar, sobre el trofeo).
 - `animacion/cartoon.dart`: la base de las animaciones al estilo de los dibujos animados
   viejos: la curva de goma, "animar en dos" (12 cuadros por segundo), `AplastarYEstirar`,
   el polvo y las rayitas de brillo, y las duraciones. Con "Quitar animaciones" del sistema,
