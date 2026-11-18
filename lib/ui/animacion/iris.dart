@@ -67,6 +67,9 @@ class _Circulo extends CustomClipper<Path> {
 /// Una ruta que entra con el iris: primero el círculo se cierra sobre la pantalla de
 /// antes, hasta quedar todo en tinta, y después se abre desde el centro sobre la nueva. Al
 /// volver, al revés. Con movimiento reducido, entra sin animación.
+///
+/// Mientras se cierra, la pantalla nueva ya está encima pero no se ve: no recibe toques
+/// (si no, un toque rápido, como un doble toque en "Inicio", tiraría los dados a ciegas).
 class RutaConIris<T> extends PageRouteBuilder<T> {
   RutaConIris({required WidgetBuilder builder, super.settings})
     : super(
@@ -93,9 +96,12 @@ class RutaConIris<T> extends PageRouteBuilder<T> {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  ClipPath(
-                    clipper: _Circulo(centro, cerrando ? todo : radio),
-                    child: Opacity(opacity: cerrando ? 0 : 1, child: hijo),
+                  AbsorbPointer(
+                    absorbing: cerrando,
+                    child: ClipPath(
+                      clipper: _Circulo(centro, cerrando ? todo : radio),
+                      child: Opacity(opacity: cerrando ? 0 : 1, child: hijo),
+                    ),
                   ),
                   IgnorePointer(
                     child: CustomPaint(

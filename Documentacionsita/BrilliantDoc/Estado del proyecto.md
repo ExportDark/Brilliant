@@ -105,7 +105,8 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       Ver [[Interfaz del tablero#Animaciones (cartoon viejo)]]
 - [x] **Tercera revisión: las animaciones** (2026-11-18) — el lector de pantalla, un
       botón que quedaba hundido, lo que se movía con "Quitar animaciones", el tablero de
-      otro mapa que festejaba y el iris que no tapaba toda la pantalla. Ver
+      otro mapa que festejaba, el iris que no tapaba toda la pantalla y la partida que se
+      podía tocar a ciegas durante el iris. Ver
       [[Revisión de lógica#Tercera revisión: las animaciones (2026-11-18)]]
 - [x] **Segunda revisión de integridad y lógica** (2026-11-17) — 3 errores arreglados con
       su prueba, invariantes en las partidas simuladas y un script para correr todo. Ver
@@ -145,7 +146,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 834 tests de la app y 1093 del servidor, todos pasando, más 18 que
+puntos por zona. 838 tests de la app y 1093 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta

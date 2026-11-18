@@ -13,10 +13,12 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
   y el toque vuelven a ser un solo elemento.
 - **Un botón podía quedar hundido** si se deshabilitaba con el dedo encima (app `d2f0a08`).
 - **La explicación se fundía con "Quitar animaciones"** (app `d2f0a08`).
-- **El tablero decidía si era el mismo mapa contando las zonas** (app): ahora compara la
+- **El tablero decidía si era el mismo mapa contando las zonas** (app `6677211`): ahora compara la
   forma del mapa, así un tablero de otro mapa no festeja.
-- **El iris no tapaba toda la pantalla** (app): ni la barra de arriba ni, en una pantalla
-  alta, el pedazo de abajo del contenido.
+- **El iris no tapaba toda la pantalla** (app `6677211`): ni la barra de arriba ni, en una
+  pantalla alta, el pedazo de abajo del contenido.
+- **Durante el iris de "Inicio" se podía tocar la partida a ciegas** (app): un toque
+  rápido tiraba los dados sin verlos; ahora, mientras se cierra, nada se puede tocar.
   Ver [[Revisión de lógica#Tercera revisión: las animaciones (2026-11-18)]].
 
 ## 2026-11-18 — Animaciones de cartoon viejo
