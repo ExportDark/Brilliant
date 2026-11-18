@@ -218,7 +218,8 @@ caber, por ejemplo a 42 px en un celular de 360 px.
   rendirse, con el botón de hacerlo en rojo (`estiloDePeligro`, en `tema.dart`) y, si no
   caben en fila, los botones uno sobre otro con el rojo arriba.
 - `widgets/dado_widget.dart`: `DadoWidget`, un dado como pieza, con borde de tinta, sombra
-  dura y los puntos de su cara. Con `anclado` se hunde, se pinta de amarillo y debajo
+  dura y los puntos de su cara. Al tirarlo salta, gira y cae rebotando (`tirada`,
+  `saltaAlAparecer`). Con `anclado` se hunde, se pinta de amarillo y debajo
   lleva ⚓ "ancla": es el único lugar donde aparece el ancla. Para lectores de pantalla
   es un botón "Dado: 4".
 - `widgets/hoja_de_reglas.dart`: `BotonDeReglas` y `HojaDeReglas`, cómo se anota con el

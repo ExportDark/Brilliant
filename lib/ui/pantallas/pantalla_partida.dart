@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../animacion/cartoon.dart';
 import '../../juego/partida_bloc.dart';
 import '../../juego/partida_event.dart';
 import '../../juego/partida_state.dart';
@@ -198,6 +199,11 @@ class _VistaPartidaState extends State<_VistaPartida> with ExplicacionPasajera {
                                   DadoWidget(
                                     key: ValueKey('dado-$indice'),
                                     valor: valor,
+                                    // Al tirarlos, saltan; el segundo, un poquito después.
+                                    saltaAlAparecer: true,
+                                    demora: indice == 0
+                                        ? Duration.zero
+                                        : Cartoon.desfaseDelSegundoDado,
                                     anclado: indice == state.dadoElegido,
                                     alTocar: () => _enviar(DadoElegido(indice)),
                                   ),

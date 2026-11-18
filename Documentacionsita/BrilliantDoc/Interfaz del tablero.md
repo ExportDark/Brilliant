@@ -215,6 +215,8 @@ Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
 | Qué | Cuándo | Cómo |
 |---|---|---|
 | Botones principales (`PiezaPresionable`) | Al apretar y al soltar | Apretado, se hunde y se aplasta; al soltar, vuelve con la goma (se estira un instante) en 0,32 s |
+| La tirada (`DadoWidget`) | Al tirar, y en línea con cada ronda (`tirada`) | Se agacha, salta estirándose y da una vuelta con las caras cambiando "en dos", y cae aplastado en su cara rebotando: 0,48 s; el segundo dado sale 60 ms después. La etiqueta "Dado: N" y el toque son siempre los de la cara real, aunque esté en el aire |
+| El dado ancla | Al elegirlo | Brinca, cae aplastándose y queda hundido: 0,3 s |
 
 ## Cómo se decidió
 

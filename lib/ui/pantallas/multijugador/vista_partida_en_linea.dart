@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../animacion/cartoon.dart';
 import '../../../juego/validacion_jugada.dart';
 import '../../../modelo/mapa.dart';
 import '../../../modelo/posicion.dart';
@@ -117,6 +118,10 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
               DadoWidget(
                 key: ValueKey('dado-$indice'),
                 valor: valor,
+                // Con cada ronda, los dados saltan; el segundo, un poquito después.
+                tirada: sala.ronda,
+                saltaAlAparecer: true,
+                demora: indice == 0 ? Duration.zero : Cartoon.desfaseDelSegundoDado,
                 anclado: jugada != null && jugada.ancla == valor,
                 alTocar: puedeJugar && _opciones.any((o) => o.ancla == valor)
                     ? () => _elegirAncla(valor)
