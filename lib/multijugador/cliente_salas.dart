@@ -127,7 +127,6 @@ class ClienteSalasHttp implements ClienteSalas {
 
   static VistaDeSala _vista(int estado, Map<String, dynamic> datos) {
     if (estado == 401) throw const SesionVencida();
-    if (estado >= 200 && estado < 300) return VistaDeSala.desdeJson(datos);
     if (estado >= 500) {
       throw ErrorDeSala(
         codigo: 'error_del_servidor',
@@ -135,11 +134,30 @@ class ClienteSalasHttp implements ClienteSalas {
         estadoHttp: estado,
       );
     }
-    throw ErrorDeSala(
-      codigo: datos['codigo'] as String? ?? 'desconocido',
-      mensaje: datos['detail'] as String? ?? 'El servidor rechazó el pedido.',
-      estadoHttp: estado,
-      motivo: datos['motivo'] as String?,
-    );
+    // Una respuesta con otra forma (un servidor de otra versión, o algo que no es JSON)
+    // no puede dejar la sala trabada: se avisa como cualquier rechazo.
+    final ErrorDeSala rechazo;
+    try {
+      if (estado >= 200 && estado < 300) return VistaDeSala.desdeJson(datos);
+      rechazo = ErrorDeSala(
+        codigo: datos['codigo'] as String? ?? 'desconocido',
+        mensaje: datos['detail'] as String? ?? 'El servidor rechazó el pedido.',
+        estadoHttp: estado,
+        motivo: datos['motivo'] as String?,
+      );
+    } on TypeError {
+      throw respuestaRara(estado);
+    } on FormatException {
+      throw respuestaRara(estado);
+    }
+    throw rechazo;
   }
+
+  /// Lo que se le dice al jugador si el servidor contestó algo que la app no entiende.
+  static ErrorDeSala respuestaRara(int estado) => ErrorDeSala(
+    codigo: 'respuesta_rara',
+    mensaje: 'El servidor contestó algo que esta versión de la app no entiende. '
+        'Actualiza la app o el servidor.',
+    estadoHttp: estado,
+  );
 }

@@ -36,6 +36,9 @@ Los mapas 1 a 4 son los niveles 1 a 4 de [[Mapas]].
   puesto libre.
 - **Si varios la llenan en la misma ronda, todos toman el mismo puesto**, y se salta el
   siguiente: dos 1.º, y el siguiente es 3.º.
+- **Los puestos se reparten al terminar la ronda, solo entre los que siguen jugando**
+  (2026-11-17): quien llenó una zona y se fue antes de que terminara la ronda no se lleva
+  el puesto, y la zona le sigue pagando ese puesto al siguiente.
 - Una zona con los tres puestos tomados queda **agotada**.
 - **Gana el primero que llega a la meta** (ver abajo). Si nadie llega, gana quien más
   puntos sume al terminar. En los dos casos, si empatan, quien tenga más 1.º; si siguen

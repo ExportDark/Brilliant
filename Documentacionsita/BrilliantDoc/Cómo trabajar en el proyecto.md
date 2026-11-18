@@ -26,6 +26,7 @@ Versión del SDK de Dart: 3.13.2 (stable).
 ## Comandos
 
 ```bash
+bash tool/probar_todo.sh                        # TODO: servidor, app y contra el servidor
 flutter test                                    # correr todos los tests
 flutter test test/ui test/main                  # solo los widget tests
 flutter test --dart-define=CON_SERVIDOR=true test/cuenta/contra_el_servidor_test.dart
@@ -36,6 +37,12 @@ flutter run -d edge                             # correr en web (en Edge)
 flutter build web                               # compilar para web
 flutter build apk --release --split-per-abi     # compilar el APK de Android
 ```
+
+`tool/probar_todo.sh` corre las pruebas del servidor (en la carpeta hermana), levanta el
+servidor (o usa el que ya esté en el 8443), corre las de la app y las dos que juegan contra
+el servidor de verdad, lo apaga y dice qué pasó con cada paso. Tarda unos 10 minutos. Las
+que juegan contra el servidor no se corren con `flutter test` solo, y una vez quedaron
+viejas sin que se notara: este script es para correr antes de subir algo del multijugador.
 
 En esta PC no hay Chrome, así que para web se usa Edge (`-d edge`). La versión de
 escritorio (`windows/`) se quitó el 2026-11-10: no se usaba, y sin Visual Studio con C++

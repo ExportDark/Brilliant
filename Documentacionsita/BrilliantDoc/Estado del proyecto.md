@@ -100,6 +100,9 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
       tablero de otro. Jugable, sin diseño. Ver [[Multijugador]]
 - [x] **Puntos del multijugador** (2026-11-10) — la tabla por mapa y color, por puesto en
       que se llena cada zona. Ver [[Puntuación]]
+- [x] **Segunda revisión de integridad y lógica** (2026-11-17) — 3 errores arreglados con
+      su prueba, invariantes en las partidas simuladas y un script para correr todo. Ver
+      [[Revisión de lógica]]
 - [x] **El tablero chico de cada jugador** (2026-11-17) — en el marcador, qué casillas
       ocupó cada uno (sin números) y la de la última ronda. Ver
       [[Multijugador#El tablero chico de cada uno (2026-11-17)]]
@@ -135,7 +138,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 786 tests de la app y 1067 del servidor, todos pasando, más 18 que
+puntos por zona. 790 tests de la app y 1093 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta

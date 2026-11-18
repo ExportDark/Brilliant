@@ -7,6 +7,17 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-17 — Segunda revisión de integridad y lógica
+
+- **Quien se iba se llevaba el puesto** (servidor `31030c8`): ahora los puestos se
+  reparten solo entre los que siguen jugando.
+- **Las salas abandonadas no se iban nunca** (servidor `31030c8`): al crear una sala se
+  ponen al día todas y las terminadas se olvidan a los 10 min.
+- **Una respuesta rara del servidor trababa la sala** (app): ahora se avisa.
+- **Pruebas de integridad**: invariantes en cada ronda de las partidas simuladas
+  (privacidad, meta, puntos de quien se fue, la caché del 304) y la meta alcanzable en
+  cada mapa; y `tool/probar_todo.sh` para correr todo junto. Ver [[Revisión de lógica]].
+
 ## 2026-11-17 — El tablero chico de cada jugador
 
 - **En el marcador se ve el tablero de cada uno, en chico** (servidor y app): qué casillas

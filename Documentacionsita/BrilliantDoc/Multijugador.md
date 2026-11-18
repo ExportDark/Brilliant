@@ -53,7 +53,8 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
 20 con 5 o 6. Se fija al empezar. Ver [[Puntuación#La meta (2026-11-17)]].
 
 "Rendirse" pide confirmación; salir de la pantalla a mitad de partida es rendirse. Quien
-se rinde o se desconecta conserva sus puntos, pero no puede ganar.
+se rinde o se desconecta conserva sus puntos, pero no puede ganar, ni se lleva el puesto
+de una zona que llenó en la ronda en que se fue.
 
 ## El marcador y el panel de zonas
 

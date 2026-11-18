@@ -1,16 +1,17 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 786 tests, todos pasando, más 18 que hablan con el
+las pruebas y qué se aprendió de ellas. 790 tests, todos pasando, más 18 que hablan con el
 servidor de verdad y solo corren si se piden (2026-11-17). El servidor tiene los suyos
-(1067, ver abajo).
+(1093, ver abajo).
 
 Ver también: [[Cómo trabajar en el proyecto]] · [[Estado del proyecto]] · [[Historial de cambios]]
 
 ## Correrlas
 
 ```bash
-C:\src\flutter\bin\flutter.bat test                       # todas
+bash tool/probar_todo.sh                                   # todo: servidor, app y contra el servidor
+C:\src\flutter\bin\flutter.bat test                       # todas las de la app
 C:\src\flutter\bin\flutter.bat test test/juego             # solo una carpeta
 C:\src\flutter\bin\flutter.bat test test/juego/partida/dados_iguales_test.dart
 ```
@@ -165,6 +166,7 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/pantallas/reglas/cada_mapa_muestra_sus_colores_test.dart` | En cada mapa, cada color de zona sale una sola vez; en el Nivel 4, las dos naranjas con su rango; en línea, también cómo se ganan los puntos (6 casos) |
 | `ui/pantallas/reglas/la_hoja_de_reglas_es_de_carton_test.dart` | La hoja de reglas es de cartón y no del verde de la mesa, para que la letra oscura se lea |
 | `ui/pantallas/reglas/la_meta_en_las_reglas_test.dart` | En línea, la hoja de reglas dice la meta, también abierta desde la partida con la meta de la sala (2 casos) |
+| `multijugador/respuesta_rara_test.dart` | Una sala con un campo de otro tipo, algo que no es JSON o un rechazo con el código de otro tipo se avisan como "respuesta rara"; y la sala no queda trabada: avisa y se puede volver a tocar (4 casos; sin el arreglo, la del bloc se quedaba esperando) |
 | `multijugador/el_tablero_chico_se_lee_test.dart` | De cada jugador llegan sus casillas ocupadas y la de la última ronda; con un servidor viejo, ninguna (2 casos) |
 | `multijugador/la_meta_se_lee_test.dart` | La sala trae la meta; con un servidor viejo que no la manda, queda en `null` (2 casos) |
 | `ui/widgets/confirmacion/salir_en_rojo_y_arriba_test.dart` | "Salir" de la partida es rojo con letra clara y, en 320 px, va arriba de "Seguir jugando" y centrado. Al escribirla salió que "Tirar dados" se desbordaba 9 px en 320 px |
@@ -424,13 +426,15 @@ Ver [[Revisión de lógica]].
 
 ## El servidor
 
-El servidor tiene sus propios tests, en Python, con pytest: **1067** (2026-11-17), que no
+El servidor tiene sus propios tests, en Python, con pytest: **1093** (2026-11-17), que no
 entran en la cuenta de la app.
 
 - `cuentas/tests/` (88, más 1 que se salta a propósito): ver [[Servidor de cuentas]]; también `GET /servidor/`.
-- `juego/tests/` (704): las reglas en Python; `test_paridad.py` exige que den lo mismo que
+- `juego/tests/` (708, con la meta alcanzable en cada mapa): las reglas en Python; `test_paridad.py` exige que den lo mismo que
   la app en todos los casos de `casos_de_jugadas.json` y en los 4 mapas.
-- `salas/tests/` (275): lobby, preparación, rondas, puntos, lo que se ve del tablero de
+- `salas/tests/` (297): lobby, preparación, rondas, puntos (quien se fue no toma
+  puestos), salas abandonadas que se limpian, invariantes en cada ronda de las partidas
+  simuladas (privacidad, meta, puntos de quien se fue, la caché del 304), lo que se ve del tablero de
   los demás (`test_tableros_ajenos.py`: casillas sin números, la de la ronda en curso
   oculta hasta que termina, la última, nada en la preparación), la meta (`test_meta.py`: según
   cuántos empiezan, fija aunque alguien se vaya, termina al cerrar la ronda en que alguien

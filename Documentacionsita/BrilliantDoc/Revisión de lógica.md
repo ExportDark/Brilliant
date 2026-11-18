@@ -1,7 +1,7 @@
 # Revisión de lógica
 
 Una revisión de los errores de lógica del proyecto (app y servidor), hecha a pedido el
-2026-11-10 y 2026-11-11, después del reporte "no me deja iniciar sesión porque ya aparece
+2026-11-10 y 2026-11-11 (y otra el 2026-11-17, ver abajo), después del reporte "no me deja iniciar sesión porque ya aparece
 que está logueado". Cada error que se encontró se arregló con una prueba que lo
 reproduce, y se comprobó que esa prueba falla sin el arreglo.
 
@@ -36,6 +36,36 @@ Ver también: [[Multijugador]] · [[Cuentas en la app]] · [[Servidor de cuentas
 | **Solo se recordaba un cierre de sesión pendiente** | Un segundo cierre sin servidor pisaba al primero, que quedaba abierto hasta vencer | Una lista (`porcerrar.lista`), sin perder la que se guardó con la versión anterior | app `5c55685` |
 | **Desbordes en el celular chico** | El código de la sala y la fila de puntos del resultado no cabían en 320 px | El código se achica; los "primeros" van debajo de los puntos | `9fe363a` |
 
+## Segunda revisión: integridad y lógica (2026-11-17)
+
+Después de la meta de puntos y del tablero chico de cada jugador. Los dos primeros se
+comprobaron corriendo el servidor en memoria antes de arreglarlos; cada prueba nueva se
+vio fallar sin su arreglo.
+
+| Error | Qué pasaba | Arreglo | Commit |
+|---|---|---|---|
+| **Quien se iba se llevaba el puesto** | Si alguien llenaba una zona y se rendía (o se desconectaba) antes de que terminara la ronda, al terminar se quedaba con el puesto y sus puntos, y corría a los demás un lugar, aunque ya no podía ganar | Los puestos se reparten solo entre los que siguen jugando (decidido el 2026-11-17; antes una prueba pedía lo contrario) | servidor `31030c8` |
+| **Las salas abandonadas no se iban nunca** | El tiempo de una sala solo corre cuando alguien le pregunta: si todos cerraban la app, la sala (en el lobby o jugando) quedaba en memoria para siempre | Al crear una sala se ponen al día todas: las abandonadas terminan y a los 10 min se olvidan | servidor `31030c8` |
+| **Una respuesta rara trababa la sala** | Una sala con un campo de otro tipo (un servidor de otra versión) o algo que no es JSON rompía la lectura sin que nadie lo atrapara: los botones quedaban deshabilitados para siempre, y durante la partida las consultas fallaban en silencio | Se avisa "El servidor contestó algo que esta versión de la app no entiende…" como cualquier rechazo | app (este commit) |
+| **Las pruebas contra el servidor no se corrían** | Una había quedado vieja desde el 2026-11-11 sin que nadie lo notara | `tool/probar_todo.sh` corre todo junto: servidor, app y las dos contra el servidor de verdad | app (este commit) |
+
+**Pruebas de integridad nuevas** (en las partidas simuladas del servidor, después de cada
+ronda y desde la vista de cada jugador, en los 4 mapas, de 2 a 6 jugadores, con gente que
+se rinde antes o justo después de anotar): de los demás solo llega lo público (sus
+casillas sin números, nunca la de la ronda en curso); `ultima` está entre las ocupadas; la
+meta no cambia; la partida termina en la ronda en que alguien llega; quien se fue no suma
+más; y con la misma `version` la vista es la misma (si no, el 304 dejaría a la app sin
+enterarse). Y que la meta más alta (26) se pueda alcanzar en cada mapa: los primeros
+puestos suman 54, 55, 54 y 50. La simulación encontró sola el error del puesto (semilla 14).
+
+**Revisado y está bien:** rendirse con la partida ya terminada muestra el resultado; la
+API rechaza con 4xx los tipos raros; la tabla de puntos cubre todas las zonas; con varios
+en la meta gana el de más puntos; ningún mapa tiene dos casillas iniciales en una zona (ya
+había pruebas en los dos repos), así que validar el reparto casilla por casilla alcanza.
+
+Se comprobó con `tool/probar_todo.sh`: 1093 pruebas del servidor, 790 de la app, y las 4 de
+cuentas y las 14 de partidas contra el servidor de verdad, todas pasando.
+
 ## Riesgos conocidos, sin arreglar
 
 Son de bajo impacto o de diseño; quedan anotados para decidir después.
@@ -51,6 +81,12 @@ Son de bajo impacto o de diseño; quedan anotados para decidir después.
 - **Si se cierra la app a mitad de una partida de un jugador, se pierde**: no se guarda.
 - **La búsqueda de servidores (mDNS) no se puede probar en el emulador**: su red no deja
   pasar el multicast. Solo se verifica en un celular de verdad.
+- **Borrar la cuenta en medio de una sala** (2026-11-17): las salas guardan a cada jugador
+  por su nombre de usuario, y durante unos 10 s (hasta que el servidor lo da por
+  desconectado) el lugar sigue a su nombre. Si en ese rato alguien crea una cuenta con el
+  mismo nombre y entra, ocuparía ese lugar. Para llegar a "Mi cuenta" hay que salir de la
+  partida (salir es rendirse), y crear cuentas tiene un límite de 10 por hora: riesgo
+  bajo.
 
 ## Cómo se comprobó
 
