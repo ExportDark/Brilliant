@@ -167,6 +167,19 @@ y Gradle los encuentra bloqueados. Qué hacer:
 - Si pasa seguido, pausar la sincronización de OneDrive mientras se compila, o mover el
   proyecto a una carpeta fuera de OneDrive (por ejemplo `C:\src\Brilliant`).
 
+**Otra forma del mismo problema** (2026-11-18): Gradle termina con `Cannot snapshot
+.../build/app/intermediates/incremental/packageRelease/.../dex-renamer-state.txt: not
+a regular file` (o lo mismo con un `.dm` en `build/app/outputs/apk/release/...`). OneDrive
+dejó esos archivos de salida como marcadores, y volver a correr no alcanza. Como son salida
+de la compilación, se borran y se regeneran solos:
+
+```bash
+rm -rf build/app/outputs/apk build/app/intermediates/incremental
+flutter build apk --release --split-per-abi
+```
+
+(`build/app/outputs/flutter-apk/`, donde quedan los APK, no hace falta borrarla.)
+
 ## Convenciones del proyecto
 
 - **Nombres en español**, consistentes con el dominio del juego (`Celda`, `Region`,
