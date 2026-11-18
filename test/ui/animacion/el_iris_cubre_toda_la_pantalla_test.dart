@@ -8,12 +8,6 @@ import 'ayudantes_animacion.dart';
 
 const pantalla = Size(1000, 1400);
 
-/// El iris que se está jugando (en línea hay dos, uno dentro del otro: el de empezar y
-/// el del final; el que está quieto no pinta nada).
-final irisJugandose = find.byWidgetPredicate(
-  (widget) => widget is CustomPaint && widget.key == const ValueKey('iris'),
-);
-
 /// Que el iris esté tapando la pantalla entera, con la barra de arriba.
 void expectCubreTodo(WidgetTester tester) {
   expect(

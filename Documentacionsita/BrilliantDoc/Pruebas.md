@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 838 tests, todos pasando, más 18 que hablan con el
+las pruebas y qué se aprendió de ellas. 860 tests, todos pasando, más 18 que hablan con el
 servidor de verdad y solo corren si se piden (2026-11-18). El servidor tiene los suyos
 (1093, ver abajo).
 
@@ -28,7 +28,7 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/juego/` | 130 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
 | `test/cuenta/` | 133 (+4) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
 | `test/multijugador/` | 80 (+14) | Los modelos que manda el servidor, `ClienteSalas` (cada ruta y cada error, con `MockClient`), `SalaBloc` (preguntar cada segundo, reconectando, conexión perdida, sala que desapareció o que cerró el anfitrión, doble toque…) y el reloj que no depende de la hora del teléfono; y, si se pide, partidas contra el servidor de verdad |
-| `test/ui/` | 294 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/ui/` | 316 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
 | `test/herramientas/` | 3 | Que los JSON que se copian al servidor (`tool/exportado/`) coincidan con lo que generaría el código de hoy |
 | `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
@@ -55,6 +55,11 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
     fijos), `abrirPreparacion()`, `abrirPartida()`,
     `tocar()`, `tirarYElegirAncla()`, `celdaEn()`, `celdasDibujadasDonde()` y los
     buscadores de botones, dados y casillas.
+  - `test/ui/animacion/ayudantes_animacion.dart`: `conMovimientoReducido()`,
+    `expectQuieto()` (no queda ningún cuadro pendiente) y, para los recorridos de
+    pantalla, qué se está moviendo ahora: `irisPintando()`, `polvoEnElTablero()`,
+    `casillaMovida()`, `escalaDelNumero()`, `alturaDelDado()` y `expectNadaSeMueve()`
+    (ninguna pieza fuera de su lugar, ni iris, ni polvo, ni un botón aplastado).
 
 ## Las pruebas sueltas
 
@@ -139,6 +144,11 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/animacion/el_iris_cubre_toda_la_pantalla_test.dart` | A mitad del iris, la tinta tapa la pantalla entera, con la barra de arriba: el del final jugando solo (tras anotar el último número), y en línea el de empezar y el del final (2 casos; sin el arreglo empezaba debajo de la barra y terminaba donde terminaba el contenido) |
 | `ui/animacion/tablero_de_otro_mapa_no_festeja_test.dart` | El Nivel 3 y el Nivel 4 tienen 8 zonas cada uno; si el tablero pasa a ser de otro mapa con números, no sale polvo ni aparece ningún número, y con los mismos números en otras zonas no se menea ninguna; en el mismo mapa, el número que llena una zona aparece con polvo y las otras casillas de la zona se menean (4 casos; sin el arreglo salía polvo y se meneaban D2 y B4) |
 | `ui/animacion/inicio_y_vuelta_con_iris_test.dart` | La app entera: "Inicio" entra a la partida con el iris y después queda solo la partida; mientras el iris se cierra, un toque donde va a estar "Tirar dados" no tira nada; un doble toque en "Inicio" entra una sola vez (y atrás vuelve a elegir el mapa); salir de la partida vuelve a elegir el mapa con el iris al revés (4 casos; sin el arreglo, el toque a ciegas tiraba los dados) |
+| `ui/animacion/partida_sola_animada_test.dart` | Un recorrido por la pantalla: la tirada salta, el ancla se elige con el dado en el aire, las casillas que se encienden dan su saltito, anotar suelta polvo una vez y el número aparece, y el turno siguiente vuelve a saltar sin mover el número de antes; tocar donde no se puede sacude la cabeza sin polvo ni número (2 casos) |
+| `ui/animacion/fin_de_partida_con_iris_test.dart` | Con la última jugada, el iris se cierra sobre el trofeo (su centro, radio 52) y se vuelve a abrir; en 320×568, lleva el trofeo a la vista y se cierra sobre él; "Jugar otra vez" se puede tocar con el iris a la mitad y lleva a la preparación; una partida que se abre ya terminada no juega el iris (4 casos) |
+| `ui/animacion/en_linea_animada_test.dart` | En línea: el iris al empezar sale después de esperar a los demás y directo desde el reparto, y no se repite con cada pregunta; los dados saltan con cada ronda nueva y no con cada pregunta ni cuando otro anota; mi jugada aceptada aparece con polvo una sola vez; al terminar, el iris se cierra sobre el trofeo del resultado; si el anfitrión cierra la sala, no hay iris (7 casos) |
+| `ui/animacion/todo_sin_movimiento_test.dart` | Con "Quitar animaciones", mirando el cuadro siguiente a cada toque y uno un poco después: "Inicio" y salir sin iris; una partida sola entera, turno por turno, sin que nada se mueva; y en línea empezar, anotar, la ronda nueva con pocos segundos y el resultado (3 casos) |
+| `ui/animacion/dos_jugadas_seguidas_test.dart` | Dos números antes de que se vaya el polvo del primero: los dos aparecen y el polvo sale entero con el segundo; el mismo tablero otra vez (otra respuesta igual) no vuelve a festejar (2 casos) |
 | `ui/animacion/iris_test.dart` | "Inicio" entra con el iris (la pantalla nueva ya está aunque no se vea) y al terminar no queda tinta; con movimiento reducido no hay iris; al terminar, el iris se queda alrededor del trofeo (su centro, radio 52) y se vuelve a abrir; la apertura se juega al aparecer si se pide; sin disparador, nada (5 casos) |
 | `ui/animacion/nada_se_mueve_solo_test.dart` | Después de abrir cada pantalla y dejar que se asiente, no queda ningún cuadro pendiente: iniciar sesión, elegir mapa, preparación, partida con los dados, lobby, partida en línea y resultado (5 casos) |
 | `ui/animacion/la_tirada_salta_test.dart` | El dado salta, gira y cae quieto y derecho en su cara; durante el salto se lee "Dado: N" con la cara real y se puede tocar; salta cuando cambia la tirada y no si sigue la misma; el ancla brinca; con movimiento reducido, nada (5 casos) |
@@ -199,6 +209,7 @@ Cada uno se repite en 5 tamaños, de `tamanosDePantalla` (en
 | `ui/pantallas/tamanos/partida_sin_desbordes_test.dart` | La partida no se desborda ni en su estado más alto: con dados, dado ancla y explicación |
 | `ui/pantallas/tamanos/tablero_entero_a_lo_ancho_test.dart` | Las 49 casillas caben a lo ancho de la pantalla, en los 4 mapas (20 casos) |
 | `ui/pantallas/tamanos/turno_jugable_en_cada_tamano_test.dart` | Se puede jugar un turno entero, haciendo scroll si los botones quedan abajo |
+| `ui/pantallas/tamanos/a_mitad_de_animacion_test.dart` | Solo en celular chico y escritorio: cada 50 ms de cada animación, nada se desborda, jugando solo (la tirada, las casillas que se encienden, el polvo y el iris del final) y en línea (el iris al empezar, los dados de la ronda nueva con el tiempo temblando y el iris del resultado) (4 casos) |
 
 Se comprobó que detectan el problema de verdad: con el tablero fijo de 48 px, los 8 casos
 de celular fallan ("A RenderFlex overflowed by 32 pixels" a 360 de ancho y por 72 a 320),

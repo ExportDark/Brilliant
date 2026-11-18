@@ -79,7 +79,31 @@ su arreglo.
 | **La explicación se fundía con "Quitar animaciones"** | Era la única animación con su duración fija | Usa `Cartoon.duracion`, como todas | app `d2f0a08` |
 | **El tablero decidía si era el mismo mapa contando las zonas** | El Nivel 3 y el Nivel 4 tienen 8 cada uno: si un tablero pasaba a ser de otro mapa con números, salía polvo, aparecían números y se meneaban casillas de zonas que no se llenaron (cada casilla compara su número con el de la casilla del mapa anterior). En el juego no llegaba a pasar: las tarjetas del lobby, las únicas que cambian de mapa, van vacías | El tablero compara la forma del mapa (qué casillas tiene cada zona, su color y su regla); con otro mapa, las casillas se dibujan de nuevo, como la primera vez | app `6677211` |
 | **El iris no tapaba toda la pantalla** | El del final (solo y en línea) y el de empezar en línea dejaban afuera la barra de arriba, y abajo terminaban donde terminaba el contenido: en una pantalla alta quedaba un pedazo sin tinta | Envuelven toda la pantalla, y el iris ocupa siempre toda su área | app `6677211` |
-| **Durante el iris de "Inicio" se podía tocar la partida a ciegas** | Mientras el círculo se cierra sobre la preparación, la partida ya está encima aunque no se vea: un toque rápido (por ejemplo, un doble toque en "Inicio") tiraba los dados sin verlos. Salió al escribir las pruebas de los recorridos | Mientras se cierra, la pantalla nueva no recibe toques | app (este commit) |
+| **Durante el iris de "Inicio" se podía tocar la partida a ciegas** | Mientras el círculo se cierra sobre la preparación, la partida ya está encima aunque no se vea: un toque rápido (por ejemplo, un doble toque en "Inicio") tiraba los dados sin verlos. Salió al escribir las pruebas de los recorridos | Mientras se cierra, la pantalla nueva no recibe toques | app `a4a9c4d` |
+
+**Pruebas de cada escenario** (22 nuevas, además de las de cada arreglo): hasta ahora se
+probaban las piezas sueltas; ahora también los recorridos por la pantalla, jugando solo y
+en línea, mirando qué se mueve en cada momento: la tirada y el ancla elegido en el aire,
+la ola de casillas, el polvo una sola vez (también cuando el servidor contesta lo mismo o
+cuando otro anota), los dados que saltan solo con cada ronda, el iris al empezar por los
+dos caminos y al terminar sobre el trofeo (también en el celular chico, con el trofeo
+abajo), "Jugar otra vez" con el iris a la mitad, sin iris si se cerró el lobby, todo con
+"Quitar animaciones" (una partida entera sin que nada se mueva), dos jugadas seguidas, y
+que nada se desborde a mitad de una animación.
+
+**Revisado y está bien:** el toque al dado en el aire llega al dado, y el dado en el aire
+no tapa los toques del tablero; el iris al empezar en línea sale por los dos caminos y no
+se repite con cada pregunta; ningún controlador de animación queda sin liberar; las
+respuestas iguales del servidor no repiten saltos ni festejos; si una zona se llena de
+golpe con todas sus casillas nuevas, cada una hace su aparición en lugar de menearse
+(en el juego entra un número por jugada, así que no pasa).
+
+Se comprobó con `tool/probar_todo.sh`: 1093 pruebas del servidor, 860 de la app y las 18
+contra el servidor de verdad, todas pasando. Y en el emulador, con el APK nuevo: jugando
+solo, el iris de "Inicio" a mitad de camino y un doble toque que entra una vez sin tirar
+los dados, la tirada y el polvo al anotar; en línea contra un rival hecho con un script,
+el iris al empezar sobre toda la pantalla (directo desde el reparto), una ronda jugada, y
+al dejar de contestar el rival, "¡Ganaste!" con el iris abriéndose desde el trofeo.
 
 ## Riesgos conocidos, sin arreglar
 

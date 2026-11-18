@@ -17,8 +17,11 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
   forma del mapa, así un tablero de otro mapa no festeja.
 - **El iris no tapaba toda la pantalla** (app `6677211`): ni la barra de arriba ni, en una
   pantalla alta, el pedazo de abajo del contenido.
-- **Durante el iris de "Inicio" se podía tocar la partida a ciegas** (app): un toque
-  rápido tiraba los dados sin verlos; ahora, mientras se cierra, nada se puede tocar.
+- **Durante el iris de "Inicio" se podía tocar la partida a ciegas** (app `a4a9c4d`): un
+  toque rápido tiraba los dados sin verlos; ahora, mientras se cierra, nada se puede tocar.
+- **Pruebas de cada escenario** (app): los recorridos por la pantalla con las animaciones,
+  solos y en línea, todo con "Quitar animaciones", dos jugadas seguidas y los tamaños a
+  mitad de animación: 22 pruebas nuevas.
   Ver [[Revisión de lógica#Tercera revisión: las animaciones (2026-11-18)]].
 
 ## 2026-11-18 — Animaciones de cartoon viejo

@@ -146,7 +146,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 838 tests de la app y 1093 del servidor, todos pasando, más 18 que
+puntos por zona. 860 tests de la app y 1093 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta

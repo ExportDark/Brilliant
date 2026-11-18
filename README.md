@@ -449,3 +449,9 @@ uno de los 4 mapas:
 - `test/ui/camino_feliz/partida_entera_por_la_pantalla_test.dart`: un **widget test** que
   abre la app, elige el mapa y juega tocando, hasta "¡Tablero completo!" y "Jugar otra
   vez".
+
+Las animaciones también se prueban como recorridos por la pantalla, en `test/ui/animacion/`
+(`partida_sola_animada`, `fin_de_partida_con_iris`, `en_linea_animada`…): qué se mueve en
+cada momento, que nada se repita con cada pregunta al servidor, una partida entera con
+"Quitar animaciones" sin que nada se mueva (`todo_sin_movimiento`), y que nada se desborde
+a mitad de una animación (`test/ui/pantallas/tamanos/a_mitad_de_animacion_test.dart`).

@@ -9,23 +9,6 @@ import 'ayudantes_animacion.dart';
 
 final botonInicio = find.widgetWithText(FilledButton, 'Inicio');
 
-/// Si algún iris está pintando tinta (el de la ruta, o el de la partida).
-bool irisPintando(WidgetTester tester) => find
-    .byWidgetPredicate(
-      (widget) => widget is CustomPaint && widget.key == const ValueKey('iris'),
-    )
-    .evaluate()
-    .any((elemento) => _pinta(elemento.renderObject!));
-
-bool _pinta(RenderObject iris) {
-  try {
-    expect(iris, paints..path());
-    return true;
-  } on TestFailure {
-    return false;
-  }
-}
-
 /// Abre la app, elige el Nivel 1 y reparte al azar: queda listo para tocar "Inicio".
 Future<void> listoParaEmpezar(WidgetTester tester) async {
   await abrirApp(tester, tirarDado: () => 4);
