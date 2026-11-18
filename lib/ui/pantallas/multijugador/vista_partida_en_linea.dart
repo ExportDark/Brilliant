@@ -34,7 +34,8 @@ class VistaPartidaEnLinea extends StatefulWidget {
   State<VistaPartidaEnLinea> createState() => _VistaPartidaEnLineaState();
 }
 
-class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with ExplicacionPasajera {
+class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
+    with ExplicacionPasajera {
   /// El número del dado ancla que eligió el jugador, o `null` si no ha elegido.
   int? _ancla;
 
@@ -79,7 +80,8 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
     final seguro = await confirmar(
       context,
       titulo: '¿Rendirte?',
-      texto: 'Quedarás fuera de la partida. Conservas los puntos que ya ganaste.',
+      texto:
+          'Quedarás fuera de la partida. Conservas los puntos que ya ganaste.',
       si: 'Rendirme',
       claveSi: const ValueKey('confirmar-rendirse'),
     );
@@ -103,7 +105,9 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
         ? jugada.casillas.toSet()
         : const <String>{};
     final dados = sala.dados ?? const <int>[];
-    final tiempo = context.select((SalaBloc bloc) => bloc.state.segundosQueQuedan);
+    final tiempo = context.select(
+      (SalaBloc bloc) => bloc.state.segundosQueQuedan,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -121,7 +125,9 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
                 // Con cada ronda, los dados saltan; el segundo, un poquito después.
                 tirada: sala.ronda,
                 saltaAlAparecer: true,
-                demora: indice == 0 ? Duration.zero : Cartoon.desfaseDelSegundoDado,
+                demora: indice == 0
+                    ? Duration.zero
+                    : Cartoon.desfaseDelSegundoDado,
                 anclado: jugada != null && jugada.ancla == valor,
                 alTocar: puedeJugar && _opciones.any((o) => o.ancla == valor)
                     ? () => _elegirAncla(valor)
@@ -142,7 +148,9 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
           // Con un ancla elegida, se puede tocar cualquier casilla vacía: las legales
           // anotan; las demás explican por qué no.
           esTocable: (posicion) =>
-              puedeJugar && jugada != null && tablero.celdaEn(posicion)!.estaVacia,
+              puedeJugar &&
+              jugada != null &&
+              tablero.celdaEn(posicion)!.estaVacia,
           iluminacionDe: (posicion) {
             if (legales.contains(posicion.notacion)) return Iluminacion.posible;
             if (!puedeJugar || jugada == null) return Iluminacion.normal;
@@ -152,7 +160,9 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
               ancla: jugada.ancla,
               valor: jugada.valor,
             );
-            return resultado is ReglaRota ? Iluminacion.bloqueada : Iluminacion.normal;
+            return resultado is ReglaRota
+                ? Iluminacion.bloqueada
+                : Iluminacion.normal;
           },
           numeroResaltadoEn: (posicion) =>
               jugada != null &&
@@ -173,7 +183,12 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea> with Explicac
             }
             // El servidor dice que ahí no: se explica por qué con las reglas de la app.
             final porQue = explicarJugada(
-              evaluarJugada(tablero, posicion, ancla: elegida.ancla, valor: elegida.valor),
+              evaluarJugada(
+                tablero,
+                posicion,
+                ancla: elegida.ancla,
+                valor: elegida.valor,
+              ),
               valor: elegida.valor,
             );
             if (porQue != null) explicar(porQue, posicion);
@@ -257,31 +272,36 @@ class _RondaYTiempo extends StatelessWidget {
         ),
         if (segundos != null) ...[
           const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(
-              color: apurado ? Paleta.peligro : Paleta.cartonClaro,
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: Paleta.tinta, width: 2),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.timer_outlined,
-                  size: 16,
-                  color: apurado ? Paleta.carton : Paleta.tinta,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$segundos s',
-                  key: const ValueKey('tiempo-de-la-ronda'),
-                  style: textos.titleSmall?.copyWith(
+          // En los últimos 10 s, la ficha tiembla un instante con cada segundo.
+          Sacudida(
+            disparador: segundos,
+            activa: apurado,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(
+                color: apurado ? Paleta.peligro : Paleta.cartonClaro,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Paleta.tinta, width: 2),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.timer_outlined,
+                    size: 16,
                     color: apurado ? Paleta.carton : Paleta.tinta,
-                    fontWeight: FontWeight.w800,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Text(
+                    '$segundos s',
+                    key: const ValueKey('tiempo-de-la-ronda'),
+                    style: textos.titleSmall?.copyWith(
+                      color: apurado ? Paleta.carton : Paleta.tinta,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -220,6 +220,10 @@ Todo vive en `lib/ui/animacion/cartoon.dart`, con las duraciones con nombre
 | Anotar (`CeldaWidget`, `TableroWidget`) | Cuando aparece un número | El número aparece de golpe (de nada, se pasa y vuelve) y sale un "¡puf!" de polvo alrededor de la casilla, "en dos": 0,38 s. El polvo va encima de todo el tablero, para que no lo tape la ficha de al lado |
 | "Aquí no se puede" | Al marcarse la casilla | Sacude la cabeza: de un lado al otro, tres veces, cada vez menos: 0,32 s |
 | Casillas donde se puede anotar | Al encenderse | Un saltito, "¡aquí!", en ola desde arriba a la izquierda: 0,24 s cada una |
+| Puntos (`FilaDePuntos`) | Cuando suben | El número nuevo hace "¡boing!" (aparece de golpe, se pasa y vuelve) y el viejo se achica; la pista de puntos crece pasándose un poco y se asienta: 0,42 s. La primera vez se dibujan donde están |
+| La ficha del tiempo (`Sacudida`) | Cada segundo de los últimos 10 | Tiembla un instante, de un lado al otro, cada vez menos: 0,22 s |
+| El logo (`LogoBrilliant`) | Al aparecer "Iniciar sesión" | Las 5 fichas caen una tras otra, como con gravedad, y rebotan al tocar la bandeja: 0,65 s, una sola vez |
+| La insignia (`Insignia`) | Al aparecer el final | Entra de golpe con la goma y suelta rayitas de brillo alrededor, "en dos": 0,48 s |
 | Una zona llena | La vez que se llena | Sus casillas se menean y se agrandan un poco, en ola: 0,46 s. Se detecta comparando el tablero de antes con el nuevo (`Region.completada`), así que sirve igual jugando solo y en línea |
 
 Al dibujarse por primera vez (por ejemplo, al abrir una partida ya empezada) el tablero no

@@ -178,3 +178,51 @@ class RayitasDeBrillo extends CustomPainter {
   bool shouldRepaint(RayitasDeBrillo antes) =>
       progreso != antes.progreso || centro != antes.centro || radio != antes.radio;
 }
+
+/// Tiembla un instante cada vez que cambia [disparador] (si está [activa]): gira de un
+/// lado al otro, cada vez menos, como algo nervioso. Para la ficha del tiempo en los
+/// últimos segundos.
+class Sacudida extends StatefulWidget {
+  final Object? disparador;
+  final bool activa;
+  final Widget child;
+
+  const Sacudida({super.key, required this.disparador, this.activa = true, required this.child});
+
+  @override
+  State<Sacudida> createState() => _SacudidaState();
+}
+
+class _SacudidaState extends State<Sacudida> with SingleTickerProviderStateMixin {
+  late final _animacion = AnimationController(vsync: this, duration: Cartoon.temblor, value: 1);
+
+  @override
+  void didUpdateWidget(Sacudida antes) {
+    super.didUpdateWidget(antes);
+    if (widget.activa && widget.disparador != antes.disparador && !Cartoon.quieto(context)) {
+      _animacion.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _animacion.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animacion,
+      builder: (context, hijo) {
+        final t = _animacion.value;
+        return Transform.rotate(
+          key: const ValueKey('sacudida'),
+          angle: t >= 1 ? 0 : 0.12 * math.sin(t * math.pi * 4) * (1 - t),
+          child: hijo,
+        );
+      },
+      child: widget.child,
+    );
+  }
+}

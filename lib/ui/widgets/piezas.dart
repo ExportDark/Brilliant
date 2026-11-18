@@ -161,7 +161,7 @@ class _PiezaPresionableState extends State<PiezaPresionable>
 
 /// Una ficha redonda con un ícono, como el trofeo del final de la partida: de color, con
 /// borde de tinta y sombra dura, y el ícono en tinta para que se lea sobre cualquier color.
-class Insignia extends StatelessWidget {
+class Insignia extends StatefulWidget {
   final IconData icono;
   final Color color;
   final double tamano;
@@ -174,18 +174,67 @@ class Insignia extends StatelessWidget {
   });
 
   @override
+  State<Insignia> createState() => _InsigniaState();
+}
+
+/// Al aparecer, la insignia entra de golpe con el rebote de goma y suelta rayitas de
+/// brillo alrededor, el "¡ding!" de los dibujos animados viejos.
+class _InsigniaState extends State<Insignia> with SingleTickerProviderStateMixin {
+  late final _entrada = AnimationController(vsync: this, duration: Cartoon.insignia, value: 1);
+  var _porEntrar = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_porEntrar) {
+      _porEntrar = false;
+      if (!Cartoon.quieto(context)) _entrada.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _entrada.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    final tamano = widget.tamano;
+    final ficha = Container(
       width: tamano,
       height: tamano,
       margin: const EdgeInsets.only(bottom: 3),
       decoration: BoxDecoration(
-        color: color,
+        color: widget.color,
         shape: BoxShape.circle,
         border: Border.all(color: Paleta.tinta, width: grosorDeTinta),
         boxShadow: sombraDura(3),
       ),
-      child: Icon(icono, size: tamano * 0.52, color: Paleta.tinta),
+      child: Icon(widget.icono, size: tamano * 0.52, color: Paleta.tinta),
+    );
+
+    return AnimatedBuilder(
+      animation: _entrada,
+      builder: (context, hijo) {
+        final t = _entrada.value;
+        // Las rayitas salen cuando ya entró, "en dos".
+        final brillo = t < 0.35 ? 0.0 : (t - 0.35) / 0.65;
+        return CustomPaint(
+          key: const ValueKey('brillo-de-la-insignia'),
+          foregroundPainter: RayitasDeBrillo(
+            progreso: t >= 1 ? 1 : const EnDos(Curves.linear, Cartoon.insignia).transform(brillo),
+            centro: Offset(tamano / 2, tamano / 2),
+            radio: tamano / 2,
+          ),
+          child: Transform.scale(
+            key: const ValueKey('entrada-de-la-insignia'),
+            scale: t >= 1 ? 1 : curvaDeGoma.transform(t),
+            child: hijo,
+          ),
+        );
+      },
+      child: ficha,
     );
   }
 }

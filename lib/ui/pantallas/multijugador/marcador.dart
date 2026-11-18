@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../modelo/color_zona.dart';
 import '../../../modelo/mapa.dart';
 import '../../../multijugador/modelos.dart';
+import '../../animacion/cartoon.dart';
 import '../../tema.dart';
 import 'tablero_chico.dart';
 import 'textos_multijugador.dart';
@@ -162,15 +163,17 @@ class FilaDePuntos extends StatelessWidget {
                 ),
               ),
               if (estado != null) ...[estado, const SizedBox(width: 8)],
-              // Los puntos cambian con un fundido suave, para que se note cuando suben.
+              // Cuando suben, los puntos hacen "¡boing!": el número nuevo aparece de golpe,
+              // se pasa de tamaño y vuelve con la goma; el viejo se achica.
               AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (hijo, animacion) => FadeTransition(
-                  opacity: animacion,
-                  child: ScaleTransition(
-                    scale: Tween(begin: 0.8, end: 1.0).animate(animacion),
-                    child: hijo,
+                duration: Cartoon.duracion(context, Cartoon.puntos),
+                transitionBuilder: (hijo, animacion) => ScaleTransition(
+                  scale: CurvedAnimation(
+                    parent: animacion,
+                    curve: curvaDeGoma,
+                    reverseCurve: Curves.easeIn,
                   ),
+                  child: hijo,
                 ),
                 child: Text.rich(
                   TextSpan(
@@ -274,11 +277,18 @@ class _PistaDePuntos extends StatelessWidget {
         borderRadius: BorderRadius.circular(3),
       ),
       alignment: Alignment.centerLeft,
-      child: FractionallySizedBox(
-        widthFactor: avance,
-        heightFactor: 1,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
+      // Al subir, crece pasándose un poco y vuelve (sin pasarse del final de la pista). La
+      // primera vez se dibuja donde está, sin crecer.
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(end: avance),
+        duration: Cartoon.duracion(context, Cartoon.puntos),
+        curve: const CurvaDeGoma(exceso: 0.15, rebotes: 1),
+        builder: (context, valor, hijo) => FractionallySizedBox(
+          widthFactor: valor.clamp(0.0, 1.0),
+          heightFactor: 1,
+          child: hijo,
+        ),
+        child: DecoratedBox(
           decoration: BoxDecoration(
             color: apagada ? Paleta.tintaSuave : Paleta.tinta,
             borderRadius: BorderRadius.circular(3),
