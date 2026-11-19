@@ -192,6 +192,9 @@ class SalasFalsas implements ClienteSalas {
   /// Cada pedido de estado se queda esperando a que el test lo suelte, si no es nulo.
   Future<void>? esperaAntesDeContestar;
 
+  /// Rendirse se queda esperando a que el test lo suelte, si no es nulo.
+  Future<void>? esperaAntesDeRendirse;
+
   /// Se llama después de anotar cada pedido que cambia algo, para que el test mueva
   /// [vista] como lo haría el servidor.
   void Function(String llamada)? alActuar;
@@ -244,6 +247,8 @@ class SalasFalsas implements ClienteSalas {
   @override
   Future<VistaDeSala?> rendirse(String codigo) async {
     llamadas.add('rendirse');
+    final espera = esperaAntesDeRendirse;
+    if (espera != null) await espera;
     _fallarSiToca();
     alActuar?.call('rendirse');
     return alRendirse;

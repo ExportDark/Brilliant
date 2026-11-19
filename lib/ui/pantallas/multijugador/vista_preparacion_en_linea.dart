@@ -7,6 +7,7 @@ import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../pantalla_preparacion.dart';
 import 'lista_de_jugadores.dart';
+import 'textos_multijugador.dart';
 
 /// La preparación en línea, cuando todavía no repartí mis números: la pantalla de
 /// preparación de siempre, entera, que al confirmar manda el reparto al servidor. Si
@@ -54,7 +55,7 @@ class VistaPreparacionEnLinea extends StatelessWidget {
         Text(
           sala.yo.activo
               ? 'Listo. Esperando a los demás$cuenta.'
-              : 'Quedaste fuera de la partida.',
+              : textoDeFuera(sala.yo),
           key: const ValueKey('esperando-la-preparacion'),
           textAlign: TextAlign.center,
           style: textos.titleMedium,
@@ -65,6 +66,15 @@ class VistaPreparacionEnLinea extends StatelessWidget {
           yo: sala.yo.usuario,
           conListo: true,
         ),
+        // Quien quedó fuera sale sin más (la flecha también).
+        if (!sala.yo.activo) ...[
+          const SizedBox(height: 12),
+          TextButton(
+            key: const ValueKey('boton-salir-de-la-partida'),
+            onPressed: () => Navigator.of(context).maybePop(),
+            child: const Text('Salir'),
+          ),
+        ],
       ],
     );
   }

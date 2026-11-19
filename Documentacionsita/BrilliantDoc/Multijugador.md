@@ -30,8 +30,11 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
    un mapa"**, con su tablero en miniatura (`TarjetaDeMapa`); la elegida lleva un borde de
    amarilla. Quien no es el anfitrión ve solo la tarjeta del mapa elegido. "Empezar" se
    habilita con 2 o más. **Salir del lobby** (o la flecha de atrás) vuelve directo a
-   "Elige un mapa". Si el anfitrión cierra la sala, los demás ven "El anfitrión cerró la
-   sala." (no un resultado: no hubo partida).
+   "Elige un mapa"; el anfitrión antes confirma ("¿Cerrar la sala? Los demás quedarán
+   fuera.", desde el 2026-11-18), porque cerrarla deja fuera a todos. Si el anfitrión
+   cierra la sala, los demás ven "El anfitrión cerró la sala." (no un resultado: no hubo
+   partida). Si mientras sale la partida ya empezó, salir no hace nada: no se rinde sin
+   preguntar.
 3. **La preparación.** La misma pantalla del modo de un jugador (`PantallaPreparacion`, con
    `alConfirmar` y `titulo`), a pantalla completa, con la cuenta regresiva en el título
    ("Quedan 60 s"). Al tocar "Inicio" el reparto va al servidor y se espera
@@ -52,9 +55,13 @@ Ver también: [[Puntuación]] · [[Servidor de cuentas]] · [[Cuentas en la app]
 **Gana el primero que llega a la meta**: 26 puntos con 2 jugadores, 24 con 3, 22 con 4 y
 20 con 5 o 6. Se fija al empezar. Ver [[Puntuación#La meta (2026-11-17)]].
 
-"Rendirse" pide confirmación; salir de la pantalla a mitad de partida es rendirse. Quien
-se rinde o se desconecta conserva sus puntos, pero no puede ganar, ni se lleva el puesto
-de una zona que llenó en la ronda en que se fue.
+"Rendirme" y la flecha de atrás, durante el reparto o la partida, preguntan lo mismo:
+"¿Rendirte? Quedarás fuera de la partida.". **Quien se rinde vuelve directo a "Elige un
+mapa"** (desde el 2026-11-18), con 2 o con más jugadores: no ve el resultado, y la
+partida de los demás sigue. Si la partida termina con el diálogo abierto, el "sí" ya no
+rinde a nadie. Quien quedó fuera por desconexión ve "Te desconectaste de la partida." y
+sale sin que se le pregunte. Quien se rinde o se desconecta conserva sus puntos, pero no
+puede ganar, ni se lleva el puesto de una zona que llenó en la ronda en que se fue.
 
 ## El marcador y el panel de zonas
 

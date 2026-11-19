@@ -28,20 +28,21 @@ void main() {
     expect(find.text('Elige un mapa'), findsOneWidget);
   });
 
-  testWidgets('El anfitrión que cierra la sala vuelve directo a "Elige un mapa"', (tester) async {
+  testWidgets('El anfitrión que cierra la sala (y lo confirma) vuelve directo a "Elige un '
+      'mapa"', (tester) async {
     final salas = SalasFalsas();
     await abrirMultijugador(tester, salas);
     await crearSala(tester, salas, vistaDePrueba());
     salas.alRendirse = null; // el servidor contesta 204
 
     await tocar(tester, find.byKey(const ValueKey('boton-salir')));
+    await tocar(tester, find.byKey(const ValueKey('confirmar-cerrar-sala')));
 
     expect(find.text('Elige un mapa'), findsOneWidget);
   });
 
-  testWidgets('La flecha de atrás en el lobby sale de la sala y vuelve en un solo paso', (
-    tester,
-  ) async {
+  testWidgets('La flecha de atrás en el lobby sale de la sala (el anfitrión confirma) y vuelve '
+      'a "Elige un mapa"', (tester) async {
     final salas = SalasFalsas();
     await abrirMultijugador(tester, salas);
     await crearSala(tester, salas, vistaDePrueba());
@@ -49,6 +50,7 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
+    await tocar(tester, find.byKey(const ValueKey('confirmar-cerrar-sala')));
 
     expect(salas.llamadas, contains('rendirse'));
     expect(find.text('Elige un mapa'), findsOneWidget);

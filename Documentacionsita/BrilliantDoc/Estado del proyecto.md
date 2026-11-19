@@ -103,6 +103,8 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 - [x] **Animaciones de cartoon viejo** (2026-11-18) — aplastar y estirar, rebotes de goma,
       polvo y brillo, e iris al empezar y al terminar la partida; nada se mueve en reposo.
       Ver [[Interfaz del tablero#Animaciones (cartoon viejo)]]
+- [x] **Cuarta revisión: rendirse, los mensajes y los botones** (2026-11-18) — ver
+      [[Revisión de lógica#Cuarta revisión: rendirse, los mensajes y los botones (2026-11-18)]]
 - [x] **Tercera revisión: las animaciones** (2026-11-18) — el lector de pantalla, un
       botón que quedaba hundido, lo que se movía con "Quitar animaciones", el tablero de
       otro mapa que festejaba, el iris que no tapaba toda la pantalla y la partida que se
@@ -146,7 +148,7 @@ Ver también: [[Cómo trabajar en el proyecto]] · [[Arquitectura general]] · [
 
 **Ya se puede jugar solo y en línea**, en la PC (web) y en un teléfono Android: solo, de
 la preparación hasta que ninguna tirada tiene jugada; en línea, de 2 a 6 jugadores con
-puntos por zona. 869 tests de la app y 1093 del servidor, todos pasando, más 18 que
+puntos por zona. 883 tests de la app y 1093 del servidor, todos pasando, más 18 que
 juegan contra el servidor de verdad.
 
 ## Qué falta

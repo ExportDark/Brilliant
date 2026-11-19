@@ -106,6 +106,22 @@ los dados, la tirada y el polvo al anotar; en línea contra un rival hecho con u
 el iris al empezar sobre toda la pantalla (directo desde el reparto), una ronda jugada, y
 al dejar de contestar el rival, "¡Ganaste!" con el iris abriéndose desde el trofeo.
 
+## Cuarta revisión: rendirse, los mensajes y los botones (2026-11-18)
+
+A pedido: que rendirse funcione bien, que cada mensaje de error sea corto y diga lo que
+pasó, y que cada botón haga lo suyo sin estorbar. Se revisó todo el código buscando
+fallas; cada prueba nueva se vio fallar sin su arreglo.
+
+| Error | Qué pasaba | Arreglo | Commit |
+|---|---|---|---|
+| **Atrapado al rendirse** | En una partida de 3 o más, quien se rendía sin ser el anfitrión quedaba en la pantalla: el servidor lo marcaba rendido y la partida seguía, la flecha volvía a preguntar "¿Rendirte?" y confirmar no hacía nada. Igual quien el servidor sacaba por desconexión | Rendirse siempre vuelve a "Elige un mapa" (decidido el 2026-11-18); quien ya quedó fuera sale sin que se le pregunte, también con un botón "Salir" | app (este commit) |
+| **Salir del lobby podía rendirlo de una partida** | Si "Empezar" iba en camino al tocar atrás, el pedido de salir llegaba con la partida empezada: se rendía sin confirmar (y si era el anfitrión, la partida terminaba) | Cada pedido de rendirse lleva el estado que se veía; si la sala ya cambió, no se hace nada | app (este commit) |
+| **Un "sí" tardío** | Si la partida terminaba con "¿Rendirte?" abierto, al confirmar igual se mandaba | Igual que el anterior | app (este commit) |
+| **Se cerraba lo que no era** | El cierre automático cerraba lo de arriba: con la hoja de reglas abierta, cerraba la hoja y dejaba la pantalla | Vuelve hasta "Elige un mapa" | app (este commit) |
+| **"Rendirme" dos veces** | Seguía activo mientras iba el pedido | Se deshabilita mientras hay un pedido | app (este commit) |
+| **Dos diálogos para lo mismo** | La flecha decía "Salir es rendirte…" y el botón "…Conservas los puntos…" | Uno solo: "¿Rendirte? Quedarás fuera de la partida." | app (este commit) |
+| **El anfitrión cerraba la sala de un toque** | Un toque sin querer dejaba fuera a todos | Confirma: "¿Cerrar la sala? Los demás quedarán fuera." (decidido el 2026-11-18) | app (este commit) |
+
 ## Riesgos conocidos, sin arreglar
 
 Son de bajo impacto o de diseño; quedan anotados para decidir después.

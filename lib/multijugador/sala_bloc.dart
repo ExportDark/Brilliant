@@ -60,7 +60,7 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
             ),
           ),
         RondaPasada() => _enSala(emit, (sala) => _cliente.pasar(sala.codigo, ronda: sala.ronda)),
-        Rendirse() => _alRendirse(emit),
+        Rendirse() => _alRendirse(event, emit),
         Preguntar() => _alPreguntar(emit),
         ErrorDescartado() => emit(state.copiaCon(error: () => null)),
       },
@@ -123,29 +123,27 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
     }
   }
 
-  Future<void> _alRendirse(Emitter<SalaState> emit) async {
-    if (state.vista == null || state.fin != FinDeSala.ninguno) return;
+  /// Rendirse (o salir del lobby) siempre saca de la pantalla: vuelve a "Elige un mapa",
+  /// también si la partida de los demás sigue. Si la sala ya no está en el estado que el
+  /// jugador veía al pedirlo, no se hace nada.
+  Future<void> _alRendirse(Rendirse event, Emitter<SalaState> emit) async {
+    final sala = state.vista;
+    if (sala == null || state.fin != FinDeSala.ninguno) return;
+    final desde = event.desde;
+    if (desde != null && sala.estado != desde) return;
     emit(state.copiaCon(ocupado: true, error: () => null));
     try {
-      final vista = await _cliente.rendirse(state.vista!.codigo);
-      if (vista == null) {
-        // Salió del lobby: ya no está en la sala, y la pantalla se cierra sola.
-        _pararDePreguntar();
-        emit(state.copiaCon(ocupado: false, fin: FinDeSala.teFuiste));
-      } else {
-        _recibir(vista, emit);
-      }
-    } on ErrorDeSala catch (error) {
-      await _alRechazar(error, emit);
-    } on SinConexion {
-      // Sin servidor no se puede avisar. Se deja de preguntar: en unos segundos el
-      // servidor lo da por desconectado, que es lo mismo que rendirse.
-      _pararDePreguntar();
-      emit(state.copiaCon(ocupado: false, fin: FinDeSala.teFuiste));
+      await _cliente.rendirse(sala.codigo);
     } on SesionVencida {
       _pararDePreguntar();
       emit(state.copiaCon(ocupado: false, fin: FinDeSala.saliste));
+      return;
+    } on Exception {
+      // Sin servidor, o lo rechazó: igual se va. Al dejar de preguntar, en unos segundos
+      // el servidor lo da por desconectado, que es lo mismo que rendirse.
     }
+    _pararDePreguntar();
+    emit(state.copiaCon(ocupado: false, fin: FinDeSala.teFuiste));
   }
 
   /// Lo que el servidor rechazó. Algunos rechazos no son un error para el jugador.

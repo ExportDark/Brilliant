@@ -11,12 +11,13 @@ import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../../tema.dart';
 import '../../widgets/celda_widget.dart';
-import '../../widgets/confirmacion.dart';
 import '../../widgets/dado_widget.dart';
 import '../../widgets/explicacion_de_jugada.dart';
 import '../../widgets/tablero_widget.dart';
+import 'confirmar_salida.dart';
 import 'marcador.dart';
 import 'panel_de_zonas.dart';
+import 'textos_multijugador.dart';
 
 /// La partida en línea: **mi** tablero, los dos dados de la ronda (iguales para todos), la
 /// cuenta regresiva, los puntos de cada jugador y el panel de zonas.
@@ -77,15 +78,10 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
 
   Future<void> _confirmarRendirse() async {
     final bloc = context.read<SalaBloc>();
-    final seguro = await confirmar(
-      context,
-      titulo: '¿Rendirte?',
-      texto:
-          'Quedarás fuera de la partida. Conservas los puntos que ya ganaste.',
-      si: 'Rendirme',
-      claveSi: const ValueKey('confirmar-rendirse'),
-    );
-    if (seguro) bloc.add(const Rendirse());
+    // El estado que se veía al tocar: si la partida termina con el diálogo abierto, el
+    // "sí" ya no rinde a nadie.
+    final desde = _sala.estado;
+    if (await confirmarRendirse(context)) bloc.add(Rendirse(desde: desde));
   }
 
   @override
@@ -93,6 +89,7 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
     final textos = Theme.of(context).textTheme;
     final sala = _sala;
     final yo = sala.yo;
+    final ocupado = context.select((SalaBloc bloc) => bloc.state.ocupado);
     final mapa = mapas.firstWhere((m) => m.nivel == sala.nivel);
     final tablero = Tablero.desdeMapa(mapa).conValores({
       for (final MapEntry(:key, :value) in yo.tablero.entries)
@@ -214,21 +211,28 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
         ),
         const SizedBox(height: 14),
         PanelDeZonas(zonas: sala.zonas),
-        if (yo.activo) ...[
-          const SizedBox(height: 12),
+        const SizedBox(height: 12),
+        if (yo.activo)
           TextButton(
             key: const ValueKey('boton-rendirse'),
             style: TextButton.styleFrom(foregroundColor: Paleta.peligro),
-            onPressed: _confirmarRendirse,
+            // Mientras va un pedido no se puede: así no se manda dos veces.
+            onPressed: ocupado ? null : _confirmarRendirse,
             child: const Text('Rendirme'),
+          )
+        else
+          // Quien quedó fuera sale sin más (la flecha también).
+          TextButton(
+            key: const ValueKey('boton-salir-de-la-partida'),
+            onPressed: () => Navigator.of(context).maybePop(),
+            child: const Text('Salir'),
           ),
-        ],
       ],
     );
   }
 
   String _indicacion(MiVista yo, JugadaLegal? jugada, bool puedeJugar) {
-    if (!yo.activo) return 'Quedaste fuera de la partida.';
+    if (!yo.activo) return textoDeFuera(yo);
     if (yo.accion == 'coloco') return 'Anotaste. Esperando a los demás…';
     if (yo.accion == 'paso') {
       return 'No tenías dónde anotar: pasaste esta ronda.';

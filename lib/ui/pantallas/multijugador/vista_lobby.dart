@@ -9,6 +9,7 @@ import '../../../multijugador/sala_state.dart';
 import '../../../modelo/mapa.dart';
 import '../../tema.dart';
 import '../../widgets/tarjeta_de_mapa.dart';
+import 'confirmar_salida.dart';
 import 'lista_de_jugadores.dart';
 import 'textos_multijugador.dart';
 import '../../widgets/piezas.dart';
@@ -22,6 +23,14 @@ class VistaLobby extends StatelessWidget {
 
   /// Cuántos jugadores hacen falta para empezar.
   static const minimo = 2;
+
+  /// Salir del lobby: el invitado sale de una vez; el anfitrión confirma, porque cierra
+  /// la sala para todos.
+  static Future<void> _salir(BuildContext context, VistaDeSala sala) async {
+    final bloc = context.read<SalaBloc>();
+    if (sala.soyElAnfitrion && !await confirmarCerrarSala(context)) return;
+    bloc.add(const Rendirse(desde: EstadoDeSala.esperando));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +162,7 @@ class VistaLobby extends StatelessWidget {
             const SizedBox(height: 8),
             TextButton(
               key: const ValueKey('boton-salir'),
-              onPressed: libre ? () => bloc.add(const Rendirse()) : null,
+              onPressed: libre ? () => _salir(context, sala) : null,
               child: Text(
                 sala.soyElAnfitrion ? 'Cerrar la sala' : 'Salir de la sala',
               ),

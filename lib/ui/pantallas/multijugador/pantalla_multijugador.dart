@@ -8,7 +8,7 @@ import '../../../multijugador/sala_bloc.dart';
 import '../../../multijugador/sala_event.dart';
 import '../../../multijugador/sala_state.dart';
 import '../../../modelo/mapa.dart';
-import '../../widgets/confirmacion.dart';
+import 'confirmar_salida.dart';
 import '../../widgets/hoja_de_reglas.dart';
 import '../../widgets/recuadro_de_aviso.dart';
 import 'vista_lobby.dart';
@@ -53,46 +53,49 @@ class PantallaMultijugador extends StatelessWidget {
 class _Cuerpo extends StatelessWidget {
   const _Cuerpo();
 
-  /// Si salirse de la pantalla es salirse de una partida: pide confirmar.
-  static bool _enPartida(SalaState state) {
+  /// Si salir de la pantalla tiene que pasar por el servidor: en una sala que no terminó,
+  /// mientras el jugador sigue en ella. Quien ya quedó fuera (se rindió o se desconectó)
+  /// sale sin más.
+  static bool _salirPasaPorElServidor(SalaState state) {
     final vista = state.vista;
     return state.enSala &&
         vista != null &&
         vista.estado != EstadoDeSala.terminada &&
-        vista.estado != EstadoDeSala.esperando;
+        vista.yo.activo;
+  }
+
+  /// Sale de la sala desde la flecha de atrás: en el lobby, el invitado sale de una vez y
+  /// el anfitrión confirma (cierra la sala para todos); en el reparto o la partida, se
+  /// pregunta si rendirse. Cada pedido lleva el estado que se estaba viendo.
+  static Future<void> _salir(BuildContext context, VistaDeSala sala) async {
+    final bloc = context.read<SalaBloc>();
+    if (sala.estado == EstadoDeSala.esperando) {
+      if (sala.soyElAnfitrion && !await confirmarCerrarSala(context)) return;
+      bloc.add(const Rendirse(desde: EstadoDeSala.esperando));
+      return;
+    }
+    if (await confirmarRendirse(context)) bloc.add(Rendirse(desde: sala.estado));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SalaBloc, SalaState>(
-      // Quien se va por su cuenta vuelve directo a "Elige un mapa". Se espera a que se
-      // redibuje, para que la pantalla ya deje salir.
+      // Quien se va por su cuenta vuelve directo a "Elige un mapa", aunque haya un
+      // diálogo o la hoja de reglas abierta. Se espera a que se redibuje, para que la
+      // pantalla ya deje salir.
       listenWhen: (antes, ahora) =>
           antes.fin != FinDeSala.teFuiste && ahora.fin == FinDeSala.teFuiste,
       listener: (context, _) =>
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.mounted) Navigator.of(context).maybePop();
+            if (context.mounted) {
+              Navigator.of(context).popUntil((ruta) => ruta.isFirst);
+            }
           }),
       builder: (context, state) {
         return PopScope(
-          canPop:
-              !state.enSala || state.vista!.estado == EstadoDeSala.terminada,
-          onPopInvokedWithResult: (salio, _) async {
-            if (salio) return;
-            // En el lobby se sale (y se avisa al servidor); en la partida, se pregunta.
-            if (!_enPartida(state)) {
-              context.read<SalaBloc>().add(const Rendirse());
-              return;
-            }
-            final seguro = await confirmar(
-              context,
-              titulo: '¿Rendirte?',
-              texto: 'Salir es rendirte: quedarás fuera de la partida.',
-              si: 'Rendirme',
-            );
-            if (seguro && context.mounted) {
-              context.read<SalaBloc>().add(const Rendirse());
-            }
+          canPop: !_salirPasaPorElServidor(state),
+          onPopInvokedWithResult: (salio, _) {
+            if (!salio) _salir(context, state.vista!);
           },
           child: _repartiendo(state)
               ? Stack(

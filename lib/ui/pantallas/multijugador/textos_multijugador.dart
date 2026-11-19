@@ -61,3 +61,7 @@ String? etiquetasDeJugador({
 
 /// La regla de la meta, para el lobby, el marcador y las reglas.
 String ganaQuienLlegaA(int meta) => 'Gana el primero que llegue a $meta puntos.';
+
+/// Por qué [yo] ya no juega: se rindió o se desconectó (el servidor lo sacó).
+String textoDeFuera(MiVista yo) =>
+    yo.estado == 'se_rindio' ? 'Te rendiste.' : 'Te desconectaste de la partida.';

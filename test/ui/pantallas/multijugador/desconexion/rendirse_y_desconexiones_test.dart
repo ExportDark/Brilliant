@@ -38,7 +38,8 @@ void main() {
       expect(find.byKey(const ValueKey('ronda-y-tiempo')), findsOneWidget);
     });
 
-    testWidgets('confirmar manda rendirse y muestra el resultado', (tester) async {
+    testWidgets('confirmar manda rendirse y vuelve a "Elige un mapa", sin pasar por el '
+        'resultado (decidido el 2026-11-18)', (tester) async {
       final salas = await _enPartida(tester);
       salas.alRendirse = vistaDePrueba(
         version: 8,
@@ -54,8 +55,8 @@ void main() {
       await tocar(tester, confirmarRendirse);
 
       expect(salas.llamadas, contains('rendirse'));
-      expect(find.byKey(const ValueKey('resultado')), findsOneWidget);
-      expect(find.text('Ganó beto'), findsOneWidget);
+      expect(find.byKey(const ValueKey('resultado')), findsNothing);
+      expect(find.text('Elige un mapa'), findsOneWidget);
     });
 
     testWidgets('quien ya se rindió ya no ve el botón', (tester) async {
@@ -70,7 +71,7 @@ void main() {
       );
 
       expect(botonRendirse, findsNothing);
-      expect(find.text('Quedaste fuera de la partida.'), findsOneWidget);
+      expect(find.text('Te rendiste.'), findsOneWidget);
     });
 
     testWidgets('salir del lobby manda rendirse y vuelve directo a "Elige un mapa"', (
@@ -82,6 +83,8 @@ void main() {
       salas.alRendirse = null;
 
       await tocar(tester, find.byKey(const ValueKey('boton-salir')));
+      // Soy la anfitriona: cierro la sala para todos, así que confirmo.
+      await tocar(tester, find.byKey(const ValueKey('confirmar-cerrar-sala')));
 
       expect(salas.llamadas, contains('rendirse'));
       expect(find.byKey(const ValueKey('fin-de-la-sala')), findsNothing);
@@ -182,10 +185,11 @@ void main() {
       );
       await pasarSegundos(tester, 1);
 
-      expect(find.text('Quedaste fuera de la partida.'), findsOneWidget);
+      expect(find.text('Te desconectaste de la partida.'), findsOneWidget);
       expect(botonRendirse, findsNothing);
-      // Ya no tengo nada que tocar.
+      // Ya no tengo nada que tocar, más que salir.
       expect(casillaTocable('D1'), findsNothing);
+      expect(find.byKey(const ValueKey('boton-salir-de-la-partida')), findsOneWidget);
     });
   });
 }

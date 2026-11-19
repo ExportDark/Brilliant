@@ -1,3 +1,5 @@
+import 'modelos.dart';
+
 /// Lo que la app le pide al [SalaBloc].
 sealed class SalaEvent {
   const SalaEvent();
@@ -47,9 +49,15 @@ final class RondaPasada extends SalaEvent {
   const RondaPasada();
 }
 
-/// Salirse de la sala o rendirse. En la partida, queda fuera.
+/// Salirse de la sala o rendirse. En la partida, queda fuera. Siempre sale de la pantalla.
+///
+/// [desde] es el estado de la sala que el jugador estaba viendo al pedirlo. Si la sala ya
+/// pasó a otro (la partida empezó mientras salía del lobby, o terminó con el diálogo
+/// abierto), no se hace nada: lo que pidió ya no es lo que pasaría.
 final class Rendirse extends SalaEvent {
-  const Rendirse();
+  final EstadoDeSala? desde;
+
+  const Rendirse({this.desde});
 }
 
 /// Preguntarle al servidor cómo va la sala. El bloc lo manda solo cada segundo; preguntar

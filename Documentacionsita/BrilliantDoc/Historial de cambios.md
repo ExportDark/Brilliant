@@ -7,6 +7,13 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 ---
 
+## 2026-11-18 — Cuarta revisión: rendirse, los mensajes y los botones
+
+- **Rendirse** (app): quien se rinde vuelve siempre a "Elige un mapa" (antes, en una
+  partida de 3 o más, quedaba atrapado); un solo diálogo; salir del lobby nunca rinde de
+  una partida ya empezada; el anfitrión confirma antes de cerrar la sala. Ver
+  [[Revisión de lógica#Cuarta revisión: rendirse, los mensajes y los botones (2026-11-18)]].
+
 ## 2026-11-18 — Los botones pedían dos toques
 
 - **Un toque alcanza otra vez** (app): al apoyar el dedo, el botón se aplastaba y Flutter

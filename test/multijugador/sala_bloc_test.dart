@@ -560,7 +560,8 @@ void main() {
   });
 
   group('SalaBloc: rendirse y el final', () {
-    test('rendirse en la partida muestra el resultado', () async {
+    test('rendirse en la partida sale, aunque la partida termine con eso (decidido el '
+        '2026-11-18: quien se rinde vuelve a "Elige un mapa")', () async {
       await entrar(partidaEnJuego());
       salas.alRendirse = vistaDePrueba(
         version: 8,
@@ -579,9 +580,8 @@ void main() {
 
       await mandar(const Rendirse());
 
-      expect(bloc.state.vista!.estado, EstadoDeSala.terminada);
-      expect(bloc.state.vista!.resultado!.ganadores, ['beto']);
-      expect(bloc.state.fin, FinDeSala.ninguno, reason: 'se queda para ver el resultado');
+      expect(salas.llamadas, contains('rendirse'));
+      expect(bloc.state.fin, FinDeSala.teFuiste);
     });
 
     test('nada se manda después de que la sala terminó', () async {
