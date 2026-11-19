@@ -17,7 +17,7 @@ void main() {
     await tocar(tester, find.widgetWithText(FilledButton, 'Borrar cuenta'));
 
     expect(find.text('¿Borrar tu cuenta?'), findsOneWidget);
-    expect(find.text('Contraseña inválida.'), findsOneWidget);
+    expect(find.text('Contraseña incorrecta.'), findsOneWidget);
     expect(servidor.cuentas, contains('ana'));
   });
 }

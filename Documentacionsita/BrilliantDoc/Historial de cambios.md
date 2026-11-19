@@ -19,7 +19,10 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 - **Botones de cuenta** (app): Enter respeta lo mismo que el botón; borrar o crear la
   cuenta no se cortan a medias; nada se manda dos veces (tampoco después de un tiempo
   agotado); la cuenta creada vuelve a "Iniciar sesión"; nada queda esperando para
-  siempre; una página de otro programa no cuenta como el servidor. Ver
+  siempre; una página de otro programa no cuenta como el servidor (`7b86238`).
+- **Mensajes cortos y que dicen lo que pasó** (app y servidor `1a89173`): una situación,
+  un mensaje, de tú, sin datos de adentro; los del servidor, escritos en el servidor; en la
+  sala, ninguno cuando la pantalla ya lo muestra. Ver
   [[Revisión de lógica#Cuarta revisión: rendirse, los mensajes y los botones (2026-11-18)]].
 
 ## 2026-11-18 — Los botones pedían dos toques

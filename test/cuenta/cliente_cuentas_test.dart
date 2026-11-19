@@ -132,7 +132,7 @@ void main() {
 
       final error = await _errorDe(() => cuentas.entrar(usuario: 'ana', contrasena: 'mala'));
 
-      expect(error.generales, ['Demasiados intentos seguidos. Espera 37 segundos e intenta de nuevo.']);
+      expect(error.generales, ['Demasiados intentos. Espera 37 s.']);
     });
 
     test('demasiados intentos (429) sin segundos en el mensaje dice "un momento"', () async {
@@ -140,7 +140,7 @@ void main() {
 
       final error = await _errorDe(() => cuentas.entrar(usuario: 'ana', contrasena: 'mala'));
 
-      expect(error.generales, ['Demasiados intentos seguidos. Espera un momento e intenta de nuevo.']);
+      expect(error.generales, ['Demasiados intentos. Espera un momento.']);
     });
 
     test('probarConexion: un servidor que limita los intentos (429) está ahí', () async {

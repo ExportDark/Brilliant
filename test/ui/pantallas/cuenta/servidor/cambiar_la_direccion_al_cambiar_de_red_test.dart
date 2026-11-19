@@ -13,11 +13,7 @@ void main() {
     // La PC cambió de red: en la dirección vieja ya no contesta nadie.
     servidor.direccion = '192.168.137.252';
     await entrarCon(tester, 'ana', contrasenaDePrueba);
-    expect(
-      find.textContaining('No se pudo conectar con el servidor.'),
-      findsOneWidget,
-    );
-    expect(indicadorDelServidor(tester), sinServidor);
+    expect(indicadorDelServidor(tester), sinServidorSinBuscar);
     expect(servidorEnUso(tester), 'servidor.test');
 
     await cambiarServidor(tester, '192.168.137.252');

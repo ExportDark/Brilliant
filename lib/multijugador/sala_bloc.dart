@@ -90,7 +90,8 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
     if (state.enSala) return;
     final codigo = event.codigo.trim().toUpperCase();
     if (codigo.isEmpty) {
-      return emit(state.copiaCon(error: () => 'Escribe el código de la sala.'));
+      // La pantalla lo pide bajo el campo antes de mandar: esto es por si acaso.
+      return emit(state.copiaCon(error: () => 'Escribe el código.'));
     }
     await _accion(emit, () => _cliente.unirse(codigo));
   }
@@ -115,9 +116,10 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
     } on ErrorDeSala catch (error) {
       await _alRechazar(error, emit);
     } on SinConexion {
+      // Si ya se ve "Reconectando…" o "Se perdió la conexión.", no se repite.
       emit(state.copiaCon(
         ocupado: false,
-        error: () => 'No se pudo conectar con el servidor. Intenta de nuevo.',
+        error: () => state.conexion == Conexion.conectada ? 'Sin conexión. Intenta de nuevo.' : null,
       ));
     } on SesionVencida {
       // La sesión se cierra sola (ver SesionBloc.conToken): aquí no queda nada que hacer.
@@ -163,6 +165,10 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
         // Un doble toque: la primera jugada (o el primer reparto) ya llegó. No hay nada
         // que decir.
         emit(state.copiaCon(ocupado: false));
+      case 'estado_incorrecto' || 'pocos_jugadores' || 'no_activo':
+        // La sala ya está en otro momento (la partida empezó o terminó, el reparto
+        // venció, faltan jugadores, ya no juego): la pantalla ya lo muestra.
+        emit(state.copiaCon(ocupado: false));
       default:
         emit(state.copiaCon(ocupado: false, error: () => _mensajeDe(error)));
     }
@@ -171,15 +177,13 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
   String _mensajeDe(ErrorDeSala error) {
     if (error.codigo == 'jugada_invalida') {
       return switch (error.motivo) {
-        'ocupada' => 'Esa casilla ya tiene un número.',
-        'sin_vecino' => 'Tiene que quedar pegada a una casilla con el número del dado ancla.',
-        'regla_rota' => 'La regla de esa zona no permite ese número.',
-        _ => error.mensaje,
+        'ocupada' => 'Esa casilla ya tiene número.',
+        'sin_vecino' => 'Esa casilla no está junto al número del dado ancla.',
+        'regla_rota' => 'Esa zona no acepta ese número.',
+        _ => 'Ahí no se puede anotar.',
       };
     }
-    if (error.codigo == 'ronda_incorrecta') {
-      return 'La ronda ya cambió. Mira la tirada nueva.';
-    }
+    if (error.codigo == 'ronda_incorrecta') return 'La ronda ya cambió.';
     return error.mensaje;
   }
 

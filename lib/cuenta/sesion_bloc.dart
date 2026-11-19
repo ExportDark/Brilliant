@@ -46,15 +46,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   }
 
   /// El aviso cuando la sesión de este aparato dejó de valer mientras se usaba.
-  static const sesionCerrada =
-      'Tu sesión se cerró: pasó mucho tiempo sin usarla, el servidor se reinició o se '
-      'entró con tu cuenta en otro aparato. Vuelve a iniciar sesión.';
-
-  /// El aviso al cerrar sesión cuando el servidor no se enteró: no se puede
-  /// decir "Cerraste sesión." a secas, porque en el servidor sigue abierta.
-  static const cierreSinServidor =
-      'Cerraste sesión en este aparato. El servidor no contestó: se le avisará al '
-      'volver a conectar, y si no, la sesión vence sola en 5 minutos.';
+  static const sesionCerrada = 'Tu sesión se cerró. Vuelve a entrar.';
 
   /// La dirección del servidor con la que se está hablando.
   Uri get servidor => _cuentas.servidor;
@@ -82,16 +74,19 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
   /// Cuando no se puede hablar con el servidor: qué hacer, sin la dirección (es un
   /// dato de adentro; si es la de otra red, "Servidor" busca el de esta).
-  ErrorDeCuenta _sinConexion(SinConexion error) => ErrorDeCuenta(
-        generales: [
-          if (error.agotada)
-            'El servidor tardó demasiado en contestar. Puede estar ocupado: espera un '
-                'momento e intenta de nuevo.'
-          else
-            'No se pudo conectar con el servidor. Revisa que esté encendido y que estés en '
-                'la misma red, o elige otro en "Servidor".',
-        ],
+  ///
+  /// Si no hubo conexión, en "Iniciar sesión" y "Crear cuenta" no se dice nada: el
+  /// indicador del servidor ya dice "Sin servidor" (o la lista, si hay varios). Donde no
+  /// hay indicador ([conIndicador] falso, al borrar la cuenta), sí.
+  ErrorDeCuenta? _sinConexion(SinConexion error, {bool conIndicador = true}) {
+    if (error.agotada) {
+      return const ErrorDeCuenta(
+        generales: ['El servidor tardó en contestar. Intenta de nuevo.'],
       );
+    }
+    if (conIndicador) return null;
+    return const ErrorDeCuenta(generales: ['Sin conexión con el servidor. Intenta de nuevo.']);
+  }
 
   Future<void> _alRevisar(Emitter<SesionState> emit) async {
     // Primero, la dirección que eligió el jugador la última vez.
@@ -116,7 +111,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       emit(SesionState.conSesion(guardada.usuario));
     } on SesionVencida {
       await _almacen.borrar();
-      emit(const SesionState.sinSesion(aviso: 'Tu sesión venció. Vuelve a iniciar sesión.'));
+      emit(const SesionState.sinSesion(aviso: sesionCerrada));
     } catch (_) {
       // El juego no necesita el servidor: sin red, sin saber a cuál de los de la red
       // hablarle, o con una respuesta de otra forma, se puede seguir jugando con la
@@ -151,7 +146,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   }
 
   static const _rechazoInesperado = ErrorDeCuenta(
-    generales: ['El servidor no aceptó el pedido. Intenta de nuevo.'],
+    generales: ['El servidor tuvo un problema. Intenta de nuevo.'],
   );
 
   Future<void> _alCrearCuenta(CuentaPedida event, Emitter<SesionState> emit) async {
@@ -189,7 +184,7 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
 
   /// El aviso cuando la cuenta se creó pero no se pudo entrar: "Crear cuenta" lo usa
   /// para volver a "Iniciar sesión".
-  static const cuentaCreada = 'Tu cuenta se creó. Inicia sesión para jugar.';
+  static const cuentaCreada = 'Cuenta creada. Ya puedes entrar.';
 
   Future<void> _alTerminar(Emitter<SesionState> emit) async {
     if (_sesion == null) return;
@@ -225,7 +220,9 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     if (!llego) {
       await _almacen.guardarPorCerrar([...await _almacen.leerPorCerrar(), sesion]);
     }
-    emit(SesionState.sinSesion(aviso: llego ? 'Cerraste sesión.' : cierreSinServidor));
+    // Sin aviso: repetiría lo que el jugador acaba de hacer. Si el servidor no se enteró,
+    // queda anotado y se le avisa al volver a conectar (o la sesión vence sola).
+    emit(const SesionState.sinSesion());
   }
 
   /// Le avisa al servidor que [sesion] se cerró. Es verdadero si ya está
@@ -264,14 +261,14 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       );
       await _olvidarSesion();
       await _almacen.guardarUltimoUsuario(null);
-      emit(const SesionState.sinSesion(aviso: 'Tu cuenta se borró.'));
+      emit(const SesionState.sinSesion(aviso: 'Cuenta borrada.'));
     } on ErrorDeCuenta catch (error) {
       emit(SesionState.conSesion(sesion.usuario, error: error));
     } on SinConexion catch (error) {
-      emit(SesionState.conSesion(sesion.usuario, error: _sinConexion(error)));
+      emit(SesionState.conSesion(sesion.usuario, error: _sinConexion(error, conIndicador: false)));
     } on SesionVencida {
       await _olvidarSesion();
-      emit(const SesionState.sinSesion(aviso: 'Tu sesión venció. Vuelve a iniciar sesión.'));
+      emit(const SesionState.sinSesion(aviso: sesionCerrada));
     } catch (_) {
       emit(SesionState.conSesion(sesion.usuario, error: _algoFallo));
     }
@@ -294,13 +291,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     } on SinConexion catch (error) {
       if (error.agotada) rethrow;
       final encontrados = await _servidor.buscarOtro(intentada);
-      if (encontrados.length > 1) {
-        throw ErrorDeCuenta(generales: [
-          'No se pudo conectar con el servidor, y en la red hay ${encontrados.length}. '
-              'Elige uno en "Servidor".',
-        ]);
-      }
-      if (encontrados.isEmpty) rethrow;
+      // Con varios, no se elige: la lista de "Iniciar sesión" los muestra para elegir.
+      if (encontrados.length != 1) rethrow;
       return pedido();
     } on Exception {
       // Contestó, aunque fuera para rechazar el pedido: está ahí.

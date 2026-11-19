@@ -140,7 +140,7 @@ void main() {
 
     await tocar(tester, casillaTocable('D1'));
 
-    expect(find.text('La regla de esa zona no permite ese número.'), findsOneWidget);
+    expect(find.text('Esa zona no acepta ese número.'), findsOneWidget);
     expect(casillaTocable('E2'), findsOneWidget, reason: 'el turno no se gastó');
   });
 

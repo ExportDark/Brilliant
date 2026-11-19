@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../cuenta/ayudantes_cuenta.dart';
@@ -18,14 +17,14 @@ void main() {
     );
 
     expect(habilitado(tester, botonEntrar), isFalse);
-    expect(find.byKey(const ValueKey('falta-servidor')), findsOneWidget);
-    expect(find.textContaining('No hay servidor'), findsOneWidget);
+    // Lo dice el indicador, una sola vez.
+    expect(indicadorDelServidor(tester), startsWith('Sin servidor'));
 
     servidor.apagado = false;
     await pasarSegundos(tester, 3);
 
     expect(habilitado(tester, botonEntrar), isTrue);
-    expect(find.byKey(const ValueKey('falta-servidor')), findsNothing);
+    expect(indicadorDelServidor(tester), startsWith('Servidor disponible'));
     await entrarCon(tester, 'ana', contrasenaDePrueba);
     expect(find.text('Elige un mapa'), findsOneWidget);
   });

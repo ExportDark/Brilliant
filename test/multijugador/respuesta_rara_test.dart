@@ -43,7 +43,7 @@ void main() {
     final error = await _errorDe(cliente.crear());
 
     expect(error.codigo, 'respuesta_rara');
-    expect(error.mensaje, contains('no entiende'));
+    expect(error.mensaje, contains('no es compatible'));
   });
 
   test('Una respuesta que no es JSON (una página de un proxy, por ejemplo), también', () async {
@@ -69,7 +69,7 @@ void main() {
     await bloc.stream.firstWhere((estado) => !estado.ocupado && estado.error != null);
 
     expect(bloc.state.ocupado, isFalse);
-    expect(bloc.state.error, contains('no entiende'));
+    expect(bloc.state.error, contains('no es compatible'));
     expect(bloc.state.vista, isNull);
   });
 }

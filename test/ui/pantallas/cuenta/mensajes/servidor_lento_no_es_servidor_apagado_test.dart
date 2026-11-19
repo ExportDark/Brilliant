@@ -12,7 +12,7 @@ void main() {
 
     await entrarCon(tester, 'ana', contrasenaDePrueba);
 
-    expect(find.textContaining('tardó demasiado en contestar'), findsOneWidget);
+    expect(find.textContaining('tardó en contestar'), findsOneWidget);
     expect(find.textContaining('Revisa que esté encendido'), findsNothing);
   });
 }

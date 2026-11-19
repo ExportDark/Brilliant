@@ -10,7 +10,7 @@ String nombreDeColor(String color) => switch (color) {
   'rojo' => 'Roja',
   'gris' => 'Gris',
   'naranja' => 'Naranja',
-  _ => color,
+  _ => 'Zona', // un color de un servidor más nuevo: nunca el código tal cual
 };
 
 /// Por qué terminó la partida.
@@ -23,7 +23,8 @@ String motivoDelFin(String motivo, {int? meta}) => switch (motivo) {
   'sala_cerrada' => 'El anfitrión cerró la sala.',
   'ultimo_jugador' => 'Los demás salieron: gana el último que quedó.',
   'todos_se_fueron' => 'Todos salieron: nadie gana.',
-  _ => motivo,
+  // Un motivo de un servidor más nuevo: nunca el código tal cual.
+  _ => 'La partida terminó.',
 };
 
 /// De un jugador que ya no está en la partida.

@@ -13,6 +13,6 @@ void main() {
 
     await crearCuentaCon(tester, 'beto', contrasenaDePrueba);
 
-    expect(find.textContaining('Demasiados intentos seguidos. Espera 3000 segundos'), findsOneWidget);
+    expect(find.text('Demasiados intentos. Espera 50 min.'), findsOneWidget);
   });
 }

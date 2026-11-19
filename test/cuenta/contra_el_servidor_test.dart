@@ -94,7 +94,7 @@ void main() {
         contrasena: contrasena,
         repetida: contrasena,
       ));
-      expect(repetido.porCampo['username'], ['Ya existe un usuario con este nombre.']);
+      expect(repetido.porCampo['username'], ['Ese nombre ya está en uso']);
 
       // Con otras mayúsculas y la contraseña con sus espacios.
       final token = await cuentas.entrar(usuario: usuario.toUpperCase(), contrasena: contrasena);
@@ -110,7 +110,7 @@ void main() {
 
   test(
     'El límite de inicios de sesión del servidor (5 por minuto) llega a la app como "demasiados '
-    'intentos", con los segundos que hay que esperar',
+    'intentos", con lo que hay que esperar',
     () async {
       // Espera a que se libere lo que gastaron las pruebas de antes.
       await Future<void>.delayed(const Duration(seconds: 61));
@@ -125,7 +125,8 @@ void main() {
       }
 
       expect(limite, isNotNull, reason: 'el servidor tenía que limitar los intentos');
-      expect(limite!.generales.single, matches(RegExp(r'Espera \d+ segundos')));
+      // Hasta un minuto: "Espera 42 s."; desde un minuto, "Espera 1 min.".
+      expect(limite!.generales.single, matches(RegExp(r'^Demasiados intentos\. Espera \d+ (s|min)\.$')));
       // Y limitado o no, el servidor sigue ahí: revisar que contesta no falla.
       await cuentas.probarConexion();
       // Se deja pasar el minuto para no estorbar a las pruebas que siguen.

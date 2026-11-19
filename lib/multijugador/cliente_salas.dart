@@ -139,9 +139,14 @@ class ClienteSalasHttp implements ClienteSalas {
     final ErrorDeSala rechazo;
     try {
       if (estado >= 200 && estado < 300) return VistaDeSala.desdeJson(datos);
+      // El mensaje del servidor solo si es uno suyo (trae código). Uno de otra parte (el
+      // de DRF, en inglés, o una página de error) no se muestra tal cual.
+      final codigo = datos['codigo'] as String?;
       rechazo = ErrorDeSala(
-        codigo: datos['codigo'] as String? ?? 'desconocido',
-        mensaje: datos['detail'] as String? ?? 'El servidor rechazó el pedido.',
+        codigo: codigo ?? 'desconocido',
+        mensaje: codigo != null && datos['detail'] is String
+            ? datos['detail'] as String
+            : 'El servidor tuvo un problema. Intenta de nuevo.',
         estadoHttp: estado,
         motivo: datos['motivo'] as String?,
       );
@@ -156,8 +161,7 @@ class ClienteSalasHttp implements ClienteSalas {
   /// Lo que se le dice al jugador si el servidor contestó algo que la app no entiende.
   static ErrorDeSala respuestaRara(int estado) => ErrorDeSala(
     codigo: 'respuesta_rara',
-    mensaje: 'El servidor contestó algo que esta versión de la app no entiende. '
-        'Actualiza la app o el servidor.',
+    mensaje: 'La app no es compatible con este servidor. Actualízala.',
     estadoHttp: estado,
   );
 }

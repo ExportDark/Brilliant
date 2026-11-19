@@ -32,8 +32,7 @@ class ListaDeServidores extends StatelessWidget {
       children: [
         if (encontrados.isEmpty)
           const Text(
-            'No se encontró ningún servidor. Revisa que esté encendido y que '
-            'estés en la misma WiFi.',
+            'No se encontró ninguno. Revisa que esté encendido y en tu WiFi.',
           ),
         for (final servidor in encontrados)
           ListTile(

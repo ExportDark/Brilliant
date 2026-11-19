@@ -55,7 +55,7 @@ class ClienteCuentas {
 
   /// Cuando el servidor contesta algo que la app no espera.
   static const _respuestaRara = ErrorDeCuenta(
-    generales: ['El servidor contestó algo inesperado. Intenta de nuevo.'],
+    generales: ['El servidor tuvo un problema. Intenta de nuevo.'],
   );
 
   /// Crea la cuenta. La contraseña va dos veces: [repetida] es la que el
@@ -231,11 +231,14 @@ class ClienteCuentas {
   /// El servidor limita los intentos (5 inicios de sesión por minuto, 10 cuentas por hora).
   /// Su mensaje trae los segundos que faltan: "...disponible en 60 segundos."
   static ErrorDeCuenta _demasiadosIntentos(Map<String, dynamic> datos) {
-    final segundos = RegExp(r'(\d+)\s*segundo').firstMatch('${datos['detail']}')?.group(1);
-    final espera = segundos == null ? 'un momento' : '$segundos segundos';
-    return ErrorDeCuenta(
-      generales: ['Demasiados intentos seguidos. Espera $espera e intenta de nuevo.'],
-    );
+    final texto = RegExp(r'(\d+)\s*segundo').firstMatch('${datos['detail']}')?.group(1);
+    final segundos = texto == null ? null : int.parse(texto);
+    final espera = switch (segundos) {
+      null => 'un momento',
+      < 60 => '$segundos s',
+      _ => '${(segundos / 60).ceil()} min',
+    };
+    return ErrorDeCuenta(generales: ['Demasiados intentos. Espera $espera.']);
   }
 
   /// Los errores de DRF vienen como `{"campo": ["mensaje", ...]}`; los que no
@@ -258,7 +261,7 @@ class ClienteCuentas {
       }
     }
     if (porCampo.isEmpty && generales.isEmpty) {
-      generales.add('El servidor rechazó el pedido.');
+      generales.add('El servidor tuvo un problema. Intenta de nuevo.');
     }
     return ErrorDeCuenta(porCampo: porCampo, generales: generales);
   }

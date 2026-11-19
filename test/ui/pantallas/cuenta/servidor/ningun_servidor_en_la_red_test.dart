@@ -12,14 +12,14 @@ void main() {
     await abrirApp(tester, servidor: servidor, conSesion: false, buscador: buscador);
 
     await tocar(tester, botonServidor);
-    expect(find.textContaining('No se encontró ningún servidor'), findsOneWidget);
+    expect(find.textContaining('No se encontró ninguno'), findsOneWidget);
 
     // Se enciende el servidor en otra PC de la red.
     servidor.direccion = '192.168.137.252';
     buscador.anunciados.add(anunciado('192.168.137.252'));
     await tocar(tester, find.widgetWithText(TextButton, 'Buscar de nuevo'));
 
-    expect(find.textContaining('No se encontró ningún servidor'), findsNothing);
+    expect(find.textContaining('No se encontró ninguno'), findsNothing);
     expect(find.text('Brilliant en ORION'), findsOneWidget);
     expect(buscador.busquedas, 2);
   });

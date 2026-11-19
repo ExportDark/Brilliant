@@ -45,7 +45,7 @@ void main() {
 
     salas.sinConexion = true;
     await tocar(tester, botonInicio);
-    expect(find.textContaining('No se pudo conectar'), findsOneWidget);
+    expect(find.text('Sin conexión. Intenta de nuevo.'), findsOneWidget);
     expect(habilitado(tester, botonInicio), isTrue);
 
     salas.sinConexion = false;

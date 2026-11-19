@@ -18,7 +18,8 @@ void main() {
 
     expect(find.byType(PantallaMiCuenta), findsNothing);
     expect(find.byType(PantallaEntrar), findsOneWidget);
-    expect(find.text('Cerraste sesión.'), findsOneWidget);
+    // Sin aviso: repetiría lo que el jugador acaba de hacer.
+    expect(find.byKey(const ValueKey('aviso-de-sesion')), findsNothing);
     expect(servidor.sesiones, isEmpty);
     // La cuenta sigue: solo se cerró la sesión.
     expect(servidor.cuentas, contains('ana'));

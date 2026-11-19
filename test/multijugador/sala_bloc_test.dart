@@ -75,7 +75,7 @@ void main() {
         await mandar(UnirseConCodigo(vacio));
 
         expect(salas.llamadas, isEmpty);
-        expect(bloc.state.error, 'Escribe el código de la sala.');
+        expect(bloc.state.error, 'Escribe el código.');
       });
     }
 
@@ -117,7 +117,7 @@ void main() {
 
       await mandar(const SalaCreada());
 
-      expect(bloc.state.error, contains('No se pudo conectar'));
+      expect(bloc.state.error, 'Sin conexión. Intenta de nuevo.');
       expect(bloc.state.vista, isNull);
       expect(bloc.state.ocupado, isFalse);
 
@@ -168,7 +168,7 @@ void main() {
       expect(bloc.state.vista!.estado, EstadoDeSala.preparando);
     });
 
-    test('empezar con un solo jugador muestra el mensaje del servidor', () async {
+    test('empezar con un solo jugador no repite lo que ya dice el lobby', () async {
       await entrar();
       salas.errorEnElProximo = const ErrorDeSala(
         codigo: 'pocos_jugadores',
@@ -178,7 +178,8 @@ void main() {
 
       await mandar(const PartidaEmpezada());
 
-      expect(bloc.state.error, 'Hacen falta al menos 2 jugadores para empezar.');
+      // El lobby ya dice que hacen falta 2: no se repite.
+      expect(bloc.state.error, isNull);
       expect(bloc.state.vista!.estado, EstadoDeSala.esperando);
     });
 
@@ -498,9 +499,9 @@ void main() {
     });
 
     for (final (motivo, mensaje) in [
-      ('ocupada', 'Esa casilla ya tiene un número.'),
-      ('sin_vecino', 'Tiene que quedar pegada a una casilla con el número del dado ancla.'),
-      ('regla_rota', 'La regla de esa zona no permite ese número.'),
+      ('ocupada', 'Esa casilla ya tiene número.'),
+      ('sin_vecino', 'Esa casilla no está junto al número del dado ancla.'),
+      ('regla_rota', 'Esa zona no acepta ese número.'),
     ]) {
       test('una jugada inválida por "$motivo" dice qué pasó, y el turno sigue', () async {
         await entrar(partidaEnJuego());
@@ -543,7 +544,7 @@ void main() {
 
       await mandar(const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'D1'));
 
-      expect(bloc.state.error, 'La ronda ya cambió. Mira la tirada nueva.');
+      expect(bloc.state.error, 'La ronda ya cambió.');
     });
 
     test('dos toques seguidos se atienden de a uno, en orden', () async {

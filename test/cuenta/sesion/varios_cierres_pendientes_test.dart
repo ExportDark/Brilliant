@@ -20,7 +20,7 @@ void main() {
     almacen.porCerrar = [servidor.sesionIniciada('ana')];
     servidor.apagado = true;
     bloc.add(const SalidaPedida());
-    await bloc.stream.firstWhere((s) => s.aviso == SesionBloc.cierreSinServidor);
+    await bloc.stream.firstWhere((s) => !s.ocupado && s.usuario == null);
 
     expect(almacen.porCerrar.map((s) => s.usuario), ['ana', 'beto']);
 

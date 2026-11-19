@@ -50,7 +50,7 @@ void main() {
     // 4. Cerrar sesión vuelve a "Iniciar sesión".
     await tocar(tester, botonMiCuenta);
     await tocar(tester, find.widgetWithText(FilledButton, 'Cerrar sesión'));
-    expect(find.text('Cerraste sesión.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('aviso-de-sesion')), findsNothing);
 
     // 5. Volver a entrar con la misma cuenta.
     await entrarCon(tester, 'carla', contrasenaDePrueba);
@@ -67,14 +67,14 @@ void main() {
     await tocar(tester, find.widgetWithText(TextButton, 'Borrar cuenta'));
     await escribir(tester, 'campo-contrasena-borrar', contrasenaDePrueba);
     await tocar(tester, find.widgetWithText(FilledButton, 'Borrar cuenta'));
-    expect(find.text('Tu cuenta se borró.'), findsOneWidget);
+    expect(find.text('Cuenta borrada.'), findsOneWidget);
     expect(servidor.cuentas, isEmpty);
     expect(almacen.sesion, isNull);
 
     // 8. Con la cuenta borrada ya no se puede entrar.
     await entrarCon(tester, 'carla', contrasenaDePrueba);
     expect(
-      find.text('No puede iniciar sesión con las credenciales proporcionadas.'),
+      find.text('Usuario o contraseña incorrectos.'),
       findsOneWidget,
     );
   });

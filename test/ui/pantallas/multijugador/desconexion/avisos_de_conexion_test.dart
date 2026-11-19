@@ -29,7 +29,7 @@ void main() {
     ahora = ahora.add(const Duration(seconds: 7));
     await pasarSegundos(tester, 1);
     expect(
-      find.text('Se perdió la conexión. Si no vuelve, quedas fuera de la partida.'),
+      find.text('Se perdió la conexión.'),
       findsOneWidget,
     );
   });
@@ -81,7 +81,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('fin-de-la-sala')), findsOneWidget);
     expect(
-      find.text('La sala ya no existe: el servidor se reinició o la cerró.'),
+      find.text('La sala ya no existe.'),
       findsOneWidget,
     );
     await tocar(tester, find.byKey(const ValueKey('boton-volver')));

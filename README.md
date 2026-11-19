@@ -416,9 +416,9 @@ que se elige se recuerda.
 Si en la red contestan **varios servidores**, la lista aparece directo en "Iniciar sesión"
 y en "Crear cuenta" (`ServidorParaEntrar`), y los botones **esperan a que haya un servidor
 que conteste**: deshabilitados sin él, y se habilitan solos cuando aparece. "Iniciar
-sesión" **recuerda el último usuario** (nunca la contraseña), y los errores dicen qué hacer:
-"Demasiados intentos… espera N segundos", "el servidor tardó demasiado" o "no se pudo
-conectar".
+sesión" **recuerda el último usuario** (nunca la contraseña), y los errores son cortos y
+dicen qué pasó, una sola vez: "Demasiados intentos. Espera 42 s.", "El servidor tardó en
+contestar. Intenta de nuevo."; sin servidor, lo dice solo el indicador.
 
 `BrilliantApp` recibe el cliente, el almacén, el buscador y los avisos de cambio de red,
 para que los tests usen un servidor falso en memoria, un buscador falso y una red falsa.

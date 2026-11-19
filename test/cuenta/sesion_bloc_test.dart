@@ -63,7 +63,7 @@ void main() {
       },
       act: (bloc) => bloc.add(const SesionRevisada()),
       verify: (bloc) {
-        expect(_resumen(bloc.state), 'sinSesion · Tu sesión venció. Vuelve a iniciar sesión.');
+        expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.sesionCerrada}');
         expect(almacen.sesion, isNull);
       },
     );
@@ -110,20 +110,21 @@ void main() {
       act: (bloc) => bloc.add(const EntradaPedida(usuario: 'ana', contrasena: 'no-es-la-buena')),
       verify: (bloc) {
         expect(_resumen(bloc.state), 'sinSesion · error');
-        expect(bloc.state.error!.generales.single, startsWith('No puede iniciar sesión'));
+        expect(bloc.state.error!.generales.single, 'Usuario o contraseña incorrectos.');
         expect(almacen.sesion, isNull);
       },
     );
 
     blocTest<SesionBloc, SesionState>(
-      'sin conexión, avisa que no se pudo hablar con el servidor',
+      'sin conexión, no lo repite en un recuadro: ya lo dice el indicador del servidor',
       build: () {
         servidor.apagado = true;
         return nuevoBloc();
       },
       act: (bloc) => bloc.add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba)),
       verify: (bloc) {
-        expect(bloc.state.error!.generales.single, startsWith('No se pudo conectar con el servidor'));
+        expect(bloc.state.error, isNull);
+        expect(cubit.state.disponibilidad, Disponibilidad.noDisponible);
       },
     );
   });
@@ -157,7 +158,7 @@ void main() {
       )),
       verify: (bloc) {
         expect(_resumen(bloc.state), 'sinSesion · error');
-        expect(bloc.state.error!.de('username'), 'Ya existe un usuario con este nombre.');
+        expect(bloc.state.error!.de('username'), 'Ese nombre ya está en uso');
       },
     );
   });
@@ -177,7 +178,7 @@ void main() {
         ..add(const SesionRevisada())
         ..add(const SalidaPedida()),
       verify: (bloc) {
-        expect(_resumen(bloc.state), 'sinSesion · Cerraste sesión.');
+        expect(_resumen(bloc.state), 'sinSesion');
         expect(almacen.sesion, isNull);
         expect(servidor.sesiones.containsKey(sesion.token), isFalse);
       },
@@ -197,7 +198,7 @@ void main() {
         bloc.add(const SalidaPedida());
       },
       verify: (bloc) {
-        expect(_resumen(bloc.state), 'sinSesion · Cerraste sesión.');
+        expect(_resumen(bloc.state), 'sinSesion');
         expect(
           servidor.pedidos.where((pedido) => pedido.url.path == '/auth/token/logout/'),
           hasLength(1),
@@ -217,8 +218,8 @@ void main() {
         bloc.add(const SalidaPedida());
       },
       verify: (bloc) {
-        // No dice "Cerraste sesión." a secas: en el servidor sigue abierta.
-        expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.cierreSinServidor}');
+        // Sin aviso: queda anotada para avisarle al servidor cuando vuelva.
+        expect(_resumen(bloc.state), 'sinSesion');
         expect(almacen.sesion, isNull);
         expect(almacen.porCerrar.single.token, sesion.token, reason: 'queda anotada para avisarle');
       },
@@ -232,7 +233,7 @@ void main() {
         ..add(const BorradoPedido(contrasena: 'no-es-la-buena')),
       verify: (bloc) {
         expect(_resumen(bloc.state), 'conSesion · ana · error');
-        expect(bloc.state.error!.de('current_password'), 'Contraseña inválida.');
+        expect(bloc.state.error!.de('current_password'), 'Contraseña incorrecta.');
         expect(servidor.cuentas, contains('ana'));
         expect(almacen.sesion, isNotNull);
       },
@@ -245,7 +246,7 @@ void main() {
         ..add(const SesionRevisada())
         ..add(const BorradoPedido(contrasena: contrasenaDePrueba)),
       verify: (bloc) {
-        expect(_resumen(bloc.state), 'sinSesion · Tu cuenta se borró.');
+        expect(_resumen(bloc.state), 'sinSesion · Cuenta borrada.');
         expect(servidor.cuentas, isEmpty);
         expect(servidor.sesiones, isEmpty);
         expect(almacen.sesion, isNull);
@@ -392,16 +393,13 @@ void main() {
     );
 
     blocTest<SesionBloc, SesionState>(
-      'si no encuentra ninguno, da el error de siempre y el servidor no está disponible',
+      'si no encuentra ninguno, el servidor no está disponible (lo dice el indicador)',
       build: blocConLaPcEnOtraRed,
       act: (bloc) => bloc
         ..add(const SesionRevisada())
         ..add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba)),
       verify: (bloc) {
-        expect(
-          bloc.state.error!.generales.single,
-          startsWith('No se pudo conectar con el servidor.'),
-        );
+        expect(bloc.state.error, isNull);
         expect(buscador.busquedas, 1);
         expect(bloc.servidor, cubit.porDefecto);
         expect(almacen.servidor, isNull);
@@ -410,7 +408,7 @@ void main() {
     );
 
     blocTest<SesionBloc, SesionState>(
-      'si contestan varios, no elige: pide elegir uno en "Servidor"',
+      'si contestan varios, no elige: la lista de "Iniciar sesión" los muestra',
       build: () {
         servidor.otrasDirecciones.add('192.168.137.40');
         buscador.anunciados.addAll([
@@ -423,10 +421,8 @@ void main() {
         ..add(const SesionRevisada())
         ..add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba)),
       verify: (bloc) {
-        expect(
-          bloc.state.error!.generales.single,
-          'No se pudo conectar con el servidor, y en la red hay 2. Elige uno en "Servidor".',
-        );
+        expect(bloc.state.error, isNull);
+        expect(cubit.state.disponibilidad, Disponibilidad.variosEncontrados);
         expect(bloc.servidor, cubit.porDefecto);
       },
     );
@@ -556,7 +552,7 @@ void main() {
         await entrarYSalirSinServidor(bloc);
         // En el servidor la sesión sigue abierta, y sin esto daría 409.
         expect(servidor.sesiones.values, contains('ana'));
-        expect(_resumen(bloc.state), 'sinSesion · ${SesionBloc.cierreSinServidor}');
+        expect(_resumen(bloc.state), 'sinSesion');
         bloc.add(const EntradaPedida(usuario: 'ana', contrasena: contrasenaDePrueba));
       },
       verify: (bloc) {

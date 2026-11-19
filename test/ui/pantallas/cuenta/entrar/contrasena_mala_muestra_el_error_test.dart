@@ -14,7 +14,7 @@ void main() {
     await entrarCon(tester, 'ana', 'no-es-la-buena');
 
     expect(
-      find.text('No puede iniciar sesión con las credenciales proporcionadas.'),
+      find.text('Usuario o contraseña incorrectos.'),
       findsOneWidget,
     );
     expect(find.byType(PantallaEntrar), findsOneWidget);
@@ -22,7 +22,7 @@ void main() {
     // Al volver a escribir, el error del intento anterior se va.
     await escribir(tester, 'campo-contrasena', 'otra');
     expect(
-      find.text('No puede iniciar sesión con las credenciales proporcionadas.'),
+      find.text('Usuario o contraseña incorrectos.'),
       findsNothing,
     );
   });

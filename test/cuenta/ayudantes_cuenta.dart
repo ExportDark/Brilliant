@@ -92,8 +92,7 @@ ServidorEncontrado anunciado(String ip, {String pc = 'ORION'}) => ServidorEncont
 /// El mensaje del servidor cuando la cuenta tiene la sesión activa en otro
 /// aparato (`Brilliant-servidor/cuentas/views.py`).
 const sesionEnOtroAparato =
-    'Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o espera '
-    '5 minutos si ya no la usas.';
+    'Tu cuenta está abierta en otro aparato. Ciérrala allá o espera 5 min.';
 
 /// Un servidor de cuentas en memoria, que contesta como el de verdad: las
 /// mismas rutas, los mismos códigos y los mismos mensajes en español, con las
@@ -250,7 +249,7 @@ class ServidorFalso {
         final usuario = _cuentaDe(datos['username']);
         if (usuario == null || cuentas[usuario] != datos['password']) {
           return _json(400, {
-            'non_field_errors': ['No puede iniciar sesión con las credenciales proporcionadas.'],
+            'non_field_errors': ['Usuario o contraseña incorrectos.'],
           });
         }
         final suyas = [for (final MapEntry(:key, :value) in sesiones.entries) if (value == usuario) key];
@@ -272,7 +271,7 @@ class ServidorFalso {
       case 'DELETE /auth/users/me/' when usuarioDelToken != null:
         if (datos['current_password'] != cuentas[usuarioDelToken]) {
           return _json(400, {
-            'current_password': ['Contraseña inválida.'],
+            'current_password': ['Contraseña incorrecta.'],
           });
         }
         cuentas.remove(usuarioDelToken);
@@ -295,7 +294,7 @@ class ServidorFalso {
     }
     if (_cuentaDe(usuario) != null) {
       return _json(400, {
-        'username': ['Ya existe un usuario con este nombre.'],
+        'username': ['Ese nombre ya está en uso'],
       });
     }
     if (contrasena.runes.length > largoMaximoContrasena) {

@@ -159,3 +159,20 @@ varios clientes. En el servidor, 239 tests de salas. El detalle, en [[Pruebas]].
   (n/6)" cuenta solo a los que siguen; copiar el código lo dice con una palomita.
 - Una sala con un mapa que la app no tiene, o una casilla fuera del tablero, se avisa como
   respuesta rara al leerla, en lugar de romper la pantalla.
+
+## Los mensajes de la sala (2026-11-18)
+
+Cortos, que dicen lo que pasó, y ninguno si la pantalla ya lo muestra:
+
+- **Sin conexión** en una acción: "Sin conexión. Intenta de nuevo." (no si ya se ve
+  "Reconectando…" o "Se perdió la conexión.").
+- **Una jugada rechazada**: "Esa casilla ya tiene número.", "Esa casilla no está junto al
+  número del dado ancla.", "Esa zona no acepta ese número."; "La ronda ya cambió.".
+- **Nada** cuando la sala ya está en otro momento (la partida empezó o terminó, el reparto
+  venció, faltan jugadores, ya no juego): la pantalla ya lo muestra.
+- El código vacío se dice bajo el campo: "Escribe el código".
+- El mensaje del servidor se muestra solo si es uno suyo (trae código): nunca el de DRF en
+  inglés. Una respuesta que la app no entiende: "La app no es compatible con este
+  servidor. Actualízala.".
+- "La sala ya no existe.", "Se perdió la conexión.", "Te desconectaste de la partida.";
+  un motivo de fin desconocido: "La partida terminó.".

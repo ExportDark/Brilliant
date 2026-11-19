@@ -59,7 +59,7 @@ void main() {
     await crearSala(tester, salas, vistaDePrueba());
 
     expect(errorDeSala, findsOneWidget);
-    expect(find.textContaining('No se pudo conectar'), findsOneWidget);
+    expect(find.text('Sin conexión. Intenta de nuevo.'), findsOneWidget);
     expect(botonCrearSala, findsOneWidget);
   });
 }

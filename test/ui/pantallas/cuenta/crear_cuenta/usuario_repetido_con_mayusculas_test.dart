@@ -12,7 +12,7 @@ void main() {
 
     await crearCuentaCon(tester, 'ANA', contrasenaDePrueba);
 
-    expect(errorDelCampo(tester, 'campo-usuario-nuevo'), 'Ya existe un usuario con este nombre.');
+    expect(errorDelCampo(tester, 'campo-usuario-nuevo'), 'Ese nombre ya está en uso');
     expect(find.byType(PantallaCrearCuenta), findsOneWidget);
     expect(servidor.cuentas, {'ana': 'la-de-otra-persona'});
   });

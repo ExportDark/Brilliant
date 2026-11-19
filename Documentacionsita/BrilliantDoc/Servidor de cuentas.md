@@ -111,8 +111,8 @@ Se agregaron el 2026-11-04, al revisar todas las validaciones de las cuentas.
 ### Una sola sesión activa por cuenta
 
 Si se entra con una cuenta que tiene la sesión **activa** en otro aparato, responde **409**:
-"Esta cuenta ya tiene la sesión iniciada en otro aparato. Ciérrala allá, o espera unos
-minutos si ya no la usas."
+"Tu cuenta está abierta en otro aparato. Ciérrala allá o espera 5 min." (desde el
+2026-11-18; antes, un texto más largo).
 
 - **Una sesión vence a los 5 minutos sin usarse** (`SESION_SIN_USO`, que es también el
   `TOKEN_TTL` de knox). knox renueva el vencimiento cada vez que se usa el token, así que

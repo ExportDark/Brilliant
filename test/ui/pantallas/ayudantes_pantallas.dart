@@ -202,8 +202,12 @@ String servidorEnUso(WidgetTester tester) => textoDeDireccion(
 /// Lo que dice el indicador cuando el servidor contesta y no se sabe su nombre.
 const servidorListo = 'Servidor disponible · Listo para jugar.';
 
-/// Lo que dice el indicador cuando el servidor no contesta.
+/// Lo que dice el indicador cuando el servidor no contesta y se puede buscar otro.
 const sinServidor = 'Sin servidor · No contesta. Toca para buscar otro.';
+
+/// Lo mismo donde no se puede buscar (la web, o una app de prueba sin buscador): se
+/// cambia la dirección a mano.
+const sinServidorSinBuscar = 'Sin servidor · No contesta. Toca para cambiar la dirección.';
 
 /// Escribe [direccion] en el diálogo del servidor y la guarda.
 Future<void> cambiarServidor(WidgetTester tester, String direccion) async {

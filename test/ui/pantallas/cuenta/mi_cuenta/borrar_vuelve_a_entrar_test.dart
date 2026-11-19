@@ -20,7 +20,7 @@ void main() {
     // Se cerraron el diálogo y "Mi cuenta": la raíz muestra "Iniciar sesión".
     expect(find.text('¿Borrar tu cuenta?'), findsNothing);
     expect(find.byType(PantallaEntrar), findsOneWidget);
-    expect(find.text('Tu cuenta se borró.'), findsOneWidget);
+    expect(find.text('Cuenta borrada.'), findsOneWidget);
     expect(servidor.cuentas, isEmpty);
     expect(servidor.sesiones, isEmpty);
   });

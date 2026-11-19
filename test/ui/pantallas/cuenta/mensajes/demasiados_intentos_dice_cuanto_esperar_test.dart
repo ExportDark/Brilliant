@@ -18,7 +18,7 @@ void main() {
     expect(
       find.descendant(
         of: find.byKey(const ValueKey('error-de-cuenta')),
-        matching: find.text('Demasiados intentos seguidos. Espera 42 segundos e intenta de nuevo.'),
+        matching: find.text('Demasiados intentos. Espera 42 s.'),
       ),
       findsOneWidget,
     );

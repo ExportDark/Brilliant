@@ -35,7 +35,7 @@ void main() {
 
     await tocar(tester, botonUnirse);
 
-    expect(find.text('Escribe el código de la sala.'), findsOneWidget);
+    expect(find.text('Escribe el código'), findsOneWidget);
     expect(salas.llamadas, isEmpty);
   });
 

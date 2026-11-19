@@ -10,7 +10,7 @@ void main() {
     await abrirApp(tester, servidor: servidor, conSesion: false);
 
     await entrarCon(tester, 'nadie', contrasenaDePrueba);
-    final sinUsuario = find.textContaining('No puede iniciar sesión con las credenciales');
+    final sinUsuario = find.text('Usuario o contraseña incorrectos.');
     expect(sinUsuario, findsOneWidget);
 
     await entrarCon(tester, 'ana', 'contrasena-mala-1');

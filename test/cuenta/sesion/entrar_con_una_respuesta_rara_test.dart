@@ -35,7 +35,7 @@ void main() {
     final estado = await entrar(bloc);
 
     expect(estado.etapa, EtapaDeSesion.sinSesion);
-    expect(estado.error?.generales.single, 'El servidor no aceptó el pedido. Intenta de nuevo.');
+    expect(estado.error?.generales.single, 'El servidor tuvo un problema. Intenta de nuevo.');
   });
 
   test('Si el servidor dice que sí pero no manda el token, no se entra y se avisa', () async {
@@ -47,7 +47,7 @@ void main() {
     expect(estado.etapa, EtapaDeSesion.sinSesion);
     expect(
       estado.error?.generales.single,
-      'El servidor contestó algo inesperado. Intenta de nuevo.',
+      'El servidor tuvo un problema. Intenta de nuevo.',
     );
   });
 }

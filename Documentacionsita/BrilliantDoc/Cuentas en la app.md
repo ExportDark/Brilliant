@@ -10,7 +10,7 @@ Ver también: [[Servidor de cuentas]] · [[Arquitectura general]] · [[Pruebas]]
 1. **Al abrir la app**, si hay una sesión guardada, se revisa con el servidor (`quién
    soy`):
    - si el token sirve, entra directo a **"Elige un mapa"**;
-   - si venció, lo olvida y muestra **"Iniciar sesión"** con el aviso "Tu sesión venció";
+   - si venció, lo olvida y muestra **"Iniciar sesión"** con el aviso "Tu sesión se cerró. Vuelve a entrar.";
    - si el servidor no contesta, lo busca en la red (ver [[#Encontrar el servidor]]); si
      tampoco así, deja jugar igual: el juego no necesita el servidor, y la sesión se
      vuelve a revisar la próxima vez.
@@ -22,7 +22,8 @@ Ver también: [[Servidor de cuentas]] · [[Arquitectura general]] · [[Pruebas]]
    - **Borrar cuenta**, en rojo. Abre un diálogo que avisa que no se puede deshacer y
      pide la contraseña.
 4. Al cerrar sesión o borrar la cuenta, la app vuelve sola a "Iniciar sesión", con el
-   aviso "Cerraste sesión." o "Tu cuenta se borró.".
+   aviso "Cuenta borrada." al borrarla (al cerrar sesión, ninguno: repetiría lo que el
+   jugador acaba de hacer).
 
 La sesión se recuerda: al cerrar la app y volverla a abrir no hay que escribir la
 contraseña otra vez.
@@ -118,11 +119,13 @@ fallaba sin llegar y el cierre de sesión se perdía. Ver [[Historial de cambios
 Al cerrar sesión, `SesionBloc` le avisa al servidor (pasando por `_conElServidor`, así
 lo encuentra si cambió de IP). En este aparato la sesión se cierra siempre, pero:
 
-- si el servidor se enteró (204, o 401 porque ya no valía), dice "Cerraste sesión.";
+- si el servidor se enteró (204, o 401 porque ya no valía), listo;
 - si no, guarda el token como **sesión por cerrar** (`AlmacenDeSesion.leerPorCerrar` /
-  `guardarPorCerrar`) y lo dice con la verdad: "Cerraste sesión en este aparato. El
-  servidor no contestó: se le avisará al volver a conectar, y si no, la sesión vence sola
-  en 5 minutos."
+  `guardarPorCerrar`) para avisarle después.
+
+En los dos casos vuelve a "Iniciar sesión" **sin aviso** (desde el 2026-11-18): decir
+"Cerraste sesión." repetía lo que el jugador acababa de hacer, y explicar cómo se le avisa
+al servidor después era un detalle de adentro.
 
 `_cerrarPendiente()` lo reintenta **al abrir la app, antes de entrar o de crear la cuenta**
 (así, en el mismo celular, nunca te bloquea el 409 de tu propia sesión) **y en cada latido
@@ -143,8 +146,7 @@ del aparato que se está usando cuente como activa:
 
 Si el latido recibe 401 (la sesión venció a los 5 minutos sin uso, el servidor se
 reinició o se entró con la cuenta en otro aparato), la app vuelve a "Iniciar sesión" con el
-aviso "Tu sesión se cerró: pasó mucho tiempo sin usarla, el servidor se reinició o se entró
-con tu cuenta en otro aparato. Vuelve a iniciar sesión.". Sin conexión no cierra nada: el
+aviso "Tu sesión se cerró. Vuelve a entrar.". Sin conexión no cierra nada: el
 juego sigue.
 
 Entrar con la cuenta activa en otro aparato muestra el mensaje del servidor en el recuadro
@@ -223,11 +225,10 @@ borrarla), el `ServidorCubit`:
 3. según cuántos contestan:
    - **uno**: se cambia a él y lo guarda; si era un pedido, el `SesionBloc` lo repite. El
      jugador no nota nada;
-   - **varios**: no elige, porque cada uno tiene sus propias cuentas. Pide elegir uno en
-     "Servidor";
-   - **ninguno**: "Sin servidor", y en un pedido, el error de siempre: "No se pudo
-     conectar con el servidor. Revisa que esté encendido y que estés en la misma red, o
-     elige otro en "Servidor"." (hasta el 2026-11-18 decía la dirección que se intentó).
+   - **varios**: no elige, porque cada uno tiene sus propias cuentas. "Iniciar sesión"
+     muestra la lista ("Elige un servidor:");
+   - **ninguno**: "Sin servidor" en el indicador, y nada más: desde el 2026-11-18 no se
+     repite en un recuadro rojo.
 
 Mientras el servidor contesta, no se busca nada. Así, **si la PC y el celular se pasan a
 otra WiFi**, el servidor se vuelve a levantar y a anunciar en la nueva, y la app, al
@@ -326,9 +327,13 @@ En "Iniciar sesión" y "Crear cuenta", `ServidorParaEntrar` muestra la lista de 
 
 ## Mensajes de error
 
-- **Demasiados intentos** (el servidor responde 429): "Demasiados intentos seguidos. Espera N segundos e intenta de nuevo." (N sale del mensaje del servidor).
-- **El servidor no contestó a tiempo** (`SinConexion.agotada`): dice que está ocupado y que se espere; no que se revise que esté encendido.
-- **No hay con quién hablar**: dice la dirección que se intentó y que se revise que esté encendido y en la misma red.
+Desde el 2026-11-18, **una situación, un mensaje**, corto, de tú y sin datos de adentro:
+
+- **Demasiados intentos** (el servidor responde 429): "Demasiados intentos. Espera 42 s." (o "Espera 50 min." si es larga; el número sale del mensaje del servidor).
+- **El servidor no contestó a tiempo** (`SinConexion.agotada`): "El servidor tardó en contestar. Intenta de nuevo."
+- **No hay con quién hablar**: lo dice el indicador ("Sin servidor"), sin un recuadro que lo repita. Al borrar la cuenta, donde no hay indicador: "Sin conexión con el servidor. Intenta de nuevo."
+- **Cualquier otra respuesta inesperada** (un 401 al entrar, un "sí" sin token, un rechazo sin mensaje, un 500): "El servidor tuvo un problema. Intenta de nuevo."
+- Los mensajes del servidor (usuario tomado, contraseña común, sesión en otro aparato…) se escriben en el servidor, cortos y de tú: "Usuario o contraseña incorrectos.", "Ese nombre ya está en uso", "Es demasiado común", "Tu cuenta está abierta en otro aparato. Ciérrala allá o espera 5 min.".
 - Usuario que no existe y contraseña mala dan el mismo mensaje. Cuenta abierta en otro aparato: ya tenía su mensaje.
 - Un servidor que contesta 429 u otro rechazo **está disponible**: `probarConexion` ya no lo toma por "sin servidor".
 

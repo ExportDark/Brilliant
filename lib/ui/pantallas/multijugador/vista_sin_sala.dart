@@ -29,7 +29,14 @@ class _VistaSinSalaState extends State<VistaSinSala> {
     super.dispose();
   }
 
+  /// Si se tocó "Unirme" sin código: se dice bajo el campo, y se va al escribir.
+  var _faltaCodigo = false;
+
   void _unirse() {
+    if (_codigo.text.trim().isEmpty) {
+      setState(() => _faltaCodigo = true);
+      return;
+    }
     setState(() => _uniendose = true);
     context.read<SalaBloc>().add(UnirseConCodigo(_codigo.text));
   }
@@ -88,9 +95,13 @@ class _VistaSinSalaState extends State<VistaSinSala> {
                 ),
               ],
               onSubmitted: (_) => _unirse(),
-              decoration: const InputDecoration(
+              onChanged: (_) {
+                if (_faltaCodigo) setState(() => _faltaCodigo = false);
+              },
+              decoration: InputDecoration(
                 labelText: 'Código de la sala',
-                prefixIcon: Icon(Icons.key_outlined),
+                prefixIcon: const Icon(Icons.key_outlined),
+                errorText: _faltaCodigo ? 'Escribe el código' : null,
               ),
             ),
             const SizedBox(height: 8),

@@ -57,7 +57,7 @@ void main() {
 
     await tester.pumpAndSettle();
     expect(
-      find.textContaining('No se encontró ningún servidor'),
+      find.textContaining('No se encontró ninguno'),
       findsOneWidget,
     );
     expectSinDatosInternos(tester, 'sin resultados');
@@ -90,15 +90,15 @@ void main() {
   });
 
   testWidgets(
-    'Si el servidor tardó demasiado al entrar, el aviso no muestra la dirección',
+    'Si el servidor tardó en contestar al entrar, el aviso no muestra la dirección',
     (tester) async {
       final servidor = ServidorFalso()..cuentas['ana'] = contrasenaDePrueba;
       await abrirApp(tester, servidor: servidor, conSesion: false);
       servidor.tardaDemasiado = true;
 
       await entrarCon(tester, 'ana', contrasenaDePrueba);
-      expect(find.textContaining('tardó demasiado'), findsOneWidget);
-      expectSinDatosInternos(tester, 'tardó demasiado');
+      expect(find.textContaining('tardó en contestar'), findsOneWidget);
+      expectSinDatosInternos(tester, 'tardó en contestar');
     },
   );
 
@@ -110,10 +110,7 @@ void main() {
       servidor.apagado = true;
 
       await entrarCon(tester, 'ana', contrasenaDePrueba);
-      expect(
-        find.textContaining('No se pudo conectar con el servidor'),
-        findsOneWidget,
-      );
+      expect(indicadorDelServidor(tester), startsWith('Sin servidor'));
       expectSinDatosInternos(tester, 'no se pudo conectar');
     },
   );

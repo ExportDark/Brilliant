@@ -21,7 +21,7 @@ void main() {
     expect(
       find.descendant(
         of: find.byKey(const ValueKey('campo-usuario-nuevo')),
-        matching: find.text('Ya existe un usuario con este nombre.'),
+        matching: find.text('Ese nombre ya está en uso'),
       ),
       findsOneWidget,
     );

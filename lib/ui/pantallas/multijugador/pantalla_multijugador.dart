@@ -116,8 +116,7 @@ class _Cuerpo extends StatelessWidget {
                                 RecuadroDeAviso(
                                   state.conexion == Conexion.reconectando
                                       ? 'Reconectando con el servidor…'
-                                      : 'Se perdió la conexión. Si no vuelve, quedas fuera de '
-                                            'la partida.',
+                                      : 'Se perdió la conexión.',
                                   key: const ValueKey('aviso-de-conexion'),
                                   icono: Icons.wifi_off_rounded,
                                 ),
@@ -178,8 +177,7 @@ class _Cuerpo extends StatelessWidget {
                                       child: RecuadroDeAviso(
                                         state.conexion == Conexion.reconectando
                                             ? 'Reconectando con el servidor…'
-                                            : 'Se perdió la conexión. Si no vuelve, quedas fuera de la '
-                                                  'partida.',
+                                            : 'Se perdió la conexión.',
                                         key: const ValueKey(
                                           'aviso-de-conexion',
                                         ),
@@ -275,7 +273,7 @@ class _FinDeSala extends StatelessWidget {
         Text(
           switch (fin) {
             FinDeSala.desaparecio =>
-              'La sala ya no existe: el servidor se reinició o la cerró.',
+              'La sala ya no existe.',
             FinDeSala.cerrada => 'El anfitrión cerró la sala.',
             FinDeSala.teFuiste => 'Saliste de la sala.',
             _ => 'Ya no estás en la sala.',

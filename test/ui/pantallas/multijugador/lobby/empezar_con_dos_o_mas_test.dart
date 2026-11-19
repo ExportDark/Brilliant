@@ -67,7 +67,8 @@ void main() {
     expect(find.byKey(const ValueKey('esperando-al-anfitrion')), findsOneWidget);
   });
 
-  testWidgets('Si el servidor rechaza empezar, muestra su mensaje', (tester) async {
+  testWidgets('Si el servidor rechaza empezar porque se fue uno, no lo repite en un recuadro: '
+      'el lobby lo dice al ponerse al día', (tester) async {
     final salas = SalasFalsas();
     await abrirMultijugador(tester, salas);
     await crearSala(tester, salas, vistaDePrueba());
@@ -78,8 +79,11 @@ void main() {
     );
 
     await tocar(tester, botonEmpezar);
+    expect(find.byKey(const ValueKey('error-de-sala')), findsNothing);
 
-    expect(find.text('Hacen falta al menos 2 jugadores para empezar.'), findsOneWidget);
+    salas.vista = vistaDePrueba(version: 2, jugadores: [jugadorJson('ana', anfitrion: true)]);
+    await pasarSegundos(tester, 1);
+    expect(find.text('Hacen falta al menos 2 jugadores.'), findsOneWidget);
     expect(find.byKey(const ValueKey('codigo-de-sala')), findsOneWidget);
   });
 }

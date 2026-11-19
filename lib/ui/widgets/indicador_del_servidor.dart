@@ -32,7 +32,12 @@ class IndicadorDelServidor extends StatelessWidget {
           // Deshabilitado (con un pedido en camino), no invita a tocar.
           Disponibilidad.noDisponible => (
               'Sin servidor',
-              alTocar == null ? 'No contesta.' : 'No contesta. Toca para buscar otro.',
+              alTocar == null
+                  ? 'No contesta.'
+                  : context.read<ServidorCubit>().puedeBuscar
+                  ? 'No contesta. Toca para buscar otro.'
+                  // En la web no se puede buscar: se escribe la dirección.
+                  : 'No contesta. Toca para cambiar la dirección.',
             ),
           Disponibilidad.variosEncontrados => (
               'Hay varios servidores',
