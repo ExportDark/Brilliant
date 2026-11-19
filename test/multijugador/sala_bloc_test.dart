@@ -141,8 +141,8 @@ void main() {
       ('elegir mapa', const MapaElegido(3)),
       ('empezar', const PartidaEmpezada()),
       ('preparar', const PreparacionEnviada({'E1': 1})),
-      ('jugar', const JugadaEnviada(dadoAncla: 1, casilla: 'D1')),
-      ('pasar', const RondaPasada()),
+      ('jugar', const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'D1')),
+      ('pasar', const RondaPasada(ronda: 1)),
       ('rendirse', const Rendirse()),
       ('preguntar', const Preguntar()),
     ]) {
@@ -416,7 +416,7 @@ void main() {
       // Ya no pregunta ni acepta pedidos.
       final llamadas = salas.llamadas.length;
       await mandar(const Preguntar());
-      await mandar(const JugadaEnviada(dadoAncla: 1, casilla: 'D1'));
+      await mandar(const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'D1'));
       expect(salas.llamadas, hasLength(llamadas));
     });
 
@@ -483,7 +483,7 @@ void main() {
       await entrar(partidaEnJuego());
       salas.vista = partidaEnJuego(version: 6, accion: 'coloco');
 
-      await mandar(const JugadaEnviada(dadoAncla: 1, casilla: 'D1'));
+      await mandar(const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'D1'));
 
       expect(salas.llamadas.last, 'jugar 1 1 D1');
       expect(bloc.state.vista!.yo.accion, 'coloco');
@@ -492,7 +492,7 @@ void main() {
     test('pasar manda la ronda', () async {
       await entrar(partidaEnJuego());
 
-      await mandar(const RondaPasada());
+      await mandar(const RondaPasada(ronda: 1));
 
       expect(salas.llamadas.last, 'pasar 1');
     });
@@ -511,7 +511,7 @@ void main() {
           motivo: motivo,
         );
 
-        await mandar(const JugadaEnviada(dadoAncla: 1, casilla: 'G7'));
+        await mandar(const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'G7'));
 
         expect(bloc.state.error, mensaje);
         expect(bloc.state.vista!.yo.accion, 'pendiente');
@@ -527,7 +527,7 @@ void main() {
         estadoHttp: 409,
       );
 
-      await mandar(const JugadaEnviada(dadoAncla: 1, casilla: 'D1'));
+      await mandar(const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'D1'));
 
       expect(bloc.state.error, isNull);
       expect(bloc.state.ocupado, isFalse);
@@ -541,7 +541,7 @@ void main() {
         estadoHttp: 409,
       );
 
-      await mandar(const JugadaEnviada(dadoAncla: 1, casilla: 'D1'));
+      await mandar(const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'D1'));
 
       expect(bloc.state.error, 'La ronda ya cambió. Mira la tirada nueva.');
     });
@@ -551,8 +551,8 @@ void main() {
       final orden = <String>[];
       salas.alActuar = orden.add;
 
-      bloc.add(const JugadaEnviada(dadoAncla: 1, casilla: 'D1'));
-      bloc.add(const RondaPasada());
+      bloc.add(const JugadaEnviada(ronda: 1, dadoAncla: 1, casilla: 'D1'));
+      bloc.add(const RondaPasada(ronda: 1));
       await pumpEventQueue();
 
       expect(orden, ['jugar 1 1 D1', 'pasar 1']);

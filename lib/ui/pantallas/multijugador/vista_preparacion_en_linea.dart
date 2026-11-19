@@ -20,9 +20,11 @@ class PreparacionEnLinea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tiempo = context.select((SalaBloc bloc) => bloc.state.segundosQueQuedan);
+    final enviando = context.select((SalaBloc bloc) => bloc.state.ocupado);
     final mapa = mapas.firstWhere((m) => m.nivel == sala.nivel);
 
     return PantallaPreparacion(
+      enviando: enviando,
       mapa: mapa,
       // Corto, para que la cuenta quepa en la barra de arriba.
       titulo: tiempo == null ? 'Reparte tus números' : 'Quedan ${tiempo.ceil()} s',

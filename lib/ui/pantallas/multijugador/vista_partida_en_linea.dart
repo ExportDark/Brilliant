@@ -116,19 +116,26 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
           children: [
             for (final (indice, valor) in dados.indexed) ...[
               if (indice > 0) const SizedBox(width: 16),
-              DadoWidget(
-                key: ValueKey('dado-$indice'),
-                valor: valor,
-                // Con cada ronda, los dados saltan; el segundo, un poquito después.
-                tirada: sala.ronda,
-                saltaAlAparecer: true,
-                demora: indice == 0
-                    ? Duration.zero
-                    : Cartoon.desfaseDelSegundoDado,
-                anclado: jugada != null && jugada.ancla == valor,
-                alTocar: puedeJugar && _opciones.any((o) => o.ancla == valor)
-                    ? () => _elegirAncla(valor)
-                    : null,
+              // Un dado sin jugadas se ve apagado: tocarlo no hace nada. Siempre dentro
+              // del mismo Opacity, para que el dado no pierda su salto al cambiar.
+              Opacity(
+                opacity: puedeJugar && !_opciones.any((o) => o.ancla == valor)
+                    ? 0.45
+                    : 1,
+                child: DadoWidget(
+                  key: ValueKey('dado-$indice'),
+                  valor: valor,
+                  // Con cada ronda, los dados saltan; el segundo, un poquito después.
+                  tirada: sala.ronda,
+                  saltaAlAparecer: true,
+                  demora: indice == 0
+                      ? Duration.zero
+                      : Cartoon.desfaseDelSegundoDado,
+                  anclado: jugada != null && jugada.ancla == valor,
+                  alTocar: puedeJugar && _opciones.any((o) => o.ancla == valor)
+                      ? () => _elegirAncla(valor)
+                      : null,
+                ),
               ),
             ],
           ],
@@ -143,9 +150,11 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
         TableroWidget(
           tablero: tablero,
           // Con un ancla elegida, se puede tocar cualquier casilla vacía: las legales
-          // anotan; las demás explican por qué no.
+          // anotan; las demás explican por qué no. Mientras va un pedido, ninguna: así
+          // un doble toque no manda dos jugadas.
           esTocable: (posicion) =>
               puedeJugar &&
+              !ocupado &&
               jugada != null &&
               tablero.celdaEn(posicion)!.estaVacia,
           iluminacionDe: (posicion) {
@@ -172,6 +181,7 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
               borrarExplicacion();
               context.read<SalaBloc>().add(
                 JugadaEnviada(
+                  ronda: sala.ronda,
                   dadoAncla: elegida.ancla,
                   casilla: posicion.notacion,
                 ),
@@ -196,8 +206,9 @@ class _VistaPartidaEnLineaState extends State<VistaPartidaEnLinea>
             padding: const EdgeInsets.only(top: 8),
             child: OutlinedButton(
               key: const ValueKey('boton-pasar'),
-              onPressed: () =>
-                  context.read<SalaBloc>().add(const RondaPasada()),
+              onPressed: ocupado
+                  ? null
+                  : () => context.read<SalaBloc>().add(RondaPasada(ronda: sala.ronda)),
               child: const Text('Pasar turno'),
             ),
           ),

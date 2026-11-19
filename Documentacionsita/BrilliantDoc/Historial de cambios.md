@@ -11,7 +11,11 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 
 - **Rendirse** (app): quien se rinde vuelve siempre a "Elige un mapa" (antes, en una
   partida de 3 o más, quedaba atrapado); un solo diálogo; salir del lobby nunca rinde de
-  una partida ya empezada; el anfitrión confirma antes de cerrar la sala. Ver
+  una partida ya empezada; el anfitrión confirma antes de cerrar la sala (`0cc473e`).
+- **Botones en línea** (app): la jugada lleva la ronda que se veía; nada se manda dos
+  veces mientras va un pedido; los errores se van al cambiar de ronda; el iris no deja
+  tocar a ciegas; y detalles (el círculo de "Unirme", copiar el código, el dado sin
+  jugadas, el mapa ya elegido, la cuenta de jugadores). Ver
   [[Revisión de lógica#Cuarta revisión: rendirse, los mensajes y los botones (2026-11-18)]].
 
 ## 2026-11-18 — Los botones pedían dos toques

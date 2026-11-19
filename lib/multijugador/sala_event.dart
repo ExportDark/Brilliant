@@ -38,15 +38,20 @@ final class PreparacionEnviada extends SalaEvent {
 
 /// Anotar el otro dado en [casilla], pegada a una casilla con el [dadoAncla].
 final class JugadaEnviada extends SalaEvent {
+  /// La ronda que el jugador veía al tocar.
+  final int ronda;
   final int dadoAncla;
   final String casilla;
 
-  const JugadaEnviada({required this.dadoAncla, required this.casilla});
+  const JugadaEnviada({required this.ronda, required this.dadoAncla, required this.casilla});
 }
 
 /// Pasar el turno (solo se puede si no hay jugada con esta tirada).
 final class RondaPasada extends SalaEvent {
-  const RondaPasada();
+  /// La ronda que el jugador veía al tocar.
+  final int ronda;
+
+  const RondaPasada({required this.ronda});
 }
 
 /// Salirse de la sala o rendirse. En la partida, queda fuera. Siempre sale de la pantalla.

@@ -124,8 +124,9 @@ class RutaConIris<T> extends PageRouteBuilder<T> {
 /// valor que no es `null` (con [alAparecer], también si ya lo tiene al dibujarse). Con
 /// cierre, se cierra sobre el trofeo (la primera [Insignia] que haya adentro), se queda un
 /// instante y se vuelve a abrir; si no hay trofeo a la vista, sobre el centro. La
-/// apertura solo se abre desde el centro. Nunca bloquea los toques, y con movimiento
-/// reducido no aparece.
+/// apertura solo se abre desde el centro. Mientras tapa la pantalla (el cierre hasta que
+/// empieza a abrirse, y la primera mitad de la apertura), lo de abajo no se puede tocar:
+/// no se ve. Con movimiento reducido no aparece.
 class Iris extends StatefulWidget {
   final Object? disparador;
   final bool cierre;
@@ -277,8 +278,28 @@ class _IrisState extends State<Iris> with SingleTickerProviderStateMixin {
             ),
           ),
         ),
+        // Encima de todo: mientras el iris tapa, se lleva los toques (no se toca a
+        // ciegas). Va siempre, para que lo de abajo no cambie de lugar en el árbol.
+        Positioned.fill(
+          child: AnimatedBuilder(
+            animation: _animacion,
+            builder: (context, _) => AbsorbPointer(
+              key: const ValueKey('iris-que-tapa'),
+              absorbing: _tapa,
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ),
       ],
     );
+  }
+
+  /// Si el iris está tapando la pantalla: el cierre, hasta que empieza a abrirse; la
+  /// apertura, en su primera mitad.
+  bool get _tapa {
+    final t = _animacion.value;
+    if (t >= 1) return false;
+    return widget.cierre ? t < 0.6 : t < 0.5;
   }
 
   /// El radio del hueco ahora, para un área que se cubre con [todo].

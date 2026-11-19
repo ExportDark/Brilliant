@@ -38,6 +38,10 @@ class PantallaPreparacion extends StatelessWidget {
   /// En línea, los puntos para ganar, para la hoja de reglas.
   final int? meta;
 
+  /// En línea, si el reparto se está mandando: mientras tanto "Inicio" no responde, así
+  /// un doble toque no lo manda dos veces.
+  final bool enviando;
+
   const PantallaPreparacion({
     super.key,
     this.mapa = nivel1,
@@ -45,6 +49,7 @@ class PantallaPreparacion extends StatelessWidget {
     this.alConfirmar,
     this.titulo,
     this.meta,
+    this.enviando = false,
   });
 
   @override
@@ -62,6 +67,7 @@ class PantallaPreparacion extends StatelessWidget {
         alConfirmar: alConfirmar,
         titulo: titulo,
         meta: meta,
+        enviando: enviando,
       ),
     );
   }
@@ -73,6 +79,7 @@ class _VistaPreparacion extends StatefulWidget {
   final void Function(Map<Posicion, int> valores)? alConfirmar;
   final String? titulo;
   final int? meta;
+  final bool enviando;
 
   const _VistaPreparacion({
     required this.mapa,
@@ -80,6 +87,7 @@ class _VistaPreparacion extends StatefulWidget {
     required this.alConfirmar,
     required this.titulo,
     required this.meta,
+    required this.enviando,
   });
 
   @override
@@ -302,7 +310,7 @@ class _VistaPreparacionState extends State<_VistaPreparacion> {
                         child: FilledButton(
                           // Sin todas las casillas llenas no se puede empezar. El bloc
                           // tampoco confirmaría, pero así el jugador lo ve de entrada.
-                          onPressed: state.completa
+                          onPressed: state.completa && !widget.enviando
                               ? () => _bloc.add(const PreparacionConfirmada())
                               : null,
                           style: FilledButton.styleFrom(

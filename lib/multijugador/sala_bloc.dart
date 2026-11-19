@@ -50,16 +50,19 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
         PartidaEmpezada() => _enSala(emit, (sala) => _cliente.empezar(sala.codigo)),
         PreparacionEnviada() =>
           _enSala(emit, (sala) => _cliente.preparar(sala.codigo, event.valores)),
+        // La ronda que el jugador veía al tocar, no la que tenga la sala ahora: si
+        // mientras tanto llegó la siguiente, el servidor la rechaza ("La ronda ya
+        // cambió") en lugar de anotarla en la ronda nueva.
         JugadaEnviada() => _enSala(
             emit,
             (sala) => _cliente.jugar(
               sala.codigo,
-              ronda: sala.ronda,
+              ronda: event.ronda,
               dadoAncla: event.dadoAncla,
               casilla: event.casilla,
             ),
           ),
-        RondaPasada() => _enSala(emit, (sala) => _cliente.pasar(sala.codigo, ronda: sala.ronda)),
+        RondaPasada() => _enSala(emit, (sala) => _cliente.pasar(sala.codigo, ronda: event.ronda)),
         Rendirse() => _alRendirse(event, emit),
         Preguntar() => _alPreguntar(emit),
         ErrorDescartado() => emit(state.copiaCon(error: () => null)),
@@ -192,11 +195,15 @@ class SalaBloc extends Bloc<SalaEvent, SalaState> {
       final ahora = _ahora();
       _ultimaRespuesta = ahora;
       // Con "no cambió nada" (null) se queda la sala de antes, pero la hora avanza: así
-      // la cuenta regresiva sigue bajando aunque nadie juegue.
+      // la cuenta regresiva sigue bajando aunque nadie juegue. Un error se va solo
+      // cuando cambia la ronda o el estado de la sala: ya no corresponde a lo que se ve.
+      final otroMomento =
+          nueva != null && (nueva.ronda != vista.ronda || nueva.estado != vista.estado);
       emit(state.copiaCon(
         vista: nueva,
         conexion: Conexion.conectada,
         ocupado: state.ocupado,
+        error: otroMomento ? () => null : null,
         recibida: nueva == null ? null : ahora,
         ahora: ahora,
       ));

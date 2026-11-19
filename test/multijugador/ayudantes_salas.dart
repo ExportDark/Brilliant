@@ -195,12 +195,18 @@ class SalasFalsas implements ClienteSalas {
   /// Rendirse se queda esperando a que el test lo suelte, si no es nulo.
   Future<void>? esperaAntesDeRendirse;
 
+  /// Cada pedido que cambia algo (crear, unirse, jugar, pasar, preparar…) se queda
+  /// esperando a que el test lo suelte, si no es nulo.
+  Future<void>? esperaAntesDeActuar;
+
   /// Se llama después de anotar cada pedido que cambia algo, para que el test mueva
   /// [vista] como lo haría el servidor.
   void Function(String llamada)? alActuar;
 
   Future<VistaDeSala> _contestar(String llamada) async {
     llamadas.add(llamada);
+    final espera = esperaAntesDeActuar;
+    if (espera != null) await espera;
     _fallarSiToca();
     alActuar?.call(llamada);
     return vista!;

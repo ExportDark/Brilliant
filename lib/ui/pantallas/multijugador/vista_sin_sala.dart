@@ -19,13 +19,25 @@ class VistaSinSala extends StatefulWidget {
 class _VistaSinSalaState extends State<VistaSinSala> {
   final _codigo = TextEditingController();
 
+  /// Si lo último que se pidió fue unirse: el círculo de espera va en "Unirme" solo
+  /// entonces, no si se tocó "Crear sala".
+  var _uniendose = false;
+
   @override
   void dispose() {
     _codigo.dispose();
     super.dispose();
   }
 
-  void _unirse() => context.read<SalaBloc>().add(UnirseConCodigo(_codigo.text));
+  void _unirse() {
+    setState(() => _uniendose = true);
+    context.read<SalaBloc>().add(UnirseConCodigo(_codigo.text));
+  }
+
+  void _crear() {
+    setState(() => _uniendose = false);
+    context.read<SalaBloc>().add(const SalaCreada());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +67,7 @@ class _VistaSinSalaState extends State<VistaSinSala> {
             const SizedBox(height: 24),
             PiezaPresionable(child: FilledButton(
               key: const ValueKey('boton-crear-sala'),
-              onPressed: libre
-                  ? () => context.read<SalaBloc>().add(const SalaCreada())
-                  : null,
+              onPressed: libre ? _crear : null,
               child: const Text('Crear sala'),
             )),
             const SizedBox(height: 28),
@@ -87,7 +97,7 @@ class _VistaSinSalaState extends State<VistaSinSala> {
             OutlinedButton(
               key: const ValueKey('boton-unirse'),
               onPressed: libre ? _unirse : null,
-              child: state.ocupado
+              child: state.ocupado && _uniendose
                   ? const SizedBox.square(
                       dimension: 22,
                       child: CircularProgressIndicator(strokeWidth: 2.5),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -75,13 +77,7 @@ class VistaLobby extends StatelessWidget {
                     ),
                   ),
                 ),
-                IconButton(
-                  key: const ValueKey('copiar-codigo'),
-                  tooltip: 'Copiar el código',
-                  icon: const Icon(Icons.copy_rounded),
-                  onPressed: () =>
-                      Clipboard.setData(ClipboardData(text: sala.codigo)),
-                ),
+                _BotonDeCopiar(codigo: sala.codigo),
               ],
             ),
             const SizedBox(height: 10),
@@ -92,7 +88,7 @@ class VistaLobby extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Jugadores (${sala.jugadores.length}/6)',
+              'Jugadores (${sala.jugadores.where((j) => j.activo).length}/6)',
               style: textos.titleMedium,
             ),
             if (sala.meta case final meta?)
@@ -111,7 +107,10 @@ class VistaLobby extends StatelessWidget {
                 tarjeta: (mapa) => TarjetaDeMapa(
                   mapa: mapa,
                   seleccionada: sala.nivel == mapa.nivel,
-                  alElegir: libre ? () => bloc.add(MapaElegido(mapa.nivel)) : null,
+                  // El que ya está elegido no manda nada.
+                  alElegir: libre && sala.nivel != mapa.nivel
+                      ? () => bloc.add(MapaElegido(mapa.nivel))
+                      : null,
                 ),
               )
             else ...[
@@ -196,6 +195,51 @@ class _FichaDeLetra extends StatelessWidget {
           color: Paleta.tinta,
         ),
       ),
+    );
+  }
+}
+
+/// Copia el código de la sala, y lo dice: el ícono pasa a una palomita un momento.
+class _BotonDeCopiar extends StatefulWidget {
+  final String codigo;
+
+  const _BotonDeCopiar({required this.codigo});
+
+  @override
+  State<_BotonDeCopiar> createState() => _BotonDeCopiarState();
+}
+
+class _BotonDeCopiarState extends State<_BotonDeCopiar> {
+  var _copiado = false;
+  Timer? _volver;
+
+  @override
+  void dispose() {
+    _volver?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _copiar() async {
+    try {
+      await Clipboard.setData(ClipboardData(text: widget.codigo));
+    } on Exception {
+      return; // Si no se pudo copiar, no se dice que sí.
+    }
+    if (!mounted) return;
+    setState(() => _copiado = true);
+    _volver?.cancel();
+    _volver = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _copiado = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      key: const ValueKey('copiar-codigo'),
+      tooltip: _copiado ? 'Copiado' : 'Copiar el código',
+      icon: Icon(_copiado ? Icons.check_rounded : Icons.copy_rounded),
+      onPressed: _copiar,
     );
   }
 }

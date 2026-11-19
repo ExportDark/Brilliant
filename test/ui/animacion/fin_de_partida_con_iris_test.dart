@@ -68,16 +68,20 @@ void main() {
   });
 
   testWidgets(
-    '"Jugar otra vez" se puede tocar con el iris a la mitad, y lleva a la '
-    'preparación del mismo mapa',
+    'Mientras el iris tapa la pantalla, "Jugar otra vez" no responde (no se toca a '
+    'ciegas); cuando se abre, sí, y lleva a la preparación del mismo mapa',
     (tester) async {
       await anotarLaUltima(tester);
       await tester.pump(const Duration(milliseconds: 300));
       expect(irisPintando(tester), isTrue);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Jugar otra vez'));
-      await tester.pumpAndSettle();
+      final jugarOtraVez = find.widgetWithText(FilledButton, 'Jugar otra vez');
+      await tester.tap(jugarOtraVez, warnIfMissed: false);
+      await tester.pump();
+      expect(find.byType(PantallaPreparacion), findsNothing);
 
+      await tester.pumpAndSettle();
+      await tocar(tester, jugarOtraVez);
       expect(find.byType(PantallaPreparacion), findsOneWidget);
       expect(find.text('Prepara tu tablero'), findsOneWidget);
       expect(irisPintando(tester), isFalse);

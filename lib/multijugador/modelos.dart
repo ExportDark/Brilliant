@@ -6,6 +6,10 @@
 /// los demás ([JugadorEnSala]) solo llega lo público.
 library;
 
+import '../modelo/mapa.dart';
+import '../modelo/posicion.dart';
+import '../modelo/tablero.dart';
+
 enum EstadoDeSala {
   esperando,
   preparando,
@@ -290,7 +294,16 @@ class VistaDeSala {
 
   bool get soyElAnfitrion => yo.usuario == anfitrion;
 
-  factory VistaDeSala.desdeJson(Map<String, dynamic> json) => VistaDeSala(
+  /// Lee la sala que mandó el servidor. Un mapa que esta app no tiene, o una casilla que
+  /// no está en el tablero, se avisan aquí ([FormatException]: "respuesta rara") y no al
+  /// dibujar la pantalla, que se rompería.
+  factory VistaDeSala.desdeJson(Map<String, dynamic> json) {
+    final vista = VistaDeSala._desdeJson(json);
+    vista._revisar();
+    return vista;
+  }
+
+  factory VistaDeSala._desdeJson(Map<String, dynamic> json) => VistaDeSala(
         codigo: json['codigo'] as String,
         version: json['version'] as int,
         estado: EstadoDeSala.desde(json['estado'] as String),
@@ -315,4 +328,28 @@ class VistaDeSala {
             ? null
             : ResultadoDePartida.desdeJson(json['resultado'] as Map<String, dynamic>),
       );
+
+  void _revisar() {
+    if (!mapas.any((mapa) => mapa.nivel == nivel)) {
+      throw FormatException('Mapa desconocido: $nivel');
+    }
+    final casillas = [
+      ...yo.tablero.keys,
+      ...yo.iniciales,
+      for (final jugada in yo.jugadas) ...jugada.casillas,
+      for (final jugador in jugadores) ...[
+        ...jugador.ocupadas,
+        ?jugador.ultima,
+      ],
+    ];
+    for (final notacion in casillas) {
+      final posicion = Posicion.desdeNotacion(notacion);
+      if (posicion.fila < 0 ||
+          posicion.fila >= Tablero.filas ||
+          posicion.columna < 0 ||
+          posicion.columna >= Tablero.columnas) {
+        throw FormatException('Casilla fuera del tablero: $notacion');
+      }
+    }
+  }
 }

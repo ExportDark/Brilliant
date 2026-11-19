@@ -145,3 +145,17 @@ varios clientes. En el servidor, 239 tests de salas. El detalle, en [[Pruebas]].
 
 - El diseño de las pantallas (por ahora son funcionales).
 - Probar con varios celulares de verdad en la misma WiFi.
+
+## Los botones mientras va un pedido (2026-11-18)
+
+- Mientras un pedido va al servidor, lo que lo mandaría otra vez no responde: las
+  casillas, "Pasar turno", "Inicio" en el reparto y "Rendirme". Así un doble toque manda
+  un solo pedido.
+- La jugada y "Pasar" llevan la ronda que el jugador veía al tocar: si mientras tanto
+  llegó la siguiente, el servidor la rechaza ("La ronda ya cambió.") en lugar de anotarla
+  en la ronda nueva.
+- Un error de la sala se va solo cuando cambia la ronda o el estado.
+- Un dado sin jugadas se ve apagado; tocar el mapa ya elegido no manda nada; "Jugadores
+  (n/6)" cuenta solo a los que siguen; copiar el código lo dice con una palomita.
+- Una sala con un mapa que la app no tiene, o una casilla fuera del tablero, se avisa como
+  respuesta rara al leerla, en lugar de romper la pantalla.
