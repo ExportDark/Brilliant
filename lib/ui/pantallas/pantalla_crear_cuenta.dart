@@ -44,7 +44,12 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
     super.dispose();
   }
 
+  /// Si se vuelve a "Iniciar sesión" porque la cuenta se creó: el aviso se queda.
+  var _volviendoConLaCuenta = false;
+
   void _crear() {
+    // Enter en el teclado respeta lo mismo que el botón.
+    if (_sesion.state.ocupado || !servidorDisponibleAhora(context)) return;
     if (!_formulario.currentState!.validate()) return;
     _sesion.add(CuentaPedida(
       usuario: _usuario.text.trim(),
@@ -62,13 +67,24 @@ class _PantallaCrearCuentaState extends State<PantallaCrearCuenta> {
     final textos = Theme.of(context).textTheme;
 
     final hayServidor = servidorListo(context);
+    final ocupado = context.select((SesionBloc bloc) => bloc.state.ocupado);
 
     return PopScope(
+      // Mientras se crea la cuenta no se sale: se perdería lo que conteste el servidor.
+      canPop: !ocupado,
       // Al volver a "Iniciar sesión", los errores de aquí ya no aplican.
       onPopInvokedWithResult: (salio, _) {
-        if (salio) _sesion.add(const AvisosDescartados());
+        if (salio && !_volviendoConLaCuenta) _sesion.add(const AvisosDescartados());
       },
-      child: BlocBuilder<SesionBloc, SesionState>(
+      child: BlocConsumer<SesionBloc, SesionState>(
+        // Si la cuenta se creó pero no se pudo entrar, vuelve a "Iniciar sesión", con el
+        // aviso y el usuario escrito.
+        listenWhen: (antes, ahora) =>
+            antes.aviso != ahora.aviso && ahora.aviso == SesionBloc.cuentaCreada,
+        listener: (context, _) {
+          _volviendoConLaCuenta = true;
+          Navigator.of(context).pop(_usuario.text.trim());
+        },
         builder: (context, state) {
           final error = state.error;
 

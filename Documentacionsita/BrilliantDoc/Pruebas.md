@@ -1,7 +1,7 @@
 # Pruebas
 
 Cómo está probado el proyecto: qué cubre cada carpeta de `test/`, cómo están organizadas
-las pruebas y qué se aprendió de ellas. 899 tests, todos pasando, más 18 que hablan con el
+las pruebas y qué se aprendió de ellas. 916 tests, todos pasando, más 18 que hablan con el
 servidor de verdad y solo corren si se piden (2026-11-18). El servidor tiene los suyos
 (1093, ver abajo).
 
@@ -26,9 +26,9 @@ Si `flutter test` vuelve a fallar por el Application Control de Windows,
 | `test/modelo/` | 80 | `Posicion` (notación, vecinas), `Celda`, `Region`, `extraerValores`, `TipoRegion`, `Tablero` (layout del manual, anotar y vaciar casillas) y los 4 mapas |
 | `test/reglas/` | 46 | Las funciones puras de cada restricción, las clases de cada color (con el gris y el naranja) y su `descripcion`. Algunos casos usan datos reales de la Partida 1 del manual |
 | `test/juego/` | 130 | `PreparacionBloc`, `PartidaBloc`, `PartidaState`, `evaluarJugada` / `hayJugada`, las casillas exactas que se iluminan, y las partidas completas simuladas y el camino feliz en los 4 mapas |
-| `test/cuenta/` | 134 (+4) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
+| `test/cuenta/` | 145 (+4) | Las reglas del usuario y la contraseña, `ClienteCuentas` (cada pedido y cada error), `ServidorCubit` (revisar, buscar en la red, elegir, volver a revisar solo), `SesionBloc` (abrir, entrar, crear, salir, borrar, cuando el servidor se mudó, el latido y la sesión en otro aparato), leer la dirección que escribe el jugador y, si se pide, las pruebas contra el servidor de verdad |
 | `test/multijugador/` | 91 (+14) | Los modelos que manda el servidor, `ClienteSalas` (cada ruta y cada error, con `MockClient`), `SalaBloc` (preguntar cada segundo, reconectando, conexión perdida, sala que desapareció o que cerró el anfitrión, doble toque…) y el reloj que no depende de la hora del teléfono; y, si se pide, partidas contra el servidor de verdad |
-| `test/ui/` | 343 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
+| `test/ui/` | 349 | `CeldaWidget`, `TableroWidget`, `DadoWidget`, el tema, la elección de mapa, la pantalla de preparación y la de partida, las de cuenta (con la lista de servidores, el usuario recordado y los mensajes), el indicador y el diálogo del servidor, las del multijugador, las pantallas en 5 tamaños, del celular chico al escritorio, y los caminos felices por la pantalla: la partida en los 4 mapas y las cuentas |
 | `test/herramientas/` | 3 | Que los JSON que se copian al servidor (`tool/exportado/`) coincidan con lo que generaría el código de hoy |
 | `test/main/` | 2 | Que la app arranque en elegir el mapa con una sesión guardada, y en "Iniciar sesión" sin ella |
 
@@ -201,6 +201,10 @@ Las reglas nuevas tienen su archivo, como las demás: `reglas/regla_rango_test.d
 | `ui/pantallas/multijugador/botones/mientras_va_un_pedido_test.dart` | Mientras va el pedido, las casillas, "Pasar turno" e "Inicio" del reparto en línea no responden: un doble toque manda un pedido (3 casos) |
 | `ui/pantallas/multijugador/botones/detalles_de_los_botones_test.dart` | Un error de la sala se va al cambiar la ronda; "Crear sala" no pone el círculo en "Unirme"; copiar el código muestra una palomita y vuelve; un dado sin jugadas se ve apagado; el mapa ya elegido no manda nada; "Jugadores (n/6)" cuenta solo a los que siguen (6 casos) |
 | `ui/animacion/el_iris_no_deja_tocar_a_ciegas_test.dart` | Al empezar en línea, un dado tocado con el iris tapando no se elige; abierto, sí |
+| `cuenta/sesion_sin_pedidos_repetidos_test.dart` | Dos "Entrar" o dos "Crear cuenta" seguidos mandan uno; con el tiempo agotado, crear la cuenta o entrar no se repiten en otro servidor de la red; sin conexión, sí (5 casos; sin el arreglo se repetían) |
+| `cuenta/sin_ruedita_eterna_test.dart` | Si el almacén no puede leer al abrir, pide entrar; si no puede guardar al entrar, avisa y "Entrar" vuelve; si "quién soy" contesta con otra forma, sigue con la sesión guardada (3 casos; antes quedaba esperando) |
+| `cuenta/una_pagina_de_otro_programa_no_es_el_servidor_test.dart` | Un 400 en HTML no es el servidor; el 401 y el 429 en JSON de Brilliant sí (3 casos) |
+| `ui/pantallas/cuenta/botones/botones_de_cuenta_test.dart` | Sin servidor, Enter no entra ni crea la cuenta; borrando la cuenta, el diálogo no se cierra y el error de la contraseña se ve; creando la cuenta, atrás no sale; si se creó y no se pudo entrar, vuelve a "Iniciar sesión" con el aviso y el usuario; deshabilitado, el indicador no dice "Toca…" (6 casos) |
 | `multijugador/respuesta_rara_test.dart` | Una sala con un campo de otro tipo, algo que no es JSON o un rechazo con el código de otro tipo se avisan como "respuesta rara"; y la sala no queda trabada: avisa y se puede volver a tocar (4 casos; sin el arreglo, la del bloc se quedaba esperando) |
 | `multijugador/el_tablero_chico_se_lee_test.dart` | De cada jugador llegan sus casillas ocupadas y la de la última ronda; con un servidor viejo, ninguna (2 casos) |
 | `multijugador/la_meta_se_lee_test.dart` | La sala trae la meta; con un servidor viejo que no la manda, queda en `null` (2 casos) |

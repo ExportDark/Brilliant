@@ -56,6 +56,9 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
   }
 
   void _entrar() {
+    // Enter en el teclado respeta lo mismo que el botón: sin servidor, o con un pedido
+    // en camino, no se manda nada.
+    if (_sesion.state.ocupado || !servidorDisponibleAhora(context)) return;
     if (!_formulario.currentState!.validate()) return;
     _sesion.add(EntradaPedida(usuario: _usuario.text.trim(), contrasena: _contrasena.text));
   }
@@ -72,9 +75,16 @@ class _PantallaEntrarState extends State<PantallaEntrar> {
     showDialog<void>(context: context, builder: (_) => const DialogoDelServidor());
   }
 
-  void _irACrearCuenta() {
+  Future<void> _irACrearCuenta() async {
     _sesion.add(const AvisosDescartados());
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PantallaCrearCuenta()));
+    // Si la cuenta se creó pero no se pudo entrar, vuelve con el usuario: queda escrito,
+    // listo para poner la contraseña.
+    final creada = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const PantallaCrearCuenta()),
+    );
+    if (creada == null || !mounted) return;
+    _usuario.text = creada;
+    _enContrasena.requestFocus();
   }
 
   @override

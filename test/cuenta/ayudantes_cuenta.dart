@@ -180,12 +180,41 @@ class ServidorFalso {
     return null;
   }
 
+  /// Cada pedido que la app intentó, llegue o no ("POST /auth/token/login/"), en orden.
+  final intentados = <String>[];
+
+  /// Cada pedido que llega se queda esperando a que el test lo suelte, si no es nulo.
+  Future<void>? esperaAntesDeContestar;
+
+  /// Pedidos ("POST /auth/token/login/") que no llegan: como si se cortara la conexión
+  /// justo para ese.
+  final rutasQueNoLlegan = <String>{};
+
+  /// Pedidos ("POST /auth/users/") que llegan pero cuya respuesta no vuelve a tiempo:
+  /// el servidor sí los atendió.
+  final rutasQueTardan = <String>{};
+
+  /// Atiende el pedido; si su ruta tarda, el servidor lo hace pero la respuesta no vuelve.
   Future<http.Response> _atender(http.Request pedido) async {
-    if (apagado) throw http.ClientException('El servidor está apagado', pedido.url);
+    final respuesta = await _atenderDeVerdad(pedido);
+    if (rutasQueTardan.contains('${pedido.method} ${pedido.url.path}')) {
+      throw TimeoutException('El servidor no contestó a tiempo');
+    }
+    return respuesta;
+  }
+
+  Future<http.Response> _atenderDeVerdad(http.Request pedido) async {
+    final rutaPedida = '${pedido.method} ${pedido.url.path}';
+    intentados.add(rutaPedida);
+    if (apagado || rutasQueNoLlegan.contains(rutaPedida)) {
+      throw http.ClientException('El servidor está apagado', pedido.url);
+    }
     if (pedido.url.host != direccion && !otrasDirecciones.contains(pedido.url.host)) {
       throw http.ClientException('Ahí no hay ningún servidor', pedido.url);
     }
     pedidos.add(pedido);
+    final espera = esperaAntesDeContestar;
+    if (espera != null) await espera;
     if (tardaDemasiado) throw TimeoutException('El servidor no contestó a tiempo');
     final regulado = regulaConSegundos;
     if (regulado != null) {

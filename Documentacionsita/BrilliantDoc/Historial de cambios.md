@@ -15,7 +15,11 @@ Ver también: [[Estado del proyecto]] · [[Pruebas]]
 - **Botones en línea** (app): la jugada lleva la ronda que se veía; nada se manda dos
   veces mientras va un pedido; los errores se van al cambiar de ronda; el iris no deja
   tocar a ciegas; y detalles (el círculo de "Unirme", copiar el código, el dado sin
-  jugadas, el mapa ya elegido, la cuenta de jugadores). Ver
+  jugadas, el mapa ya elegido, la cuenta de jugadores) (`35a25d4`).
+- **Botones de cuenta** (app): Enter respeta lo mismo que el botón; borrar o crear la
+  cuenta no se cortan a medias; nada se manda dos veces (tampoco después de un tiempo
+  agotado); la cuenta creada vuelve a "Iniciar sesión"; nada queda esperando para
+  siempre; una página de otro programa no cuenta como el servidor. Ver
   [[Revisión de lógica#Cuarta revisión: rendirse, los mensajes y los botones (2026-11-18)]].
 
 ## 2026-11-18 — Los botones pedían dos toques

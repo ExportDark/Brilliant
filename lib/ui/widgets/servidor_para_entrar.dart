@@ -6,6 +6,11 @@ import '../../cuenta/servidor_state.dart';
 import '../tema.dart';
 import 'lista_de_servidores.dart';
 
+/// Lo mismo que [servidorListo], para leerlo una vez (al tocar Enter en el teclado), sin
+/// redibujar cuando cambia.
+bool servidorDisponibleAhora(BuildContext context) =>
+    context.read<ServidorCubit>().state.disponibilidad == Disponibilidad.disponible;
+
 /// Si ya se puede entrar o crear la cuenta: solo con un servidor que contesta.
 bool servidorListo(BuildContext context) => context.select(
   (ServidorCubit cubit) =>

@@ -126,6 +126,8 @@ class _DialogoBorrarCuentaState extends State<_DialogoBorrarCuenta> {
   }
 
   void _borrar() {
+    // Enter en el teclado: con el pedido en camino no se manda otro.
+    if (context.read<SesionBloc>().state.ocupado) return;
     if (!_formulario.currentState!.validate()) return;
     context.read<SesionBloc>().add(BorradoPedido(contrasena: _contrasena.text));
   }
@@ -137,64 +139,70 @@ class _DialogoBorrarCuentaState extends State<_DialogoBorrarCuenta> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SesionBloc, SesionState>(
-      builder: (context, state) {
-        final error = state.error;
+    // Mientras se borra, el diálogo no se cierra (ni tocando afuera ni con atrás): si la
+    // contraseña estaba mal, el error se ve aquí.
+    final ocupado = context.select((SesionBloc bloc) => bloc.state.ocupado);
+    return PopScope(
+      canPop: !ocupado,
+      child: BlocBuilder<SesionBloc, SesionState>(
+        builder: (context, state) {
+          final error = state.error;
 
-        return AlertDialog(
-          // En un celular bajo, con el teclado abierto, el diálogo se desplaza
-          // en vez de desbordarse.
-          scrollable: true,
-          icon: const Icon(Icons.warning_amber_rounded, color: Paleta.peligro, size: 36),
-          title: const Text('¿Borrar tu cuenta?'),
-          actionsOverflowAlignment: accionesApiladas.alineacion,
-          actionsOverflowDirection: accionesApiladas.direccion,
-          actionsOverflowButtonSpacing: accionesApiladas.separacion,
-          content: Form(
-            key: _formulario,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Se borra para siempre, con todas sus sesiones. No se puede deshacer. '
-                  'Escribe tu contraseña para confirmar.',
-                ),
-                const SizedBox(height: 16),
-                CampoDeContrasena(
-                  key: const ValueKey('campo-contrasena-borrar'),
-                  controlador: _contrasena,
-                  etiqueta: 'Tu contraseña',
-                  error: error?.de('current_password'),
-                  habilitado: !state.ocupado,
-                  pistasDeAutocompletado: const [],
-                  alTerminar: _borrar,
-                  validar: (texto) =>
-                      (texto ?? '').isEmpty ? 'Escribe tu contraseña para confirmar' : null,
-                ),
-                if (error != null && error.generales.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  RecuadroDeAviso(
-                    error.generales.join('\n'),
-                    key: const ValueKey('error-de-cuenta'),
-                    icono: Icons.error_outline_rounded,
+          return AlertDialog(
+            // En un celular bajo, con el teclado abierto, el diálogo se desplaza
+            // en vez de desbordarse.
+            scrollable: true,
+            icon: const Icon(Icons.warning_amber_rounded, color: Paleta.peligro, size: 36),
+            title: const Text('¿Borrar tu cuenta?'),
+            actionsOverflowAlignment: accionesApiladas.alineacion,
+            actionsOverflowDirection: accionesApiladas.direccion,
+            actionsOverflowButtonSpacing: accionesApiladas.separacion,
+            content: Form(
+              key: _formulario,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Se borra para siempre, con todas sus sesiones. No se puede deshacer. '
+                    'Escribe tu contraseña para confirmar.',
                   ),
+                  const SizedBox(height: 16),
+                  CampoDeContrasena(
+                    key: const ValueKey('campo-contrasena-borrar'),
+                    controlador: _contrasena,
+                    etiqueta: 'Tu contraseña',
+                    error: error?.de('current_password'),
+                    habilitado: !state.ocupado,
+                    pistasDeAutocompletado: const [],
+                    alTerminar: _borrar,
+                    validar: (texto) =>
+                        (texto ?? '').isEmpty ? 'Escribe tu contraseña para confirmar' : null,
+                  ),
+                  if (error != null && error.generales.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    RecuadroDeAviso(
+                      error.generales.join('\n'),
+                      key: const ValueKey('error-de-cuenta'),
+                      icono: Icons.error_outline_rounded,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: state.ocupado ? null : _cancelar,
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              style: estiloDePeligro.merge(estiloDeBotonDeDialogo),
-              onPressed: state.ocupado ? null : _borrar,
-              child: const Text('Borrar cuenta'),
-            ),
-          ],
-        );
-      },
+            actions: [
+              TextButton(
+                onPressed: state.ocupado ? null : _cancelar,
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                style: estiloDePeligro.merge(estiloDeBotonDeDialogo),
+                onPressed: state.ocupado ? null : _borrar,
+                child: const Text('Borrar cuenta'),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

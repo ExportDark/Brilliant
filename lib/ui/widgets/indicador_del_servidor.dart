@@ -29,9 +29,10 @@ class IndicadorDelServidor extends StatelessWidget {
               'Servidor disponible',
               nombre ?? 'Listo para jugar.',
             ),
+          // Deshabilitado (con un pedido en camino), no invita a tocar.
           Disponibilidad.noDisponible => (
               'Sin servidor',
-              'No contesta. Toca para buscar otro.',
+              alTocar == null ? 'No contesta.' : 'No contesta. Toca para buscar otro.',
             ),
           Disponibilidad.variosEncontrados => (
               'Hay varios servidores',

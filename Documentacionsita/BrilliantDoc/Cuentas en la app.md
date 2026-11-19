@@ -332,3 +332,17 @@ En "Iniciar sesión" y "Crear cuenta", `ServidorParaEntrar` muestra la lista de 
 - Usuario que no existe y contraseña mala dan el mismo mensaje. Cuenta abierta en otro aparato: ya tenía su mensaje.
 - Un servidor que contesta 429 u otro rechazo **está disponible**: `probarConexion` ya no lo toma por "sin servidor".
 
+### Los botones de cuenta (2026-11-18)
+
+- **Enter en el teclado** respeta lo mismo que el botón: sin servidor, o con un pedido en
+  camino, no manda nada.
+- **Lo que va en camino no se corta:** el diálogo de borrar la cuenta no se cierra
+  mientras se borra, y "Crear cuenta" no deja salir mientras se crea.
+- **Nada se manda dos veces:** después de un tiempo agotado, entrar, crear o borrar la
+  cuenta no se repiten en otro servidor (el pedido pudo haber llegado); solo se repite si
+  no hubo conexión. Un segundo "Entrar" con la sesión ya iniciada no se manda.
+- **Si la cuenta se creó pero no se pudo entrar**, "Crear cuenta" vuelve sola a "Iniciar
+  sesión" con el aviso y el usuario escrito.
+- **Lo inesperado no deja esperando** (el almacén que falla, una respuesta de otra forma).
+- **Solo una respuesta de Brilliant (JSON) cuenta como "Servidor disponible"**: una
+  página de otro programa en esa dirección no.

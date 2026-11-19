@@ -99,15 +99,12 @@ class ClienteCuentas {
   /// ajeno que se haga pasar por el de Brilliant no contesta: da [SinConexion].
   /// Espera la respuesta hasta [espera]: para revisar si está, no hace falta
   /// tanto como para un pedido de verdad.
+  ///
+  /// Solo cuenta una respuesta de Brilliant, en JSON (el 401 sin token, o el 429 de
+  /// demasiados intentos): una página de otro programa en esa dirección (HTML) no.
   Future<void> probarConexion({Uri? en, Duration espera = _espera}) async {
-    try {
-      await _pedir('GET', 'auth/users/me/', en: en, espera: espera);
-    } on SesionVencida {
-      return;
-    } on ErrorDeCuenta {
-      // Contestó, aunque fuera para limitar los intentos o rechazar el pedido: está ahí.
-      return;
-    }
+    final (:estado, :datos) = await enviar('GET', 'auth/users/me/', en: en, espera: espera);
+    if (datos.isEmpty) throw const SinConexion();
   }
 
   /// El nombre con el que se presenta el servidor en [en] ("Brilliant en ORION"), o

@@ -100,8 +100,15 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     // Un cierre de sesión que no llegó la última vez, se vuelve a mandar.
     await _cerrarPendiente();
 
-    final guardada = await _almacen.leer();
-    if (guardada == null) return emit(const SesionState.sinSesion());
+    final Sesion? leida;
+    try {
+      leida = await _almacen.leer();
+    } catch (_) {
+      // Si no se puede leer lo guardado, se empieza de nuevo: que no quede esperando.
+      return emit(const SesionState.sinSesion());
+    }
+    if (leida == null) return emit(const SesionState.sinSesion());
+    final guardada = leida;
 
     try {
       await _conElServidor(() => _cuentas.quienSoy(guardada.token));
@@ -110,16 +117,22 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     } on SesionVencida {
       await _almacen.borrar();
       emit(const SesionState.sinSesion(aviso: 'Tu sesión venció. Vuelve a iniciar sesión.'));
-    } on Exception {
-      // El juego no necesita el servidor: sin red, o sin saber a cuál de los
-      // de la red hablarle, se puede seguir jugando con la sesión guardada,
-      // que se vuelve a revisar la próxima vez.
+    } catch (_) {
+      // El juego no necesita el servidor: sin red, sin saber a cuál de los de la red
+      // hablarle, o con una respuesta de otra forma, se puede seguir jugando con la
+      // sesión guardada, que se vuelve a revisar la próxima vez.
       _sesion = guardada;
       emit(SesionState.conSesion(guardada.usuario));
     }
   }
 
+  /// Lo que se dice si algo inesperado falló (el almacén del aparato, una respuesta de
+  /// otra forma): que no quede esperando.
+  static const _algoFallo = ErrorDeCuenta(generales: ['Algo falló. Intenta de nuevo.']);
+
   Future<void> _alEntrar(EntradaPedida event, Emitter<SesionState> emit) async {
+    // Un segundo "Entrar" que llega cuando el primero ya entró no se manda.
+    if (state.etapa == EtapaDeSesion.conSesion) return;
     emit(state.esperando());
     try {
       await _iniciar(event.usuario, event.contrasena);
@@ -132,6 +145,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       // Iniciar sesión no lleva token: el servidor no debería decir esto nunca. Si lo
       // dice, "Entrar" no se queda esperando.
       emit(const SesionState.sinSesion(error: _rechazoInesperado));
+    } catch (_) {
+      emit(const SesionState.sinSesion(error: _algoFallo));
     }
   }
 
@@ -140,6 +155,8 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
   );
 
   Future<void> _alCrearCuenta(CuentaPedida event, Emitter<SesionState> emit) async {
+    // Un segundo "Crear cuenta" que llega cuando la primera ya entró no se manda.
+    if (state.etapa == EtapaDeSesion.conSesion) return;
     emit(state.esperando());
     try {
       await _conElServidor(() => _cuentas.crearCuenta(
@@ -153,16 +170,26 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
       return emit(SesionState.sinSesion(error: _sinConexion(error)));
     } on SesionVencida {
       return emit(const SesionState.sinSesion(error: _rechazoInesperado));
+    } catch (_) {
+      return emit(const SesionState.sinSesion(error: _algoFallo));
     }
 
     try {
       await _iniciar(event.usuario, event.contrasena);
       emit(SesionState.conSesion(event.usuario));
-    } on Exception {
-      // La cuenta sí se creó: solo falló iniciar la sesión.
-      emit(const SesionState.sinSesion(aviso: 'Tu cuenta se creó. Inicia sesión para jugar.'));
+    } catch (_) {
+      // La cuenta sí se creó: solo falló iniciar la sesión. "Crear cuenta" vuelve a
+      // "Iniciar sesión" con el aviso y el usuario escrito.
+      try {
+        await _almacen.guardarUltimoUsuario(event.usuario);
+      } catch (_) {}
+      emit(const SesionState.sinSesion(aviso: cuentaCreada));
     }
   }
+
+  /// El aviso cuando la cuenta se creó pero no se pudo entrar: "Crear cuenta" lo usa
+  /// para volver a "Iniciar sesión".
+  static const cuentaCreada = 'Tu cuenta se creó. Inicia sesión para jugar.';
 
   Future<void> _alTerminar(Emitter<SesionState> emit) async {
     if (_sesion == null) return;
@@ -245,20 +272,27 @@ class SesionBloc extends Bloc<SesionEvent, SesionState> {
     } on SesionVencida {
       await _olvidarSesion();
       emit(const SesionState.sinSesion(aviso: 'Tu sesión venció. Vuelve a iniciar sesión.'));
+    } catch (_) {
+      emit(SesionState.conSesion(sesion.usuario, error: _algoFallo));
     }
   }
 
-  /// Hace [pedido]; si el servidor no contesta, le pide al [ServidorCubit]
-  /// buscarlo en la red, por si la PC o el aparato cambiaron de red. Si
-  /// contesta uno solo, el cubit se cambia a él y el pedido se repite. Si
-  /// contestan varios, no elige: el jugador elige en "Servidor".
+  /// Hace [pedido]; si no hubo conexión, le pide al [ServidorCubit] buscarlo en la red,
+  /// por si la PC o el aparato cambiaron de red. Si contesta uno solo, el cubit se cambia
+  /// a él y el pedido se repite. Si contestan varios, no elige: el jugador elige en
+  /// "Servidor".
+  ///
+  /// Si el tiempo se agotó, el pedido pudo haber llegado aunque la respuesta no: no se
+  /// repite (crear la cuenta dos veces diría "ya existe ese usuario", y entrar dos veces,
+  /// "sesión en otro aparato").
   Future<T> _conElServidor<T>(Future<T> Function() pedido) async {
     final intentada = servidor;
     try {
       final respuesta = await pedido();
       _servidor.contesto();
       return respuesta;
-    } on SinConexion {
+    } on SinConexion catch (error) {
+      if (error.agotada) rethrow;
       final encontrados = await _servidor.buscarOtro(intentada);
       if (encontrados.length > 1) {
         throw ErrorDeCuenta(generales: [
